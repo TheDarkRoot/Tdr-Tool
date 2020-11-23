@@ -32,6 +32,7 @@ W="\033[0;1m"   # White
 R="\033[31;1m"  # Red
 C="\033[36;1m"  # Cyan
 M="\033[35;1m"  # Magenta
+clear;
 echo -e "\n$CC #######$YY ##################$CC #######$YY ####################
 $CC    #    #####  #####          #     ####   ####  #
 $CC    #    #    # #    #         #    #    # #    # #
@@ -43,15 +44,10 @@ $YY ####################[$GG TheDarkRoot$YY ]####################\n
 $CC =======================================================\n
 $GG >_TheDarkRoot Repositories:\n
 $YY    [\033[0;1m1$YY]$GG AnonSMS
-$CC    [\033[33;1mi$CC]$GG Anonymous SMS sending tool.\n
-$YY    [\033[0;1m2$YY]$GG Hasher  
-$CC    [\033[33;1mi$CC]$GG Hasher is a Hash Cracker that has supported more than 7 types of hashes.\n
-$YY    [\033[0;1m3$YY]$GG Hashgen 
-$CC    [\033[33;1mi$CC]$GG Generate more 39 type hash.\n
-$YY    [\033[0;1m4$YY]$GG Terpack 
-$CC    [\033[33;1mi$CC]$GG TheDarkRoot termux package installer.\n
-$YY    [\033[0;1m5$YY]$GG UserID  
-$CC    [\033[33;1mi$CC]$GG Search for usernames on more than 75 social media.\n
+$YY    [\033[0;1m2$YY]$GG Hasher
+$YY    [\033[0;1m3$YY]$GG Hashgen
+$YY    [\033[0;1m4$YY]$GG Terpack
+$YY    [\033[0;1m5$YY]$GG UserID\n
 $GG >_Termux Settings:\n
 $YY    [\033[0;1mU$YY]$GG Update   =$CC [\033[33;1mi$CC]$GG Termux update.
 $YY    [\033[0;1mT$YY]$GG ParrotOS =$CC [\033[33;1mi$CC]$GG Parrot OS theme for Termux.
