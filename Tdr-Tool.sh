@@ -66,7 +66,7 @@ read -p " [*] Program Number: " pn
 if [[ $pn == U || $pn == u ]]; then
 clear;echo -e "$CC\n [$YY↓$CC]$GG Updating...\n";apt update;apt upgrade -y;clear;
 echo -e "$CC [$YY*$CC]$GG Termux setup storage...$YY";
-( termux-setup-storage; ) &> /dev/null & spin;
+( rm -rf storage;termux-setup-storage; ) &> /dev/null & spin;
 echo -e "$CC [$YY*$CC]$GG Pkg installing...$YY";
 ( pkg install git -y;pkg install python -y;pkg install python2;pkg install ruby -y;pkg install php -y;pkg install cowsay -y;pkg install figlet;pkg install toilet -y;pkg install wget -y;pkg install curl -y;pkg install vim -y;pkg install proot;pkg install crunch;pkg install neofetch;pkg install nano;pkg install cmatrix;pkg install openssh -y;pkg install zsh;pkg install termux-api; ) &> /dev/null & spin;
 echo -e "$CC [$YY*$CC]$GG Pip installing...$YY";
