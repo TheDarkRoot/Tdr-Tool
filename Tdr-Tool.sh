@@ -83,7 +83,7 @@ elif [[ $pn == T || $pn == t ]]; then
 
 elif [[ $pn == K || $pn == k ]]; then
         echo -e "\n$CC [$YY*$CC]$GG Updating Termux key...\n$CC [\033[33;1mi$CC]$GG Utility to add direction keys to Termux.";
-	( cd ~/Tdr-Tool;git clone https://github.com/TheDarkRoot/AnonSMS.git;cd AnonSMS;chmod +x *; ) &> /dev/null & spin;
+	( cd ~/Tdr-Tool;git clone https://github.com/TheDarkRoot/Terkey.git;cd Terkey;chmod +x *; ) &> /dev/null & spin;
 	cd ~/Tdr-Tool
         bash Tdr-Tool.sh
 
