@@ -77,14 +77,16 @@ bash Tdr-Tool.sh
 
 elif [[ $pn == T || $pn == t ]]; then
         echo -e "\n$CC [$YY*$CC]$GG Updating Parrot OS theme...\n$CC [\033[33;1mi$CC]$GG Parrot OS theme for Termux.";
-	( curl https://raw.githubusercontent.com/TheDarkRoot/ParrotOS-T/main/ParrotOS-T.sh -o ParrotOS-T.sh;chmod +x ParrotOS-T.sh;bash ParrotOS-T.sh; ) &> /dev/null & spin;
+	( cd ~/Tdr-Tool;curl https://raw.githubusercontent.com/TheDarkRoot/ParrotOS-T/main/ParrotOS-T.sh -o ParrotOS-T.sh;chmod +x ParrotOS-T.sh;bash ParrotOS-T.sh; ) &> /dev/null & spin;
 	cd ~/Tdr-Tool
+	rm -rf ParrotOS-T.sh
         bash Tdr-Tool.sh
 
 elif [[ $pn == K || $pn == k ]]; then
         echo -e "\n$CC [$YY*$CC]$GG Updating Termux key...\n$CC [\033[33;1mi$CC]$GG Utility to add direction keys to Termux.";
-	( cd ~/Tdr-Tool;git clone https://github.com/TheDarkRoot/Terkey.git;cd Terkey;chmod +x *; ) &> /dev/null & spin;
+	( cd ~/Tdr-Tool;curl https://raw.githubusercontent.com/TheDarkRoot/Terkey/master/Terkey.sh -o Terkey.sh;chmod +x Terkey.sh;bash Terkey.sh; ) &> /dev/null & spin;
 	cd ~/Tdr-Tool
+	rm -rf Terkey.sh
         bash Tdr-Tool.sh
 
 elif [[ $pn == E || $pn == e ]]; then
@@ -93,31 +95,31 @@ elif [[ $pn == E || $pn == e ]]; then
 
 elif [[ $pn == 1 || $pn == 01 ]]; then
         echo -e "\n$CC [$YY*$CC]$GG Downloading AnonSMS...\n$CC [\033[33;1mi$CC]$GG Anonymous SMS sending tool.";
-	( cd ~/Tdr-Tool;git clone https://github.com/TheDarkRoot/AnonSMS.git;cd AnonSMS;chmod +x *; ) &> /dev/null & spin;
+	( cd ~/Tdr-Tool;rm -rf AnonSMS;git clone https://github.com/TheDarkRoot/AnonSMS.git;cd AnonSMS;chmod +x *; ) &> /dev/null & spin;
 	cd ~/Tdr-Tool
         bash Tdr-Tool.sh
 
 elif [[ $pn == 2 || $pn == 02 ]]; then
         echo -e "\n$CC [$YY*$CC]$GG Downloading Hasher...\n$CC [\033[33;1mi$CC]$GG This is a Hash Cracker.";
-	( cd ~/Tdr-Tool;git clone https://github.com/TheDarkRoot/Hasher.git;cd Hasher;chmod +x *; ) &> /dev/null & spin;
+	( cd ~/Tdr-Tool;rm -rf Hasher;git clone https://github.com/TheDarkRoot/Hasher.git;cd Hasher;chmod +x *; ) &> /dev/null & spin;
 	cd ~/Tdr-Tool
         bash Tdr-Tool.sh
 
 elif [[ $pn == 3 || $pn == 03 ]]; then
         echo -e "\n$CC [$YY*$CC]$GG Downloading Hashgen...\n$CC [\033[33;1mi$CC]$GG Generate more 39 type hash.";
-	( cd ~/Tdr-Tool;git clone https://github.com/TheDarkRoot/Hashgen.git;cd Hashgen;chmod +x *; ) &> /dev/null & spin;
+	( cd ~/Tdr-Tool;rm -rf Hashgen;git clone https://github.com/TheDarkRoot/Hashgen.git;cd Hashgen;chmod +x *; ) &> /dev/null & spin;
 	cd ~/Tdr-Tool
         bash Tdr-Tool.sh
 
 elif [[ $pn == 4 || $pn == 04 ]]; then
         echo -e "\n$CC [$YY*$CC]$GG Downloading Terpack...\n$CC [\033[33;1mi$CC]$GG TheDarkRoot termux package installer.";
-		( cd ~/Tdr-Tool;git clone https://github.com/TheDarkRoot/Terpack.git;cd Terpack;chmod +x *; ) &> /dev/null & spin;
+		( cd ~/Tdr-Tool;rm -rf Terpack;git clone https://github.com/TheDarkRoot/Terpack.git;cd Terpack;chmod +x *; ) &> /dev/null & spin;
 	cd ~/Tdr-Tool
         bash Tdr-Tool.sh
 
 elif [[ $pn == 5 || $pn == 05 ]]; then
         echo -e "\n$CC [$YY*$CC]$GG Downloading UserID...\n$CC [\033[33;1mi$CC]$GG Search usernames on social media";
-		( cd ~/Tdr-Tool;git clone https://github.com/TheDarkRoot/UserID.git;cd UserID;chmod +x *; ) &> /dev/null & spin;
+		( cd ~/Tdr-Tool;rm -rf UserID;git clone https://github.com/TheDarkRoot/UserID.git;cd UserID;chmod +x *; ) &> /dev/null & spin;
 	cd ~/Tdr-Tool
         bash Tdr-Tool.sh
 
