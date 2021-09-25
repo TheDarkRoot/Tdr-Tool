@@ -32,7 +32,7 @@ W="\033[0;1m"   # White
 R="\033[31;1m"  # Red
 C="\033[36;1m"  # Cyan
 M="\033[35;1m"  # Magenta
-rm -rf storage;termux-setup-storage;clear;
+clear;
 echo -e "\n$CC #######$YY ##################$CC #######$YY ####################
 $CC    #    #####  #####          #     ####   ####  #
 $CC    #    #    # #    #         #    #    # #    # #
