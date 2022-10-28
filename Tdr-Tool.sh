@@ -72,7 +72,7 @@ echo -e "$CC [$YY*$CC]$GG Pkg installing...$YY";
 echo -e "$CC [$YY*$CC]$GG Pip installing...$YY";
 ( gem install lolcat;pip install --upgrade pip;pip2 install --upgrade pip;pip install bs4;pip2 install bs4;pip install requests;pip2 install requests;pip install mechanize;pip2 install mechanize;pip2 install passlib;pip2 install progressbar;pip install pillow; ) &> /dev/null & spin;
 echo -e "$CC [$YY*$CC]$GG Tdr-Tool updating...$YY";
-( cd ~/Tdr-Tool/;curl https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/main/Tdr-Tool.sh -o Tdr-Tool.sh; ) &> /dev/null & spin;
+( cd ~/Tdr-Tool/;curl https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh -o Tdr-Tool.sh; ) &> /dev/null & spin;
 bash Tdr-Tool.sh
 
 elif [[ $pn == T || $pn == t ]]; then
