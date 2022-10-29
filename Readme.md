@@ -28,7 +28,7 @@ The author of this project is not responsible for any possible harm caused by th
 
 > ***Open the terminal and type following commands.***
 ```
-$ curl https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/main/Tdr-Tool.sh -o Tdr-Tool.sh;chmod +x Tdr-Tool.sh;bash Tdr-Tool.sh
+curl https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/main/Tdr-Tool.sh -o Tdr-Tool.sh;chmod +x Tdr-Tool.sh;bash Tdr-Tool.sh
 ```
 
 # Screenshot
