@@ -56,8 +56,10 @@ $CC │    └─⊸ [\033[33;1mi$CC]$GG Search usernames on social media.\n$CC 
 $CC └⊸⟜┬─⊸ [\033[33;1mTermux Settings:$CC]\n    │
 $CC    ├─┬─⊸ [\033[0;1mU$CC]$GG Update
 $CC    │ └─⊸ [\033[33;1mi$CC]$GG Termux update.
-$CC    ├─┬─⊸ [\033[0;1mT$CC]$GG ParrotOS
+$CC    ├─┬─⊸ [\033[0;1mP$CC]$GG ParrotOS
 $CC    │ └─⊸ [\033[33;1mi$CC]$GG Parrot OS theme for Termux.
+$CC    ├─┬─⊸ [\033[0;1mT$CC]$GG TheDarkRoot-T
+$CC    │ └─⊸ [\033[33;1mi$CC]$GG TheDarkRoot theme for Termux.
 $CC    ├─┬─⊸ [\033[0;1mK$CC]$GG Terkey
 $CC    │ └─⊸ [\033[33;1mi$CC]$GG Utility to add direction keys to Termux.
 $CC    └─┬─⊸ [\033[0;1mE$CC]$GG Exit
@@ -75,11 +77,18 @@ echo -e "$CC [$YY*$CC]$GG Tdr-Tool updating...$YY";
 ( cd ~/Tdr-Tool/;curl https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh -o Tdr-Tool.sh; ) &> /dev/null & spin;
 bash Tdr-Tool.sh
 
-elif [[ $pn == T || $pn == t ]]; then
+elif [[ $pn == P || $pn == p ]]; then
         echo -e "\n$CC [$YY*$CC]$GG Updating Parrot OS theme...\n$CC [\033[33;1mi$CC]$GG Parrot OS theme for Termux.";
 	( cd ~/Tdr-Tool;curl https://raw.githubusercontent.com/TheDarkRoot/ParrotOS-T/master/ParrotOS-T.sh -o ParrotOS-T.sh;chmod +x ParrotOS-T.sh;bash ParrotOS-T.sh; ) &> /dev/null & spin;
 	cd ~/Tdr-Tool
 	rm -rf ParrotOS-T.sh
+        bash Tdr-Tool.sh
+
+elif [[ $pn == T || $pn == t ]]; then
+        echo -e "\n$CC [$YY*$CC]$GG Updating TheDarkRoot theme...\n$CC [\033[33;1mi$CC]$GG TheDarkRoot theme for Termux.";
+	( cd ~/Tdr-Tool;curl https://raw.githubusercontent.com/TheDarkRoot/TheDarkRoot-T/master/TheDarkRoot-T.sh -o TheDarkRoot-T.sh;chmod +x TheDarkRoot-T.sh;bash TheDarkRoot-T.sh; ) &> /dev/null & spin;
+	cd ~/Tdr-Tool
+	rm -rf TheDarkRoot-T.sh
         bash Tdr-Tool.sh
 
 elif [[ $pn == K || $pn == k ]]; then
