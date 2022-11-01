@@ -68,9 +68,9 @@ clear;echo -e "$CC\n [$YY↓$CC]$GG Updating...\n";apt update;apt upgrade -y;cle
 echo -e "$CC [$YY*$CC]$GG Termux setup storage...$YY";
 ( rm -rf storage;termux-setup-storage; ) &> /dev/null & spin;
 echo -e "$CC [$YY*$CC]$GG Pkg installing...$YY";
-( pkg install git -y;pkg install python -y;pkg install python2;pkg install ruby -y;pkg install php -y;pkg install cowsay -y;pkg install figlet;pkg install toilet -y;pkg install wget -y;pkg install curl -y;pkg install vim -y;pkg install proot;pkg install crunch;pkg install neofetch;pkg install nano;pkg install cmatrix;pkg install openssh -y;pkg install zsh;pkg install termux-api; ) &> /dev/null & spin;
+( pkg install ruby -y;pkg install git -y;pkg install python -y;pkg install python2 -y;pkg install python3 -y;pkg install php -y;pkg install zip -y;pkg install unzip -y;pkg install cowsay -y;pkg install figlet;pkg install wget -y;pkg install curl -y;pkg install vim -y;pkg install proot -y;pkg install crunch;pkg install neofetch;pkg install nodejs -y;pkg install nodejs-lts -y;pkg install nano;pkg install cmatrix;pkg install toilet -y;pkg install zsh -y;pkg install sl;pkg install tmate -y;apt install bash -y;pkg install tur-repo;pkg install zphisher -y;pkg install termux-api;pkg install openssh -y;apt install openssl-tool -y; ) &> /dev/null & spin;
 echo -e "$CC [$YY*$CC]$GG Pip installing...$YY";
-( gem install lolcat;pip install --upgrade pip;pip2 install --upgrade pip;pip install bs4;pip2 install bs4;pip install requests;pip2 install requests;pip install mechanize;pip2 install mechanize;pip2 install passlib;pip2 install progressbar;pip install pillow; ) &> /dev/null & spin;
+( gem install lolcat;pip install --upgrade pip;pip2 install --upgrade pip;pip install bs4;pip2 install bs4;pip install requests;pip2 install requests;pip install mechanize;pip2 install mechanize;pip install passlib;pip2 install passlib;pip install progressbar;pip2 install progressbar;pip install pillow;pip2 install pillow;pip install speedtest-cli;npm install --global speed-test;python -m pip install requests; ) &> /dev/null & spin;
 echo -e "$CC [$YY*$CC]$GG Tdr-Tool updating...$YY";
 ( cd ~/Tdr-Tool/;curl https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh -o Tdr-Tool.sh; ) &> /dev/null & spin;
 bash Tdr-Tool.sh
