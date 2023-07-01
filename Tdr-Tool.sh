@@ -51,7 +51,9 @@ $CC │  ├─┬─⊸ [\033[0;1m3$CC]$GG Hashgen
 $CC │  │ └─⊸ [\033[33;1mi$CC]$GG Generate more 39 type hash.
 $CC │  ├─┬─⊸ [\033[0;1m4$CC]$GG Terpack
 $CC │  │ └─⊸ [\033[33;1mi$CC]$GG TheDarkRoot termux package installer.
-$CC │  └─┬─⊸ [\033[0;1m5$CC]$GG UserID
+$CC │  ├─┬─⊸ [\033[0;1m5$CC]$GG Tertest
+$CC │  │ └─⊸ [\033[33;1mi$CC]$GG Termux internet speed test.
+$CC │  └─┬─⊸ [\033[0;1m6$CC]$GG UserID
 $CC │    └─⊸ [\033[33;1mi$CC]$GG Search usernames on social media.\n$CC │
 $CC └⊸⟜┬─⊸ [\033[33;1mTermux Settings:$CC]\n    │
 $CC    ├─┬─⊸ [\033[0;1mU$CC]$GG Update
@@ -125,8 +127,14 @@ elif [[ $pn == 4 || $pn == 04 ]]; then
 		( cd ~/Tdr-Tool;rm -rf Terpack;git clone https://github.com/TheDarkRoot/Terpack.git;cd Terpack;chmod +x *;cp Terpack.sh ~; ) &> /dev/null & spin;
 	cd ~/Tdr-Tool
         bash Tdr-Tool.sh
-
+		
 elif [[ $pn == 5 || $pn == 05 ]]; then
+        echo -e "\n$CC [$YY*$CC]$GG Downloading Tertest...\n$CC [\033[33;1mi$CC]$GG Termux internet speed test.";
+		( cd ~/Tdr-Tool;rm -rf Tertest;git clone https://github.com/TheDarkRoot/Tertest.git;cd Tertest;chmod +x *; ) &> /dev/null & spin;
+	cd ~/Tdr-Tool
+        bash Tdr-Tool.sh
+
+elif [[ $pn == 6 || $pn == 06 ]]; then
         echo -e "\n$CC [$YY*$CC]$GG Downloading UserID...\n$CC [\033[33;1mi$CC]$GG Search usernames on social media";
 		( cd ~/Tdr-Tool;rm -rf UserID;git clone https://github.com/TheDarkRoot/UserID.git;cd UserID;chmod +x *; ) &> /dev/null & spin;
 	cd ~/Tdr-Tool
