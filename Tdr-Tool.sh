@@ -102,7 +102,7 @@ elif [[ $pn == K || $pn == k ]]; then
 
 elif [[ $pn == E || $pn == e ]]; then
         echo -e "\n$CC [$YY*$CC]$RR Good bye...$YY\n";
-		sleep 3;exit;
+		sleep 0;exit;
 
 elif [[ $pn == 1 || $pn == 01 ]]; then
         echo -e "\n$CC [$YY*$CC]$GG Downloading AnonSMS...\n$CC [\033[33;1mi$CC]$GG Anonymous SMS sending tool.";
