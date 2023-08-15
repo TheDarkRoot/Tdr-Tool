@@ -53,19 +53,21 @@ $CC │  ├─┬─⊸ [\033[0;1m4$CC]$GG Terpack
 $CC │  │ └─⊸ [\033[33;1mi$CC]$GG TheDarkRoot termux package installer.
 $CC │  ├─┬─⊸ [\033[0;1m5$CC]$GG Tertest
 $CC │  │ └─⊸ [\033[33;1mi$CC]$GG Termux internet speed test.
+$CC │  ├─┬─⊸ [\033[0;1m5$CC]$GG Tertext
+$CC │  │ └─⊸ [\033[33;1mi$CC]$GG Program for creating words from letters.
 $CC │  └─┬─⊸ [\033[0;1m6$CC]$GG UserID
 $CC │    └─⊸ [\033[33;1mi$CC]$GG Search usernames on social media.\n$CC │
 $CC └⊸⟜┬─⊸ [\033[33;1mTermux Settings:$CC]\n    │
 $CC    ├─┬─⊸ [\033[0;1mU$CC]$GG Update
 $CC    │ └─⊸ [\033[33;1mi$CC]$GG Termux update.
-$CC    ├─┬─⊸ [\033[0;1mP$CC]$GG ParrotOS
+$CC    ├─┬─⊸ [\033[0;1mP$CC]$GG ParrotOS-T
 $CC    │ └─⊸ [\033[33;1mi$CC]$GG Parrot OS theme for Termux.
 $CC    ├─┬─⊸ [\033[0;1mT$CC]$GG TheDarkRoot-T
 $CC    │ └─⊸ [\033[33;1mi$CC]$GG TheDarkRoot theme for Termux.
 $CC    ├─┬─⊸ [\033[0;1mK$CC]$GG Terkey
 $CC    │ └─⊸ [\033[33;1mi$CC]$GG Utility to add direction keys to Termux.
 $CC    └─┬─⊸ [\033[0;1mE$CC]$GG Exit
-$CC      └─⊸ [\033[33;1mi$CC]$GG Termux exit.$YY\n"
+$CC      └─⊸ [\033[33;1mi$CC]$GG Tdr-Tool exit.$YY\n"
 read -p " [*] Program Number: " pn
 if [[ $pn == U || $pn == u ]]; then
 clear;echo -e "$CC\n [$YY↓$CC]$GG Updating...\n";apt update;apt upgrade -y;clear;
@@ -135,7 +137,12 @@ elif [[ $pn == 5 || $pn == 05 ]]; then
         bash Tdr-Tool.sh
 
 elif [[ $pn == 6 || $pn == 06 ]]; then
-        echo -e "\n$CC [$YY*$CC]$GG Downloading UserID...\n$CC [\033[33;1mi$CC]$GG Search usernames on social media";
+        echo -e "\n$CC [$YY*$CC]$GG Downloading Tertext...\n$CC [\033[33;1mi$CC]$GG Program for creating words from letters.";
+		( cd ~/Tdr-Tool;rm -rf Tertext;git clone https://github.com/TheDarkRoot/Tertext.git;cd Tertext;chmod +x *; ) &> /dev/null & spin;
+	cd ~/Tdr-Tool
+        bash Tdr-Tool.sh
+elif [[ $pn == 7 || $pn == 07 ]]; then
+        echo -e "\n$CC [$YY*$CC]$GG Downloading UserID...\n$CC [\033[33;1mi$CC]$GG Search usernames on social media.";
 		( cd ~/Tdr-Tool;rm -rf UserID;git clone https://github.com/TheDarkRoot/UserID.git;cd UserID;chmod +x *; ) &> /dev/null & spin;
 	cd ~/Tdr-Tool
         bash Tdr-Tool.sh
