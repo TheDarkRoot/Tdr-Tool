@@ -53,9 +53,9 @@ $CC │  ├─┬─⊸ [\033[0;1m4$CC]$GG Terpack
 $CC │  │ └─⊸ [\033[33;1mi$CC]$GG TheDarkRoot termux package installer.
 $CC │  ├─┬─⊸ [\033[0;1m5$CC]$GG Tertest
 $CC │  │ └─⊸ [\033[33;1mi$CC]$GG Termux internet speed test.
-$CC │  ├─┬─⊸ [\033[0;1m5$CC]$GG Tertext
+$CC │  ├─┬─⊸ [\033[0;1m6$CC]$GG Tertext
 $CC │  │ └─⊸ [\033[33;1mi$CC]$GG Program for creating words from letters.
-$CC │  └─┬─⊸ [\033[0;1m6$CC]$GG UserID
+$CC │  └─┬─⊸ [\033[0;1m7$CC]$GG UserID
 $CC │    └─⊸ [\033[33;1mi$CC]$GG Search usernames on social media.\n$CC │
 $CC └⊸⟜┬─⊸ [\033[33;1mTermux Settings:$CC]\n    │
 $CC    ├─┬─⊸ [\033[0;1mU$CC]$GG Update
