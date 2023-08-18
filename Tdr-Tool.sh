@@ -43,34 +43,34 @@ $CC    #    #####  #    #         #     ####   ####  ######
 $YY ####################[$GG TheDarkRoot$YY ]####################
 $CC =======================================================
 $CC ┌⊸⟜┬───⊸ [$MM TheDarkRoot Repositories:$CC ]
-$CC │  ├─┬─⊸ [$YY» 1 $BB ⟫$RR AnonSMS$CC]
-$CC │  │ └─⊸ [$YY»$CC]$GG Anonymous SMS sending tool.$CC]
-$CC │  ├─┬─⊸ [$YY» 2 $BB ⟫$RR Hasher$CC]
-$CC │  │ └─⊸ [$YY»$CC]$GG This is a Hash Cracker.$CC]
-$CC │  ├─┬─⊸ [$YY» 3 $BB ⟫$RR Hashgen$CC]
-$CC │  │ └─⊸ [$YY»$CC]$GG Generate more 39 type hash.$CC]
-$CC │  ├─┬─⊸ [$YY» 4 $BB ⟫$RR Terpack$CC]
-$CC │  │ └─⊸ [$YY»$CC]$GG TheDarkRoot termux package installer.$CC]
-$CC │  ├─┬─⊸ [$YY» 5 $BB ⟫$RR Tertest$CC]
-$CC │  │ └─⊸ [$YY»$CC]$GG Termux internet speed test.
-$CC │  ├─┬─⊸ [$YY» 6 $BB ⟫$RR Tertext$CC]
-$CC │  │ └─⊸ [$YY»$CC]$GG Program for creating words from letters.$CC]
-$CC │  ├─┬─⊸ [$YY» 7 $BB ⟫$RR UserID$CC]
-$CC │  │ └─⊸ [$YY»$CC]$GG Search usernames on social media.$CC]
-$CC │  └─┬─⊸ [$YY» X $BB ⟫$RR X-Project$CC]
-$CC │    └─⊸ [$YY»$CC]$GG Code in the trial period.$CC]
+$CC │  ├─┬─⊸ [$YY›1$YY‹$RR AnonSMS$CC]
+$CC │  │ └─⊸ [$YY »$GG Anonymous SMS sending tool.$CC]
+$CC │  ├─┬─⊸ [$YY›2$YY‹$RR Hasher$CC]
+$CC │  │ └─⊸ [$YY »$GG This is a Hash Cracker.$CC]
+$CC │  ├─┬─⊸ [$YY›3$YY‹$RR Hashgen$CC]
+$CC │  │ └─⊸ [$YY »$GG Generate more 39 type hash.$CC]
+$CC │  ├─┬─⊸ [$YY›4$YY‹$RR Terpack$CC]
+$CC │  │ └─⊸ [$YY »$GG TheDarkRoot termux package installer.$CC]
+$CC │  ├─┬─⊸ [$YY›5$YY‹$RR Tertest$CC]
+$CC │  │ └─⊸ [$YY »$GG Termux internet speed test.
+$CC │  ├─┬─⊸ [$YY›6$YY‹$RR Tertext$CC]
+$CC │  │ └─⊸ [$YY »$GG Program for creating words from letters.$CC]
+$CC │  ├─┬─⊸ [$YY›7$YY‹$RR UserID$CC]
+$CC │  │ └─⊸ [$YY »$GG Search usernames on social media.$CC]
+$CC │  └─┬─⊸ [$YY›X$YY‹$RR X-Project$CC]
+$CC │    └─⊸ [$YY »$GG Code in the trial period.$CC]
 $CC └⊸⟜┬───⊸ [$MM Termux Settings:$CC ]
-$CC    ├─┬─⊸ [$YY» U $BB ⟫$RR Update$CC]
-$CC    │ └─⊸ [$YY»$CC]$GG Termux update.$CC]
-$CC    ├─┬─⊸ [$YY» P $BB ⟫$RR ParrotOS-T$CC]
-$CC    │ └─⊸ [$YY»$CC]$GG Parrot OS theme for Termux.$CC]
-$CC    ├─┬─⊸ [$YY» T $BB ⟫$RR TheDarkRoot-T$CC]
-$CC    │ └─⊸ [$YY»$CC]$GG TheDarkRoot theme for Termux.$CC]
-$CC    ├─┬─⊸ [$YY» K $BB ⟫$RR Terkey$CC]
-$CC    │ └─⊸ [$YY»$CC]$GG Utility to add direction keys to Termux.$CC]
-$CC    └─┬─⊸ [$YY» Q $BB ⟫$RR Exit
-$CC      └─⊸ [$YY»$GG Tdr-Tool exit.$CC]\n"
-read -p " $(echo -e " ${CC}[${YY}*${CC}]${MM} Program Number: ${YY}")" pn
+$CC    ├─┬─⊸ [$YY›U$YY‹$RR Update$CC]
+$CC    │ └─⊸ [$YY »$GG Termux update.$CC]
+$CC    ├─┬─⊸ [$YY›P$YY‹$RR ParrotOS-T$CC]
+$CC    │ └─⊸ [$YY »$GG Parrot OS theme for Termux.$CC]
+$CC    ├─┬─⊸ [$YY›T$YY‹$RR TheDarkRoot-T$CC]
+$CC    │ └─⊸ [$YY »$GG TheDarkRoot theme for Termux.$CC]
+$CC    ├─┬─⊸ [$YY›K$YY‹$RR Terkey$CC]
+$CC    │ └─⊸ [$YY »$GG Utility to add direction keys to Termux.$CC]
+$CC    └─┬─⊸ [$YY›Q$YY‹$RR Exit$CC]
+$CC      └─⊸ [$YY »$GG Tdr-Tool exit.$CC]\n"
+read -p " $(echo -e " ${CC}【${YY}»${CC}】${MM} Program Number: ${YY}")" pn
 if [[ $pn == U || $pn == u ]]; then
 clear;echo -e "$CC\n [$YY↓$CC]$GG Updating...\n";apt update -y;apt upgrade -y;clear;
 #Termux Packages Installing
@@ -105,12 +105,18 @@ elif [[ $pn == K || $pn == k ]]; then
 	rm -rf Terkey.sh
         bash Tdr-Tool.sh
 
+elif [[ $pn == BASH || $pn == bash ]]; then
+        echo -e "\n$CC [$YY*$CC]$GG Tdr-Tool Updating...\n$CC [\033[33;1mi$CC]$GG Utility to add direction keys to Termux.";
+	( cd ~/Tdr-Tool/;rm -rf Tdr-Tool.sh;curl https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh -o Tdr-Tool.sh; ) &> /dev/null & spin;
+	cd ~/Tdr-Tool
+        bash Tdr-Tool.sh
+
 elif [[ $pn == Q || $pn == q ]]; then
         echo -e "\n $CC [$YY*$CC]$RR Good bye...";
 		sleep 0;exit;
 
 elif [[ $pn == 1 || $pn == 01 ]]; then
-        echo -e "\n$CC [$YY*$CC]$GG Downloading AnonSMS...\n$CC [\033[33;1mi$CC]$GG Anonymous SMS sending tool.";
+        echo -e "\n$CC [$YY*$CC]$GG Downloading AnonSMS...\n$CC [\033[33;1mi$CC]$GG TheDarkRoot tool pack.";
 	( cd ~/Tdr-Tool;rm -rf AnonSMS;git clone https://github.com/TheDarkRoot/AnonSMS.git;cd AnonSMS;chmod +x *; ) &> /dev/null & spin;
 	cd ~/Tdr-Tool
         bash Tdr-Tool.sh
@@ -151,8 +157,8 @@ elif [[ $pn == 7 || $pn == 07 ]]; then
         bash Tdr-Tool.sh
 
 else
-	echo -e "\n  ${YY}[${RR}X${YY}]${RR} Invalid action."	
+	echo -e "\n  ${YY}[${RR}⦸${YY}]${RR} Invalid Action."	
 	sleep 1
 	clear
-	bash Tdr-Tool.sh
+	cd;cd x;bash Tdr-Tool.sh
 fi
