@@ -40,9 +40,9 @@ $CC    #    #    # #    #  #####  #    #    # #    # #
 $CC    #    #    # #####          #    #    # #    # #
 $CC    #    #    # #   #          #    #    # #    # #
 $CC    #    #####  #    #         #     ####   ####  ######
-$YY ####################[$GG TheDarkRoot$YY ]####################
+$YY ###################[›$GG TheDarkRoot $YY‹]###################
 $CC =======================================================
-$CC ┌⊸⟜┬───⊸ [$MM TheDarkRoot Repositories:$CC ]
+$CC ┌⊸⟜┬───⊸ [$MM TheDarkRoot Repositories: $CC]
 $CC │  ├─┬─⊸ [$YY›1$YY‹$RR AnonSMS$CC]
 $CC │  │ └─⊸ [$YY »$GG Anonymous SMS sending tool.$CC]
 $CC │  ├─┬─⊸ [$YY›2$YY‹$RR Hasher$CC]
@@ -59,7 +59,7 @@ $CC │  ├─┬─⊸ [$YY›7$YY‹$RR UserID$CC]
 $CC │  │ └─⊸ [$YY »$GG Search usernames on social media.$CC]
 $CC │  └─┬─⊸ [$YY›X$YY‹$RR X-Project$CC]
 $CC │    └─⊸ [$YY »$GG Code in the trial period.$CC]
-$CC └⊸⟜┬───⊸ [$MM Termux Settings:$CC ]
+$CC └⊸⟜┬───⊸ [$MM Termux Settings: $CC]
 $CC    ├─┬─⊸ [$YY›U$YY‹$RR Update$CC]
 $CC    │ └─⊸ [$YY »$GG Termux update.$CC]
 $CC    ├─┬─⊸ [$YY›P$YY‹$RR ParrotOS-T$CC]
@@ -70,7 +70,7 @@ $CC    ├─┬─⊸ [$YY›K$YY‹$RR Terkey$CC]
 $CC    │ └─⊸ [$YY »$GG Utility to add direction keys to Termux.$CC]
 $CC    └─┬─⊸ [$YY›Q$YY‹$RR Exit$CC]
 $CC      └─⊸ [$YY »$GG Tdr-Tool exit.$CC]\n"
-read -p " $(echo -e " ${CC}【${YY}»${CC}】${MM} Program Number: ${YY}")" pn
+read -p " $(echo -e " ${CC}[${YY}»${CC}]${MM} Program Number: ${YY}")" pn
 if [[ $pn == U || $pn == u ]]; then
 clear;echo -e "$CC\n [$YY↓$CC]$GG Updating...\n";apt update -y;apt upgrade -y;clear;
 #Termux Packages Installing
@@ -112,7 +112,7 @@ elif [[ $pn == BASH || $pn == bash ]]; then
         bash Tdr-Tool.sh
 
 elif [[ $pn == Q || $pn == q ]]; then
-        echo -e "\n $CC [$YY*$CC]$RR Good bye...";
+        echo -e "\n $CC [$YY»$CC]$RR Good bye...";
 		sleep 0;exit;
 
 elif [[ $pn == 1 || $pn == 01 ]]; then
@@ -160,5 +160,5 @@ else
 	echo -e "\n  ${YY}[${RR}⦸${YY}]${RR} Invalid Action."	
 	sleep 1
 	clear
-	cd;cd x;bash Tdr-Tool.sh
+	cd ~/Tdr-Tool;bash Tdr-Tool.sh
 fi
