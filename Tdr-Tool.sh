@@ -18,7 +18,7 @@ while kill -0 $pid 2>/dev/null; do
   done
 done
 
-echo -ne "\b\b\b\b\b\b\b\b\b\b$msg_done\n"
+echo -ne "\b\b\b\b\b\b\b\b\b\b\b\b$msg_done\n"
 }
 
 #Colors
@@ -135,13 +135,13 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	echo -e "\n $CC [${YY}i$CC]$GG UserID: Search usernames on social media.";
 	( cd ~/Tdr-Tool;rm -rf UserID;git clone https://github.com/TheDarkRoot/UserID.git;cd UserID;chmod +x *; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading UserID..." " $WW⟫$GG Complete."
 
-	elif
-	echo -e "\n  ${YY}[${RR}⦸${YY}]${RR} Invalid Action."	
-	sleep 1
-	
-	else [[ $pn == Q || $pn == q ]]; then
+	elif [[ $pn == Q || $pn == q ]]; then
 	echo -e "\n $CC [$YY»$CC]$RR Good Bye...";
 	sleep 0;exit;
+
+	else
+	echo -e "\n  ${YY}[${RR}⦸${YY}]${RR} Invalid Action."	
+	sleep 1
 
     fi
 done
