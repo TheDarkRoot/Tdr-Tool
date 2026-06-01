@@ -18,10 +18,9 @@ local delay=0.10
 local spinner=( '\033[34;1m■■■■■■■' '\033[32;1m█\033[33;1m■■■■■■' '\033[33;1m■\033[32;1m█\033[33;1m■■■■■' '\033[33;1m■■\033[32;1m█\033[33;1m■■■■' '\033[33;1m■■■\033[32;1m█\033[33;1m■■■' '\033[33;1m■■■■\033[32;1m█\033[33;1m■■' '\033[33;1m■■■■■\033[32;1m█\033[33;1m■' '\033[33;1m■■■■■■\033[32;1m█' '\033[34;1m■■■■■■■' '\033[33;1m■■■■■■\033[32;1m█' '\033[33;1m■■■■■\033[32;1m█\033[33;1m■' '\033[33;1m■■■■\033[32;1m█\033[33;1m■■' '\033[33;1m■■■\033[32;1m█\033[33;1m■■■' '\033[33;1m■■\033[32;1m█\033[33;1m■■■■' '\033[33;1m■\033[32;1m█\033[33;1m■■■■■' '\033[32;1m█\033[33;1m■■■■■■' )
 
 while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
-
 for i in "${spinner[@]}"
 do
-  echo -ne "\r$CC [$YY↓$CC]$YY Downloading please wait...$CC 【$i$CC】";
+  echo -ne "\r$CC 【$i$CC】";
   sleep $delay
   printf "\b\b\b\b\b\b\b\b";
 done
@@ -86,7 +85,7 @@ $CC    └─┬─⊸ [$YY›Q$YY‹$RR Exit$CC]
 $CC      └─⊸ [$YY »$GG Tdr-Tool exit.$CC]\n"
 
 read -p " $(echo -e " ${CC}[${YY}»${CC}]${MM} Program Number: ${YY}")" pn
-	
+
 	# [KRİTİK]: Çıkış işlemi internet kontrolünden önce çalışmalıdır.
 	if [[ $pn == Q || $pn == q ]]; then
 		echo -e "\n $CC [$YY»$CC]$RR Good Bye...";
@@ -94,49 +93,48 @@ read -p " $(echo -e " ${CC}[${YY}»${CC}]${MM} Program Number: ${YY}")" pn
 	fi
 
 	# [2. YÖNTEM INTEGRASYONU]: Küresel İnternet Doğrulama Kontrolü
-	# Kullanıcının seçimi geçerli bir indirme/güncelleme fonksiyonu ise tetiklenir.
 	if [[ $pn =~ ^(U|u|P|p|T|t|K|k|X|x|BASH|bash|[0-7]|0[1-7])$ ]]; then
-		ping -c 1 github.com &> /dev/null
+		echo -e "$CC [$YY»$CC]$GG Checking internet connection...";
+		( ping -c 1 github.com ) &> /dev/null &
+		ping_pid=$!
+		spin
+		wait $ping_pid
 		if [ $? -ne 0 ]; then
 			echo -e "\n  ${YY}[${RR}⦸${YY}]${RR} Hata: İnternet bağlantısı bulunamadı! Mevcut araçlarınız korundu."
 			sleep 2
-			continue # Döngünün başına döner ve menüyü tekrar yükler
+			continue
 		fi
 	fi
 
 	if [[ $pn == U || $pn == u ]]; then
 	clear;echo -e "$CC\n [$YY↓$CC]$GG Updating...\n";apt update -y;apt upgrade -y;clear;
-	#Termux Packages Installing
 	echo -e "$CC [$YY»$CC]$GG Packages Installing...";
 	( pkg install ruby git python python2 python3 python-pip php zip unzip cowsay figlet wget curl vim proot crunch neofetch nano cmatrix toilet zsh sl tmate bash tor privoxy -y;pkg install termux-api termux-tools play-audio mpv openssh openssl-tool crunch -y; ) &> /dev/null & spin;
-	#Termux Tools Installing
 	echo -e "$CC [$YY»$CC]$GG Tools Installing...";
 	( gem install lolcat;pip3 install --upgrade pip;pip3 install bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest speedtest-cli;pkg install nodejs -y;pkg install nodejs-lts -y;npm install readline-sync;npm install;npm install --global speed-test; ) &> /dev/null & spin;
-	#Termux Tdr-Tool Updating
 	echo -e "$CC [$YY»$CC]$GG Tdr-Tool Updating...$YY";
-	( cd ~/Tdr-Tool/;curl -s -f https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh -o Tdr-Tool.sh; ) &> /dev/null & spin;
+	( cd ~/Tdr-Tool/;curl -s -f [raw.githubusercontent.com](https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh) -o Tdr-Tool.sh; ) &> /dev/null & spin;
 
 	elif [[ $pn == P || $pn == p ]]; then
 	echo -e "\n$CC [$YY»$CC]$GG Parrot OS Theme Updating...\n$CC [\033[33;1mi$CC]$GG Parrot OS theme for Termux.";
-	( cd ~/Tdr-Tool;curl -s -f https://raw.githubusercontent.com/TheDarkRoot/ParrotOS-T/master/ParrotOS-T.sh -o ParrotOS-T.sh;chmod +x ParrotOS-T.sh;bash ParrotOS-T.sh;cd ~/Tdr-Tool;rm -rf ParrotOS-T.sh; ) &> /dev/null & spin;
+	( cd ~/Tdr-Tool;curl -s -f [raw.githubusercontent.com](https://raw.githubusercontent.com/TheDarkRoot/ParrotOS-T/master/ParrotOS-T.sh) -o ParrotOS-T.sh;chmod +x ParrotOS-T.sh;bash ParrotOS-T.sh;cd ~/Tdr-Tool;rm -rf ParrotOS-T.sh; ) &> /dev/null & spin;
 
 	elif [[ $pn == T || $pn == t ]]; then
 	echo -e "\n$CC [$YY»$CC]$GG TheDarkRoot Theme Updating...\n$CC [\033[33;1mi$CC]$GG TheDarkRoot theme for Termux.";
-	( cd ~/Tdr-Tool;curl -s -f https://raw.githubusercontent.com/TheDarkRoot/TheDarkRoot-T/master/TheDarkRoot-T.sh -o TheDarkRoot-T.sh;chmod +x TheDarkRoot-T.sh;bash TheDarkRoot-T.sh;cd ~/Tdr-Tool;rm -rf TheDarkRoot-T.sh; ) &> /dev/null & spin;
+	( cd ~/Tdr-Tool;curl -s -f [raw.githubusercontent.com](https://raw.githubusercontent.com/TheDarkRoot/TheDarkRoot-T/master/TheDarkRoot-T.sh) -o TheDarkRoot-T.sh;chmod +x TheDarkRoot-T.sh;bash TheDarkRoot-T.sh;cd ~/Tdr-Tool;rm -rf TheDarkRoot-T.sh; ) &> /dev/null & spin;
 
 	elif [[ $pn == K || $pn == k ]]; then
 	echo -e "\n$CC [$YY»$CC]$GG Termux Key Updating...\n$CC [\033[33;1mi$CC]$GG Utility to add direction keys to Termux.";
-	( cd ~/Tdr-Tool;curl -s -f https://raw.githubusercontent.com/TheDarkRoot/Terkey/master/Terkey.sh -o Terkey.sh;chmod +x Terkey.sh;bash Terkey.sh;cd ~/Tdr-Tool;rm -rf Terkey.sh; ) &> /dev/null & spin;
+	( cd ~/Tdr-Tool;curl -s -f [raw.githubusercontent.com](https://raw.githubusercontent.com/TheDarkRoot/Terkey/master/Terkey.sh) -o Terkey.sh;chmod +x Terkey.sh;bash Terkey.sh;cd ~/Tdr-Tool;rm -rf Terkey.sh; ) &> /dev/null & spin;
 
 	elif [[ $pn == X || $pn == x ]]; then
 	echo -e "\n$CC [$YY»$CC]$GG X-Project Updating...\n$CC [\033[33;1mi$CC]$GG Code in the trial period.";
-	# [1. YÖNTEM INTEGRASYONU]: Akıllı Git Kontrolü
 	( 
 		cd ~/Tdr-Tool || mkdir -p ~/Tdr-Tool && cd ~/Tdr-Tool
 		if [ -d "x" ]; then
 			cd x && git pull
 		else
-			git clone https://github.com/TheDarkRoot/x.git
+			git clone [github.com](https://github.com/TheDarkRoot/x.git)
 			cd x
 		fi
 		chmod +x *
@@ -144,17 +142,16 @@ read -p " $(echo -e " ${CC}[${YY}»${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == BASH || $pn == bash ]]; then
 	echo -e "\n$CC [$YY»$CC]$GG Tdr-Tool Updating...\n$CC [\033[33;1mi$CC]$GG TheDarkRoot tool pack.";
-	( cd ~/Tdr-Tool/;curl -s -f https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh -o Tdr-Tool.sh; ) &> /dev/null & spin;
+	( cd ~/Tdr-Tool/;curl -s -f [raw.githubusercontent.com](https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh) -o Tdr-Tool.sh; ) &> /dev/null & spin;
 
 	elif [[ $pn == 1 || $pn == 01 ]]; then
 	echo -e "\n$CC [$YY»$CC]$GG Downloading/Updating AnonSMS...\n$CC [\033[33;1mi$CC]$GG Anonymous SMS sending tool.";
-	# AnonSMS Akıllı Güncelleme Mantığı
 	( 
 		cd ~/Tdr-Tool || mkdir -p ~/Tdr-Tool && cd ~/Tdr-Tool
 		if [ -d "AnonSMS" ]; then
 			cd AnonSMS && git pull
 		else
-			git clone https://github.com/TheDarkRoot/AnonSMS.git
+			git clone [github.com](https://github.com/TheDarkRoot/AnonSMS.git)
 			cd AnonSMS
 		fi
 		chmod +x *
@@ -162,13 +159,12 @@ read -p " $(echo -e " ${CC}[${YY}»${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == 2 || $pn == 02 ]]; then
 	echo -e "\n$CC [$YY»$CC]$GG Downloading/Updating Hasher...\n$CC [\033[33;1mi$CC]$GG This is a Hash Cracker.";
-	# Hasher Akıllı Güncelleme Mantığı
 	( 
 		cd ~/Tdr-Tool || mkdir -p ~/Tdr-Tool && cd ~/Tdr-Tool
 		if [ -d "Hasher" ]; then
 			cd Hasher && git pull
 		else
-			git clone https://github.com/TheDarkRoot/Hasher.git
+			git clone [github.com](https://github.com/TheDarkRoot/Hasher.git)
 			cd Hasher
 		fi
 		chmod +x *
@@ -176,13 +172,12 @@ read -p " $(echo -e " ${CC}[${YY}»${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == 3 || $pn == 03 ]]; then
 	echo -e "\n$CC [$YY»$CC]$GG Downloading/Updating Hashgen...\n$CC [\033[33;1mi$CC]$GG Generate more 39 type hash.";
-	# Hashgen Akıllı Güncelleme Mantığı
 	( 
 		cd ~/Tdr-Tool || mkdir -p ~/Tdr-Tool && cd ~/Tdr-Tool
 		if [ -d "Hashgen" ]; then
 			cd Hashgen && git pull
 		else
-			git clone https://github.com/TheDarkRoot/Hashgen.git
+			git clone [github.com](https://github.com/TheDarkRoot/Hashgen.git)
 			cd Hashgen
 		fi
 		chmod +x *
@@ -190,28 +185,26 @@ read -p " $(echo -e " ${CC}[${YY}»${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == 4 || $pn == 04 ]]; then
 	echo -e "\n$CC [$YY»$CC]$GG Downloading/Updating Terpack...\n$CC [\033[33;1mi$CC]$GG TheDarkRoot termux package installer.";
-	# Terpack Akıllı Güncelleme Mantığı
 	( 
 		cd ~/Tdr-Tool || mkdir -p ~/Tdr-Tool && cd ~/Tdr-Tool
 		if [ -d "Terpack" ]; then
 			cd Terpack && git pull
 		else
-			git clone https://github.com/TheDarkRoot/Terpack.git
+			git clone [github.com](https://github.com/TheDarkRoot/Terpack.git)
 			cd Terpack
 		fi
 		chmod +x *
 		cp Terpack.sh ~
 	) &> /dev/null & spin;
-		
+
 	elif [[ $pn == 5 || $pn == 05 ]]; then
 	echo -e "\n$CC [$YY»$CC]$GG Downloading/Updating Tertest...\n$CC [\033[33;1mi$CC]$GG Termux internet speed test.";
-	# Tertest Akıllı Güncelleme Mantığı
 	( 
 		cd ~/Tdr-Tool || mkdir -p ~/Tdr-Tool && cd ~/Tdr-Tool
 		if [ -d "Tertest" ]; then
 			cd Tertest && git pull
 		else
-			git clone https://github.com/TheDarkRoot/Tertest.git
+			git clone [github.com](https://github.com/TheDarkRoot/Tertest.git)
 			cd Tertest
 		fi
 		chmod +x *
@@ -219,13 +212,12 @@ read -p " $(echo -e " ${CC}[${YY}»${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == 6 || $pn == 06 ]]; then
 	echo -e "\n$CC [$YY»$CC]$GG Downloading/Updating Tertext...\n$CC [\033[33;1mi$CC]$GG Program for creating words from letters.";
-	# Tertext Akıllı Güncelleme Mantığı
 	( 
 		cd ~/Tdr-Tool || mkdir -p ~/Tdr-Tool && cd ~/Tdr-Tool
 		if [ -d "Tertext" ]; then
 			cd Tertext && git pull
 		else
-			git clone https://github.com/TheDarkRoot/Tertext.git
+			git clone [github.com](https://github.com/TheDarkRoot/Tertext.git)
 			cd Tertext
 		fi
 		chmod +x *
@@ -233,21 +225,20 @@ read -p " $(echo -e " ${CC}[${YY}»${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == 7 || $pn == 07 ]]; then
 	echo -e "\n$CC [$YY»$CC]$GG Downloading/Updating UserID...\n$CC [\033[33;1mi$CC]$GG Search usernames on social media.";
-	# UserID Akıllı Güncelleme Mantığı
 	( 
 		cd ~/Tdr-Tool || mkdir -p ~/Tdr-Tool && cd ~/Tdr-Tool
 		if [ -d "UserID" ]; then
 			cd UserID && git pull
 		else
-			git clone https://github.com/TheDarkRoot/UserID.git
+			git clone [github.com](https://github.com/TheDarkRoot/UserID.git)
 			cd UserID
 		fi
 		chmod +x *
 	) &> /dev/null & spin;
 
 	else
-	echo -e "\n  ${YY}[${RR}⦸${YY}]${RR} Invalid Action."	
+	echo -e "\n  ${YY}[${RR}⦸${YY}]${RR} Invalid Action."
 	sleep 1
-	
+
     fi
 done
