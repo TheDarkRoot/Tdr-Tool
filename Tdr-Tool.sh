@@ -18,10 +18,14 @@ while kill -0 $pid 2>/dev/null; do
   done
 done
 
-# Animasyon bitince satırı temizler ve bitiş mesajını ekler
-echo -ne "\r\033[K"
-echo -e "$msg_done"
-echo ""
+# ----- ESKİ HALİ -----
+# echo -ne "\r\033[K"
+# echo -e "$msg_done"
+# echo ""
+
+# ----- YENİ HALİ -----
+# Animasyon kutusunun kapladığı alanı (12 karakter) geriye doğru siler ve bitiş mesajını ekler
+echo -ne "\b\b\b\b\b\b\b\b\b\b\b\b$msg_done\n\n"
 }
 #Colors
 BB="\033[34;1m" # Blue Light
