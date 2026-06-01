@@ -13,7 +13,7 @@ while kill -0 $pid 2>/dev/null; do
   for i in "${spinner[@]}"
   do
     # \r ile satır başına döner, metni yazar. \033[K önceki metinden kalan artıkları siler.
-    echo -ne "\r $msg_loading $CC【$i$CC】\033[K";
+    echo -ne "\r$msg_loading $CC【$i$CC】\033[K";
     sleep $delay
   done
 done
@@ -117,7 +117,7 @@ read -p " $(echo -e " ${CC}[${YY}»${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == 1 || $pn == 01 ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG AnonSMS: Anonymous SMS sending tool.";
-	( cd ~/Tdr-Tool;rm -rf AnonSMS;git clone https://github.com/TheDarkRoot/AnonSMS.git;cd AnonSMS;chmod +x *; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading AnonSMS..."
+	( cd ~/Tdr-Tool;rm -rf AnonSMS;git clone https://github.com/TheDarkRoot/AnonSMS.git;cd AnonSMS;chmod +x *; ) &> /dev/null & spin " $CC[$YY↓$CC]$GG Downloading AnonSMS..."
 
 	elif [[ $pn == 2 || $pn == 02 ]]; then
 	echo -e "\n$CC [$YY»$CC]$GG Downloading Hasher...\n$CC [\033[33;1mi$CC]$GG This is a Hash Cracker.";
