@@ -122,7 +122,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	elif [[ $pn == 4 || $pn == 04 ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Terpack: TheDarkRoot termux package installer.";
 	( cd ~/Tdr-Tool;rm -rf Terpack;git clone https://github.com/TheDarkRoot/Terpack.git;cd Terpack;chmod +x *;cp Terpack.sh ~; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Terpack..." " $WW⟫$GG Complete."
-		
+
 	elif [[ $pn == 5 || $pn == 05 ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Tertest: Termux internet speed test.";
 	( cd ~/Tdr-Tool;rm -rf Tertest;git clone https://github.com/TheDarkRoot/Tertest.git;cd Tertest;chmod +x *; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Tertest..." " $WW⟫$GG Complete."
@@ -135,13 +135,13 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	echo -e "\n $CC [${YY}i$CC]$GG UserID: Search usernames on social media.";
 	( cd ~/Tdr-Tool;rm -rf UserID;git clone https://github.com/TheDarkRoot/UserID.git;cd UserID;chmod +x *; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading UserID..." " $WW⟫$GG Complete."
 
-	elif [[ $pn == Q || $pn == q ]]; then
-	echo -e "\n $CC [$YY»$CC]$RR Good Bye...";
-	sleep 0;exit;
-
-	else
+	elif
 	echo -e "\n  ${YY}[${RR}⦸${YY}]${RR} Invalid Action."	
 	sleep 1
 	
+	else [[ $pn == Q || $pn == q ]]; then
+	echo -e "\n $CC [$YY»$CC]$RR Good Bye...";
+	sleep 0;exit;
+
     fi
 done
