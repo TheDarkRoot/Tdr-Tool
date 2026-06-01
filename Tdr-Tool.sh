@@ -5,18 +5,23 @@ local pid=$!
 local delay=0.10
 local spinner=( '\033[34;1m■■■■■■■' '\033[32;1m█\033[33;1m■■■■■■' '\033[33;1m■\033[32;1m█\033[33;1m■■■■■' '\033[33;1m■■\033[32;1m█\033[33;1m■■■■' '\033[33;1m■■■\033[32;1m█\033[33;1m■■■' '\033[33;1m■■■■\033[32;1m█\033[33;1m■■' '\033[33;1m■■■■■\033[32;1m█\033[33;1m■' '\033[33;1m■■■■■■\033[32;1m█' '\033[34;1m■■■■■■■' '\033[33;1m■■■■■■\033[32;1m█' '\033[33;1m■■■■■\033[32;1m█\033[33;1m■' '\033[33;1m■■■■\033[32;1m█\033[33;1m■■' '\033[33;1m■■■\033[32;1m█\033[33;1m■■■' '\033[33;1m■■\033[32;1m█\033[33;1m■■■■' '\033[33;1m■\033[32;1m█\033[33;1m■■■■■' '\033[32;1m█\033[33;1m■■■■■■' )
 
-while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
+# Kod içinden gönderilen mesaj parametrelerini yakalar
+local msg_loading="$1"
+local msg_done="$2"
 
-for i in "${spinner[@]}"
-do
-  echo -ne "\r$CC [$YY↓$CC]$YY Downloading please wait...$CC 【$i$CC】";
-  sleep $delay
-  printf "\b\b\b\b\b\b\b\b";
+while kill -0 $pid 2>/dev/null; do
+  for i in "${spinner[@]}"
+  do
+    # \r ile satır başına döner, metni yazar. \033[K önceki metinden kalan artıkları siler.
+    echo -ne "\r$CC [$YY↓$CC]$YY $msg_loading $CC【$i$CC】\033[K";
+    sleep $delay
+  done
 done
-done
-printf "   \b\b\b\b\b"
-printf "$WW⟫$GG Completed.\n";
-echo "";
+
+# Animasyon bitince satırı temizler ve bitiş mesajını ekler
+echo -ne "\r\033[K"
+echo -e "$WW⟫$GG $msg_done"
+echo ""
 }
 #Colors
 BB="\033[34;1m" # Blue Light
@@ -112,7 +117,7 @@ read -p " $(echo -e " ${CC}[${YY}»${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == 1 || $pn == 01 ]]; then
 	echo -e "\n$CC [$YY»$CC]$GG Downloading AnonSMS...\n$CC [\033[33;1mi$CC]$GG Anonymous SMS sending tool.";
-	( cd ~/Tdr-Tool;rm -rf AnonSMS;git clone https://github.com/TheDarkRoot/AnonSMS.git;cd AnonSMS;chmod +x *; ) &> /dev/null & spin;
+	( cd ~/Tdr-Tool;rm -rf AnonSMS;git clone [github.com](https://github.com/TheDarkRoot/AnonSMS.git;cd) AnonSMS;chmod +x *; ) &> /dev/null & spin "AnonSMS indiriliyor..." "AnonSMS başarıyla kuruldu!"
 
 	elif [[ $pn == 2 || $pn == 02 ]]; then
 	echo -e "\n$CC [$YY»$CC]$GG Downloading Hasher...\n$CC [\033[33;1mi$CC]$GG This is a Hash Cracker.";
