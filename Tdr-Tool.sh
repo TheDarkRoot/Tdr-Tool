@@ -3,30 +3,27 @@
 spin () {
 local pid=$!
 local delay=0.10
-local spinner=( '\033[34;1m■■■■■■■' '\033[32;1m█\033[33;1m■■■■■■' '\033[33;1m■\033[32;1m█\033[33;1m■■■■■' '\033[33;1m■■\033[32;1m█\033[33;1m■■■■' '\033[33;1m■■■\033[32;1m█\033[33;1m■■■' '\033[33;1m■■■■\033[32;1m█\033[33;1m■■' '\033[33;1m■■■■■\033[32;1m█\033[33;1m■' '\033[33;1m■■■■■■\033[32;1m█' '\033[34;1m■■■■■■■' '\033[33;1m■■■■■■\033[32;1m█' '\033[33;1m■■■■■\033[32;1m█\033[33;1m■' '\033[33;1m■■■■\033[32;1m█\033[33;1m■■' '\033[33;1m■■■\033[32;1m█\033[33;1m■■■' '\033[33;1m■■\033[32;1m█\033[33;1m■■■■' '\033[33;1m■\033[32;1m█\033[33;1m■■■■■' '\033[32;1m█\033[33;1m■■■■■■' )
+local spinner=( '\033[34;1m■■■■■■■' '\033[32;1m█\033[33;1m■■■■■' '\033[33;1m■\033[32;1m█\033[33;1m■■■■' '\033[33;1m■■\033[32;1m█\033[33;1m■■■' '\033[33;1m■■■\033[32;1m█\033[33;1m■■' '\033[33;1m■■■■\033[32;1m█\033[33;1m■' '\033[33;1m■■■■■\033[32;1m█' '\033[33;1m■■■■■■\033[32;1m█' '\033[34;1m■■■■■■■' '\033[33;1m■■■■■■\033[32;1m█' '\033[33;1m■■■■■\033[32;1m█\033[33;1m■' '\033[33;1m■■■■\033[32;1m█\033[33;1m■■' '\033[33;1m■■■\033[32;1m█\033[33;1m■■■' '\033[33;1m■\033[32;1m█\033[33;1m■■■■' '\033[32;1m█\033[33;1m■■■■■' )
 
-# Kod içinden gönderilen mesaj parametrelerini yakalar
 local msg_loading="$1"
 local msg_done="$2"
+
+# Döngü başlamadan ÖNCE sadece 1 kere alt satıra inmesini sağlıyoruz:
+echo -e ""
 
 while kill -0 $pid 2>/dev/null; do
   for i in "${spinner[@]}"
   do
-    # \r ile satır başına döner, metni yazar. \033[K önceki metinden kalan artıkları siler.
-    echo -ne -e "\r  $msg_loading $CC【$i$CC】\033[K";
+    # -ne içinde tek seferde birleştirdik. \r ile artık hep AYNI satırın başına dönecek.
+    echo -ne "\r  $msg_loading $CC【$i$CC】\033[K";
     sleep $delay
   done
 done
 
-# ----- ESKİ HALİ -----
-# echo -ne "\r\033[K"
-# echo -e "$msg_done"
-# echo ""
-
-# ----- YENİ HALİ -----
-# Animasyon kutusunun kapladığı alanı (20 karakter) geriye doğru siler ve bitiş mesajını ekler
+# Animasyon kutusunun alanını (20 karakter) geriye doğru siler ve bitiş mesajını yazar
 echo -ne "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b$msg_done\n\n"
 }
+
 #Colors
 BB="\033[34;1m" # Blue Light
 YY="\033[33;1m" # Yellow Light
@@ -85,7 +82,7 @@ read -p " $(echo -e " ${CC}[${YY}»${CC}]${MM} Program Number: ${YY}")" pn
 	
 	if [[ $pn == U || $pn == u ]]; then
 	#Termux Update
-	( apt update -y;apt upgrade -y; ) &> /dev/null & spin "\n $CC [$YY↓$CC]$GG Updating..." " $WW ⟫$GG Complete."
+	( apt update -y;apt upgrade -y; ) &> /dev/null & spin " $CC [$YY↓$CC]$GG Updating..." " $WW ⟫$GG Complete."
 	#Termux Packages Installing
 	echo -e " $CC [$YY↓$CC]$GG Packages Installing...";
 	( pkg install ruby git python python2 python3 python-pip php zip unzip cowsay figlet wget curl vim proot crunch neofetch nano cmatrix toilet zsh sl tmate bash tor privoxy -y;pkg install termux-api termux-tools play-audio mpv openssh openssl-tool crunch -y; ) &> /dev/null & spin; 
