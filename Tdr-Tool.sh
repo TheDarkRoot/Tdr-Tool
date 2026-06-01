@@ -58,7 +58,7 @@ $CC │  │ └─⊸ [$YY »$GG Generate more 39 type hash.$CC]
 $CC │  ├─┬─⊸ [$YY›4$YY‹$RR Terpack$CC]
 $CC │  │ └─⊸ [$YY »$GG TheDarkRoot termux package installer.$CC]
 $CC │  ├─┬─⊸ [$YY›5$YY‹$RR Tertest$CC]
-$CC │  │ └─⊸ [$YY »$GG Termux internet speed test.
+$CC │  │ └─⊸ [$YY »$GG Termux internet speed test.$CC]
 $CC │  ├─┬─⊸ [$YY›6$YY‹$RR Tertext$CC]
 $CC │  │ └─⊸ [$YY »$GG Program for creating words from letters.$CC]
 $CC │  └─┬─⊸ [$YY›7$YY‹$RR UserID$CC]
@@ -99,41 +99,41 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	echo -e "\n $CC [${YY}i$CC]$GG Terkey: Utility to add direction keys to Termux.";
 	( cd ~/Tdr-Tool;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Terkey/master/Terkey.sh?t=$(date +%s)" -o Terkey.sh;chmod +x Terkey.sh;bash Terkey.sh;cd ~/Tdr-Tool;rm -rf Terkey.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Terkey..." " $WW⟫$GG Complete."
 
-	elif [[ $pn == X || $pn == x ]]; then
-	echo -e "\n $CC [${YY}i$CC]$GG X-Project: Code in the trial period.";
-	( cd ~/Tdr-Tool;rm -rf x;git clone https://github.com/TheDarkRoot/x.git;cd x;chmod +x *; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading X-Project..."
-
 	elif [[ $pn == BASH || $pn == bash ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: TheDarkRoot tool pack.";
 	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh;chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Tdr-Tool..." " $WW⟫$GG Complete."
 
+	elif [[ $pn == X || $pn == x ]]; then
+	echo -e "\n $CC [${YY}i$CC]$GG X-Project: Code in the trial period.";
+	( cd ~/Tdr-Tool && rm -rf .X-Project_temp && git clone --quiet https://github.com/TheDarkRoot/X-Project.git .X-Project_temp && chmod +x .X-Project_temp/* && rm -rf X-Project && mv .X-Project_temp X-Project ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading X-Project..."
+
 	elif [[ $pn == 1 || $pn == 01 ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG AnonSMS: Anonymous SMS sending tool.";
-	( cd ~/Tdr-Tool;rm -rf AnonSMS;git clone https://github.com/TheDarkRoot/AnonSMS.git;cd AnonSMS;chmod +x *; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading AnonSMS..." " $WW⟫$GG Complete."
+	( cd ~/Tdr-Tool && rm -rf .AnonSMS_temp && git clone --quiet https://github.com/TheDarkRoot/AnonSMS.git .AnonSMS_temp && chmod +x .AnonSMS_temp/* && rm -rf AnonSMS && mv .AnonSMS_temp AnonSMS ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading AnonSMS..." " $WW⟫$GG Complete."
 
 	elif [[ $pn == 2 || $pn == 02 ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Hasher: This is a Hash Cracker.";
-	( cd ~/Tdr-Tool;rm -rf Hasher;git clone https://github.com/TheDarkRoot/Hasher.git;cd Hasher;chmod +x *; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Hasher..." " $WW⟫$GG Complete."
+	( cd ~/Tdr-Tool && rm -rf .Hasher_temp && git clone --quiet https://github.com/TheDarkRoot/Hasher.git .Hasher_temp && chmod +x .Hasher_temp/* && rm -rf Hasher && mv .Hasher_temp Hasher ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Hasher..." " $WW⟫$GG Complete."
 
 	elif [[ $pn == 3 || $pn == 03 ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Hashgen: Generate more 39 type hash.";
-	( cd ~/Tdr-Tool;rm -rf Hashgen;git clone https://github.com/TheDarkRoot/Hashgen.git;cd Hashgen;chmod +x *; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Hashgen..." " $WW⟫$GG Complete."
+	( cd ~/Tdr-Tool && rm -rf .Hashgen_temp && git clone --quiet https://github.com/TheDarkRoot/Hashgen.git .Hashgen_temp && chmod +x .Hashgen_temp/* && rm -rf Hashgen && mv .Hashgen_temp Hashgen ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Hashgen..." " $WW⟫$GG Complete."
 
 	elif [[ $pn == 4 || $pn == 04 ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Terpack: TheDarkRoot termux package installer.";
-	( cd ~/Tdr-Tool;rm -rf Terpack;git clone https://github.com/TheDarkRoot/Terpack.git;cd Terpack;chmod +x *;cp Terpack.sh ~; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Terpack..." " $WW⟫$GG Complete."
+	( cd ~/Tdr-Tool && rm -rf .Terpack_temp && git clone --quiet https://github.com/TheDarkRoot/Terpack.git .Terpack_temp && chmod +x .Terpack_temp/* && rm -rf Terpack && mv .Terpack_temp Terpack ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Terpack..." " $WW⟫$GG Complete."
 
 	elif [[ $pn == 5 || $pn == 05 ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Tertest: Termux internet speed test.";
-	( cd ~/Tdr-Tool;rm -rf Tertest;git clone https://github.com/TheDarkRoot/Tertest.git;cd Tertest;chmod +x *; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Tertest..." " $WW⟫$GG Complete."
+	( cd ~/Tdr-Tool && rm -rf .Tertest_temp && git clone --quiet https://github.com/TheDarkRoot/Tertest.git .Tertest_temp && chmod +x .Tertest_temp/* && rm -rf Tertest && mv .Tertest_temp Tertest ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Tertest..." " $WW⟫$GG Complete."
 
 	elif [[ $pn == 6 || $pn == 06 ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Tertext: Program for creating words from letters.";
-	( cd ~/Tdr-Tool;rm -rf Tertext;git clone https://github.com/TheDarkRoot/Tertext.git;cd Tertext;chmod +x *; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Tertext..." " $WW⟫$GG Complete."
+	( cd ~/Tdr-Tool && rm -rf .Tertext_temp && git clone --quiet https://github.com/TheDarkRoot/Tertext.git .Tertext_temp && chmod +x .Tertext_temp/* && rm -rf Tertext && mv .Tertext_temp Tertext ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Tertext..." " $WW⟫$GG Complete."
 
 	elif [[ $pn == 7 || $pn == 07 ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG UserID: Search usernames on social media.";
-	( cd ~/Tdr-Tool;rm -rf UserID;git clone https://github.com/TheDarkRoot/UserID.git;cd UserID;chmod +x *; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading UserID..." " $WW⟫$GG Complete."
+	( cd ~/Tdr-Tool && rm -rf .UserID_temp && git clone --quiet https://github.com/TheDarkRoot/UserID.git .UserID_temp && chmod +x .UserID_temp/* && rm -rf UserID && mv .UserID_temp UserID ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading UserID..." " $WW⟫$GG Complete."
 
 	elif [[ $pn == Q || $pn == q ]]; then
 	echo -e "\n $CC [$YY»$CC]$RR Good Bye...";
