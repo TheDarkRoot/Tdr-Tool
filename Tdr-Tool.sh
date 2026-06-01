@@ -13,7 +13,7 @@ while kill -0 $pid 2>/dev/null; do
   for i in "${spinner[@]}"
   do
     # \r ile satır başına döner, metni yazar. \033[K önceki metinden kalan artıkları siler.
-    echo -ne "\r$YY $msg_loading $CC【$i$CC】\033[K";
+    echo -ne "\r $msg_loading $CC【$i$CC】\033[K";
     sleep $delay
   done
 done
@@ -109,7 +109,7 @@ read -p " $(echo -e " ${CC}[${YY}»${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == BASH || $pn == bash ]]; then
 	echo -e "\n$CC [$YY»$CC]$GG Tdr-Tool Updating...\n$CC [\033[33;1mi$CC]$GG TheDarkRoot tool pack.";
-	( cd ~/Tdr-Tool/;rm -rf Tdr-Tool.sh;curl https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh -o Tdr-Tool.sh; ) &> /dev/null & spin;
+	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; ) &> /dev/null & spin;
 
 	elif [[ $pn == Q || $pn == q ]]; then
 	echo -e "\n $CC [$YY»$CC]$RR Good Bye...";
