@@ -20,8 +20,8 @@ while kill -0 $pid 2>/dev/null; do
   done
 done
 
-# Animasyon kutusunun alanını (20 karakter) geriye doğru siler ve bitiş mesajını yazar
-echo -ne "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b$msg_done\n\n"
+# Animasyon kutusunun alanını (12 karakter) geriye doğru siler ve bitiş mesajını yazar
+echo -ne "\b\b\b\b\b\b\b\b\b\b\b\b$msg_done\n\n"
 }
 
 #Colors
@@ -82,7 +82,7 @@ read -p " $(echo -e " ${CC}[${YY}»${CC}]${MM} Program Number: ${YY}")" pn
 	
 	if [[ $pn == U || $pn == u ]]; then
 	#Termux Update
-	( apt update -y;apt upgrade -y; ) &> /dev/null & spin " $CC [$YY↓$CC]$GG Updating..." " $WW ⟫$GG Complete."
+	( apt update -y;apt upgrade -y; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Updating..." " $WW ⟫$GG Complete."
 	#Termux Packages Installing
 	echo -e " $CC [$YY↓$CC]$GG Packages Installing...";
 	( pkg install ruby git python python2 python3 python-pip php zip unzip cowsay figlet wget curl vim proot crunch neofetch nano cmatrix toilet zsh sl tmate bash tor privoxy -y;pkg install termux-api termux-tools play-audio mpv openssh openssl-tool crunch -y; ) &> /dev/null & spin; 
