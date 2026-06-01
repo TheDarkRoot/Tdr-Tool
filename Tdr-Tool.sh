@@ -117,8 +117,8 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh;chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Tdr-Tool..." " $WW⟫$GG Complete."
 
 	elif [[ $pn == X || $pn == x ]]; then
-	echo -e "\n $CC [${YY}i$CC]$GG X-Project: Code in the trial period.";
-	( cd ~/Tdr-Tool && rm -rf .X-Project_temp && git clone --quiet https://github.com/TheDarkRoot/X-Project.git .X-Project_temp && chmod +x .X-Project_temp && chmod +x .X-Project_temp/* && rm -rf X-Project && mv .X-Project_temp X-Project ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading X-Project..."
+	echo -e "\n $CC [${YY}i$CC]$GG X: Code in the trial period.";
+	( cd ~/Tdr-Tool && rm -rf .x_temp && git clone --quiet https://github.com/TheDarkRoot/x.git .x_temp && chmod +x .x_temp && chmod +x .x_temp/* && rm -rf x && mv .x_temp x ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading X..."
 
 	elif [[ $pn == 1 || $pn == 01 ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG AnonSMS: Anonymous SMS sending tool.";
