@@ -13,7 +13,7 @@ while kill -0 $pid 2>/dev/null; do
   for i in "${spinner[@]}"
   do
     # \r ile satır başına döner, metni yazar. \033[K önceki metinden kalan artıkları siler.
-    echo -ne "\r $msg_loading $CC【$i$CC】\033[K";
+    echo -ne "\r  $msg_loading $CC【$i$CC】\033[K";
     sleep $delay
   done
 done
