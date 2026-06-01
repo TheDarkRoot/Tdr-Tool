@@ -18,7 +18,7 @@ while kill -0 $pid 2>/dev/null; do
   done
 done
 
-echo -ne "\b\b\b\b\b\b\b\b\b\b\b\b$msg_done\n"
+echo -e "\r  $msg_loading \033[K$msg_done"
 }
 
 #Colors
