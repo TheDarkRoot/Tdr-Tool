@@ -105,7 +105,6 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	fi
 
 	( sleep 1.5 ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Internet control..." "$status"
-	read -n 1 -s -p " $(echo -e "\n  ${CC}[${YY}~${CC}]${MM} Press any key to return to main menu...${YY}")"
 
 	elif [[ $pn == P || $pn == p ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG ParrotOS-T: Parrot OS theme for Termux.";
@@ -163,5 +162,13 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	echo -e "\n  ${YY}[${RR}⦸${YY}]${RR} Invalid Action."	
 	sleep 1
 
+    fi
+
+	if [[ $pn != Q && $pn != q && $pn != "" ]]; then
+        # Invalid Action durumunda zaten sleep 1 var, onu da hariç tutalım:
+        # Eğer girilen değer menüdeki geçerli parametrelerden biriyse beklet:
+        if [[ $pn =~ ^(U|u|UT|ut|P|p|T|t|K|k|BASH|bash|X|x|[1-7]|0[1-7]|I|i)$ ]]; then
+            read -n 1 -s -p " $(echo -e "\n  ${CC}[${YY}~${CC}]${MM} Press any key to return to main menu...${YY}")"
+        fi
     fi
 done
