@@ -165,10 +165,16 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
     fi
 
 	if [[ $pn != Q && $pn != q && $pn != "" ]]; then
-        # Invalid Action durumunda zaten sleep 1 var, onu da hariç tutalım:
-        # Eğer girilen değer menüdeki geçerli parametrelerden biriyse beklet:
+        # Kullanıcı geçersiz bir şey (Invalid Action) yazmadıysa bekletme uyarısını çıkar
         if [[ $pn =~ ^(U|u|UT|ut|P|p|T|t|K|k|BASH|bash|X|x|[1-7]|0[1-7]|I|i)$ ]]; then
+
+            # Kullanıcı herhangi bir tuşa basana kadar bekler
             read -n 1 -s -p " $(echo -e "\n  ${CC}[${YY}~${CC}]${MM} Press any key to return to main menu...${YY}")"
+
+            # EĞER GÜNCELLEME YAPILDIYSA PROGRAMI ŞİMDİ YENİDEN BAŞLAT:
+            if [[ $pn == U || $pn == u || $pn == UT || $pn == ut ]]; then
+                exec bash ~/Tdr-Tool/Tdr-Tool.sh
+            fi
         fi
     fi
 done
