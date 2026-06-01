@@ -90,10 +90,13 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
 	exec bash ~/Tdr-Tool/Tdr-Tool.sh
 
+	elif [[ $pn == UT || $pn == ut ]]; then
+	echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: Fast updating program...";
+	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
+	exec bash ~/Tdr-Tool/Tdr-Tool.sh
+
 	elif [[ $pn == I || $pn == i ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Checking internet connection...";
-
-	# Google DNS'e ping atarak internet durumunu kontrol ediyoruz
 	ping -c 1 8.8.8.8 &> /dev/null
 	if [ $? -eq 0 ]; then
 		status="$WW⟫$GG ONLINE"
@@ -101,11 +104,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 		status="$WW⟫$RR OFFLINE"
 	fi
 
-	# Animasyon dönüyor ve bittiğinde ONLINE/OFFLINE yazıyor
 	( sleep 1.5 ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Internet control..." "$status"
-
-	# <--- TAM BURAYA EKLEYECEKSİN --->
-	# Kullanıcı herhangi bir tuşa basana kadar bekler, basınca clear çekip menüye döner.
 	read -n 1 -s -p " $(echo -e "\n  ${CC}[${YY}~${CC}]${MM} Press any key to return to main menu...${YY}")"
 
 	elif [[ $pn == P || $pn == p ]]; then
