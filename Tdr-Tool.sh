@@ -89,7 +89,6 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == I || $pn == i ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: Checking internet connection...";
-	
 	# Google DNS'e 1 adet paket göndererek interneti test ediyoruz
 	# ping başarılı olursa 'online' değişkenine Yeşil ONLINE, başarısız olursa Kırmızı OFFLINE yazıyoruz.
 	ping -c 1 8.8.8.8 &> /dev/null
@@ -98,10 +97,9 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	else
 		status="$WW⟫$RR OFFLINE"
 	fi
-	
 	# Animasyonu tetikliyoruz (Arka planda sadece 1.5 saniye yapay bir uyku modu çalıştırıyoruz ki animasyon görünsün)
 	( sleep 1.5 ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Internet control..." "$status"
-	
+
 	elif [[ $pn == P || $pn == p ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG ParrotOS-T: Parrot OS theme for Termux.";
 	( cd ~/Tdr-Tool;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/ParrotOS-T/master/ParrotOS-T.sh?t=$(date +%s)" -o ParrotOS-T.sh;chmod +x ParrotOS-T.sh;bash ParrotOS-T.sh;cd ~/Tdr-Tool;rm -rf ParrotOS-T.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading ParrotOS-T..." " $WW⟫$GG Complete."
