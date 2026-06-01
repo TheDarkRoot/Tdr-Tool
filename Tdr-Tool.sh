@@ -15,13 +15,13 @@ while kill -0 $pid 2>/dev/null; do
   for i in "${spinner[@]}"
   do
     # -ne içinde tek seferde birleştirdik. \r ile artık hep AYNI satırın başına dönecek.
-    echo -ne "\r  $msg_loading $CC【$i$CC】\033[K";
+    echo -ne "\r$msg_loading $CC【$i$CC】\033[K";
     sleep $delay
   done
 done
 
 # Animasyon kutusunun alanını (12 karakter) geriye doğru siler ve bitiş mesajını yazar
-echo -ne "\b\b\b\b\b\b\b\b\b\b\b\b$msg_done\n\n"
+echo -ne "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b$msg_done\n\n"
 }
 
 #Colors
