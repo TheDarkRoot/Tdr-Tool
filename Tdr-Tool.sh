@@ -116,8 +116,8 @@ read -p " $(echo -e " ${CC}[${YY}»${CC}]${MM} Program Number: ${YY}")" pn
 	sleep 0;exit;
 
 	elif [[ $pn == 1 || $pn == 01 ]]; then
-	echo -e "\n$CC [$YY»$CC]$GG Downloading AnonSMS...\n$CC [\033[33;1mi$CC]$GG Anonymous SMS sending tool.";
-	( cd ~/Tdr-Tool;rm -rf AnonSMS;git clone https://github.com/TheDarkRoot/AnonSMS.git;cd AnonSMS;chmod +x *; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG AnonSMS indiriliyor..."
+	echo -e "\n$CC [\033[33;1mi$CC]$GG AnonSMS: Anonymous SMS sending tool.";
+	( cd ~/Tdr-Tool;rm -rf AnonSMS;git clone https://github.com/TheDarkRoot/AnonSMS.git;cd AnonSMS;chmod +x *; ) &> /dev/null & spin "$CC [$YY↓$CC]$GG Downloading AnonSMS..."
 
 	elif [[ $pn == 2 || $pn == 02 ]]; then
 	echo -e "\n$CC [$YY»$CC]$GG Downloading Hasher...\n$CC [\033[33;1mi$CC]$GG This is a Hash Cracker.";
