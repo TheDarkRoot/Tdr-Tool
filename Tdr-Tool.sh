@@ -64,6 +64,8 @@ $CC │  │ └─⊸ [$YY »$GG Program for creating words from letters.$CC]
 $CC │  └─┬─⊸ [$YY›7$YY‹$RR UserID$CC]
 $CC │    └─⊸ [$YY »$GG Search usernames on social media.$CC]
 $CC └⊸⟜┬───⊸ [$MM Termux Settings: $CC]
+$CC    ├─┬─⊸ [$YY›I$YY‹$RR Internet$CC]
+$CC    │ └─⊸ [$YY »$GG Test your internet connection.$CC]
 $CC    ├─┬─⊸ [$YY›U$YY‹$RR Update$CC]
 $CC    │ └─⊸ [$YY »$GG Termux update.$CC]
 $CC    ├─┬─⊸ [$YY›P$YY‹$RR ParrotOS-T$CC]
@@ -76,7 +78,7 @@ $CC    └─┬─⊸ [$YY›Q$YY‹$RR Exit$CC]
 $CC      └─⊸ [$YY »$GG Tdr-Tool exit.$CC]\n"
 
 read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
-	
+
 	if [[ $pn == U || $pn == u ]]; then
 	#Termux Update
 	( apt update -y;apt upgrade -y; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Updating..." " $WW⟫$GG Complete."
@@ -103,7 +105,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	# <--- TAM BURAYA EKLEYECEKSİN --->
 	# Kullanıcı herhangi bir tuşa basana kadar bekler, basınca clear çekip menüye döner.
-	read -n 1 -s -p " $(echo -e "\n ${CC}[${YY}~${CC}]${MM} Press any key to return to main menu...${YY}")"
+	read -n 1 -s -p " $(echo -e "\n  ${CC}[${YY}~${CC}]${MM} Press any key to return to main menu...${YY}")"
 
 	elif [[ $pn == P || $pn == p ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG ParrotOS-T: Parrot OS theme for Termux.";
