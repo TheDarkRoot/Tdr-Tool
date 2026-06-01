@@ -13,7 +13,7 @@ while kill -0 $pid 2>/dev/null; do
   for i in "${spinner[@]}"
   do
     # \r ile satır başına döner, metni yazar. \033[K önceki metinden kalan artıkları siler.
-    echo -ne "\r  $msg_loading $CC【$i$CC】\033[K";
+    echo -ne -e "\r  $msg_loading $CC【$i$CC】\033[K";
     sleep $delay
   done
 done
@@ -85,7 +85,7 @@ read -p " $(echo -e " ${CC}[${YY}»${CC}]${MM} Program Number: ${YY}")" pn
 	
 	if [[ $pn == U || $pn == u ]]; then
 	#Termux Update
-	( apt update -y;apt upgrade -y; ) \n &> /dev/null & spin "$CC[$YY↓$CC]$GG Updating..." " $WW ⟫$GG Complete."
+	( apt update -y;apt upgrade -y; ) &> /dev/null & spin "\n $CC [$YY↓$CC]$GG Updating..." " $WW ⟫$GG Complete."
 	#Termux Packages Installing
 	echo -e " $CC [$YY↓$CC]$GG Packages Installing...";
 	( pkg install ruby git python python2 python3 python-pip php zip unzip cowsay figlet wget curl vim proot crunch neofetch nano cmatrix toilet zsh sl tmate bash tor privoxy -y;pkg install termux-api termux-tools play-audio mpv openssh openssl-tool crunch -y; ) &> /dev/null & spin; 
