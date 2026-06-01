@@ -5,23 +5,19 @@ local pid=$!
 local delay=0.10
 local spinner=( '\033[34;1m■■■■■■■' '\033[32;1m█\033[33;1m■■■■■■' '\033[33;1m■\033[32;1m█\033[33;1m■■■■■' '\033[33;1m■■\033[32;1m█\033[33;1m■■■■' '\033[33;1m■■■\033[32;1m█\033[33;1m■■■' '\033[33;1m■■■■\033[32;1m█\033[33;1m■■' '\033[33;1m■■■■■\033[32;1m█\033[33;1m■' '\033[33;1m■■■■■■\033[32;1m█' '\033[34;1m■■■■■■■' '\033[33;1m■■■■■■\033[32;1m█' '\033[33;1m■■■■■\033[32;1m█\033[33;1m■' '\033[33;1m■■■■\033[32;1m█\033[33;1m■■' '\033[33;1m■■■\033[32;1m█\033[33;1m■■■' '\033[33;1m■■\033[32;1m█\033[33;1m■■■■' '\033[33;1m■\033[32;1m█\033[33;1m■■■■■' '\033[32;1m█\033[33;1m■■■■■■' )
 
-# Kod içinden gönderilen mesaj parametrelerini yakalar
 local msg_loading="$1"
 local msg_done="$2"
 
-# Döngü başlamadan ÖNCE sadece 1 kere alt satıra inmesini sağlıyoruz:
 echo -e ""
 
 while kill -0 $pid 2>/dev/null; do
   for i in "${spinner[@]}"
   do
-    # -ne içinde tek seferde birleştirdik. \r ile artık hep AYNI satırın başına dönecek.
     echo -ne "\r  $msg_loading $CC【$i$CC】\033[K";
     sleep $delay
   done
 done
 
-# Animasyon kutusunun alanını (12 karakter) geriye doğru siler ve bitiş mesajını yazar
 echo -ne "\b\b\b\b\b\b\b\b\b\b$msg_done\n"
 }
 
@@ -111,10 +107,6 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: TheDarkRoot tool pack.";
 	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh;chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Tdr-Tool..." " $WW⟫$GG Complete."
 
-	elif [[ $pn == Q || $pn == q ]]; then
-	echo -e "\n $CC [$YY»$CC]$RR Good Bye...";
-	sleep 0;exit;
-
 	elif [[ $pn == 1 || $pn == 01 ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG AnonSMS: Anonymous SMS sending tool.";
 	( cd ~/Tdr-Tool;rm -rf AnonSMS;git clone https://github.com/TheDarkRoot/AnonSMS.git;cd AnonSMS;chmod +x *; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading AnonSMS..." " $WW⟫$GG Complete."
@@ -143,9 +135,13 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	echo -e "\n $CC [${YY}i$CC]$GG UserID: Search usernames on social media.";
 	( cd ~/Tdr-Tool;rm -rf UserID;git clone https://github.com/TheDarkRoot/UserID.git;cd UserID;chmod +x *; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading UserID..." " $WW⟫$GG Complete."
 
-	else
+	elif
 	echo -e "\n  ${YY}[${RR}⦸${YY}]${RR} Invalid Action."	
 	sleep 1
+
+	else [[ $pn == Q || $pn == q ]]; then
+	echo -e "\n $CC [$YY»$CC]$RR Good Bye...";
+	sleep 0;exit;
 	
     fi
 done
