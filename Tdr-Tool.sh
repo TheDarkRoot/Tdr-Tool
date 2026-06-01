@@ -20,7 +20,7 @@ done
 
 # Animasyon bitince satırı temizler ve bitiş mesajını ekler
 echo -ne "\r\033[K"
-echo -e "$WW⟫$GG $msg_done"
+echo -e "$msg_done"
 echo ""
 }
 #Colors
@@ -81,16 +81,15 @@ read -p " $(echo -e " ${CC}[${YY}»${CC}]${MM} Program Number: ${YY}")" pn
 	
 	if [[ $pn == U || $pn == u ]]; then
 	#Termux Update
-	echo -e "$CC\n [$YY↓$CC]$GG Updating...\n";
-	( apt update -y;apt upgrade -y; ) &> /dev/null & spin;
+	echo -e ( apt update -y;apt upgrade -y; ) &> /dev/null & spin; " $CC\n [$YY↓$CC]$GG Updating..." "$WW⟫$GG Complete."
 	#Termux Packages Installing
-	echo -e "$CC [$YY»$CC]$GG Packages Installing...";
+	echo -e " $CC [$YY↓$CC]$GG Packages Installing...";
 	( pkg install ruby git python python2 python3 python-pip php zip unzip cowsay figlet wget curl vim proot crunch neofetch nano cmatrix toilet zsh sl tmate bash tor privoxy -y;pkg install termux-api termux-tools play-audio mpv openssh openssl-tool crunch -y; ) &> /dev/null & spin; 
 	#Termux Tools Installing
-	echo -e "$CC [$YY»$CC]$GG Tools Installing...";
+	echo -e " $CC [$YY↓$CC]$GG Tools Installing...";
 	( gem install lolcat;pip3 install --upgrade pip;pip3 install bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest speedtest-cli;pkg install nodejs -y;pkg install nodejs-lts -y;npm install readline-sync;npm install;npm install --global speed-test; ) &> /dev/null & spin;
 	#Termux Tdr-Tool Updating
-	echo -e "$CC [$YY»$CC]$GG Tdr-Tool Updating...$YY";
+	echo -e " $CC [$YY↓$CC]$GG Tdr-Tool Updating...$YY";
 	( cd ~/Tdr-Tool/;curl https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh -o Tdr-Tool.sh; ) &> /dev/null & spin;
 
 	elif [[ $pn == P || $pn == p ]]; then
