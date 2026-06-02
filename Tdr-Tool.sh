@@ -108,7 +108,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	# İnternet kontrol animasyonu dönüyor
 	( sleep 1.5 ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Internet control..." "$status"
-	
+
 	# Eğer internet varsa Hız Testi aşamasına geçiyoruz
 	if [ "$is_online" = true ]; then
 		echo -e ""
@@ -116,15 +116,15 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Want to run an internet speed test? (Y/n): ${YY}")" st_choice
 
 		if [[ -z $st_choice || $st_choice == Y || $st_choice == y ]]; then
-			echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: Running Speedtest via speedtest.net altyapısı..."
+			echo -e "\n $CC [${YY}i$CC]$GG Starting the speed test..."
 
 			# Python veya npm bağımlılığı olmadan doğrudan resmi altyapıyı kullanan saf bash scripti indirip çalıştırıyoruz
-			( curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 - --simple > .st_result.txt 2>&1 ) & spin "$CC[$YY↓$CC]$GG Testing network speed..." " $WW⟫$GG Complete."
+			( curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 - --simple > .st_result.txt 2>&1 ) & spin "$CC[$YY↓$CC]$GG Network speed tested." " $WW⟫$GG Complete."
 
-			echo -e "${CC}======================================================${WW}"
+			echo -e "  ${CC}======================================================${WW}"
 			# Alınan tüm resmi verileri ekrana listeliyoruz
 			cat .st_result.txt
-			echo -e "${CC}======================================================${WW}"
+			echo -e "  ${CC}======================================================${WW}"
 
 			# Sonuçları kaydetme aşaması
 			read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Do you want to save the results to a file? (Y/n): ${YY}")" save_choice
@@ -132,10 +132,10 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 			if [[ -z $save_choice || $save_choice == Y || $save_choice == y ]]; then
 				log_file="speedtest_result_$(date +%Y%m%d_%H%M%S).txt"
 				mv .st_result.txt ~/Tdr-Tool/"$log_file"
-				echo -e "\n ${CC}[${GG}✓${CC}]${GG} Saved successfully as: ${YY}~/Tdr-Tool/$log_file"
+				echo -e "\n  ${CC}[${GG}✓${CC}]${GG} Saved successfully as: ${YY}~/Tdr-Tool/$log_file"
 			else
 				rm -f .st_result.txt
-				echo -e "\n ${CC}[${RR}x${CC}]${RR} Results deleted."
+				echo -e "\n  ${CC}[${RR}x${CC}]${RR} Results deleted."
 			fi
 		else
 			echo -e "\n  ${CC}[${YY}i${CC}]${GG} Speedtest skipped."
