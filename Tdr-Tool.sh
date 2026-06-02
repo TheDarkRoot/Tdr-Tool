@@ -116,16 +116,10 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Want to run an internet speed test? (Y/n): ${YY}")" st_choice
 
 		if [[ -z $st_choice || $st_choice == Y || $st_choice == y ]]; then
-			echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: Checking Speedtest dependency..."
+			echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: Running Speedtest via speedtest.net altyapısı..."
 
-			# Kararsız npm paketi yerine kararlı Python bağımlılığını kontrol edip kuruyoruz
-			if ! command -v speedtest-cli &> /dev/null; then
-				echo -e " $CC [${YY}i$CC]$YY Installing speedtest-cli..."
-				pip3 install speedtest-cli &> /dev/null
-			fi
-
-			# Arka planda speedtest.net üzerinden test yaparken senin spin animasyonunu oynatıyoruz
-			speedtest-cli > .st_result.txt 2>&1 & spin "$CC[$YY↓$CC]$GG Running Speedtest via speedtest.net..." " $WW⟫$GG Complete."
+			# Python veya npm bağımlılığı olmadan doğrudan resmi altyapıyı kullanan saf bash scripti indirip çalıştırıyoruz
+			( curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 - --simple > .st_result.txt 2>&1 ) & spin "$CC[$YY↓$CC]$GG Testing network speed..." " $WW⟫$GG Complete."
 
 			echo -e "${CC}======================================================${WW}"
 			# Alınan tüm resmi verileri ekrana listeliyoruz
@@ -136,7 +130,6 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 			read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Do you want to save the results to a file? (Y/n): ${YY}")" save_choice
 
 			if [[ -z $save_choice || $save_choice == Y || $save_choice == y ]]; then
-				# local ibaresini kaldırdık, hata düzeldi. Dosya adı tarih damgalı oluşturuluyor.
 				log_file="speedtest_result_$(date +%Y%m%d_%H%M%S).txt"
 				mv .st_result.txt ~/Tdr-Tool/"$log_file"
 				echo -e "\n ${CC}[${GG}✓${CC}]${GG} Saved successfully as: ${YY}~/Tdr-Tool/$log_file"
