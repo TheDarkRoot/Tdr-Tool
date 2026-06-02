@@ -37,6 +37,78 @@ R="\033[31;1m"  # Red
 C="\033[36;1m"  # Cyan
 M="\033[35;1m"  # Magenta
 
+run_speedtest () {
+	echo -e "\n $CC [${YY}i$CC]$GG Starting the speed test..."
+
+	# Ham verileri filtreleyebilmek için normal çıktı alıyoruz ve uyarıları gizliyoruz
+	( curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -W ignore - > .st_raw.txt 2>&1 ) & spin "$CC[$YY↓$CC]$GG Testing network speed..." " $WW⟫$GG Complete."
+
+	# Alınan ham verileri ayıklıyoruz
+	my_ip=$(grep -oE "Testing from .* \([0-9.]+\)" .st_raw.txt | grep -oE "[0-9.]+" | head -n 1)
+	provider=$(grep -oE "Testing from .* \(" .st_raw.txt | sed 's/Testing from //' | sed 's/ ($//' | sed 's/ (//')
+	server_info=$(grep "Hosted by" .st_raw.txt | sed 's/Hosted by //' | cut -d '[' -f1 | sed 's/ *$//')
+	
+	# Ping ayıklama yapısı
+	ping_val=$(grep "Hosted by" .st_raw.txt | grep -oE "\[[0-9.]+ ms\]" | sed 's/\[//g' | sed 's/\]//g')
+	[[ -z $ping_val ]] && ping_val=$(grep "Hosted by" .st_raw.txt | grep -oE "[0-9.]+ ms")
+	
+	dl_val=$(grep "Download:" .st_raw.txt | sed 's/Download: //')
+	ul_val=$(grep "Upload:" .st_raw.txt | sed 's/Upload: //')
+
+	# Değerleri sayısal formata çevirip kalite kontrolü yapıyoruz
+	dl_num=$(echo "$dl_val" | awk '{print $1}')
+	ul_num=$(echo "$ul_val" | awk '{print $1}')
+	ping_num=$(echo "$ping_val" | awk '{print $1}')
+
+	[[ -z $dl_num ]] && dl_num=0
+	[[ -z $ul_num ]] && ul_num=0
+	[[ -z $ping_num ]] && ping_num=0
+
+	# Dinamik Kalite Hesaplama Alanı
+	b_qual="$RR Poor" && g_qual="$RR Poor" && s_qual="$RR Poor" && v_qual="$RR Poor"
+
+	# Browsing (Webde Gezinme) Kalitesi
+	if (( $(echo "$dl_num >= 15" | bc -l) )); then b_qual="$GG Great"; elif (( $(echo "$dl_num >= 5" | bc -l) )); then b_qual="$YY Good"; fi
+	# Gaming (Oyun) Kalitesi
+	if (( $(echo "$ping_num <= 30 && $ping_num > 0" | bc -l) && $(echo "$ul_num >= 5" | bc -l) )); then g_qual="$GG Great"; elif (( $(echo "$ping_num <= 60" | bc -l) )); then g_qual="$YY Good"; fi
+	# Streaming (Video İzleme) Kalitesi
+	if (( $(echo "$dl_num >= 25" | bc -l) )); then s_qual="$GG Great"; elif (( $(echo "$dl_num >= 10" | bc -l) )); then s_qual="$YY Good"; fi
+	# Video Call (Görüntülü Görüşme) Kalitesi
+	if (( $(echo "$ul_num >= 8" | bc -l) && $(echo "$ping_num <= 40" | bc -l) )); then v_qual="$GG Great"; elif (( $(echo "$ul_num >= 3" | bc -l) )); then v_qual="$YY Good"; fi
+
+	# Orijinal .st_result.txt dosyasını kaydetmek üzere düz metin hazırlıyoruz
+	echo -e "IP Address: $my_ip\nProvider: $provider\nServer: $server_info\nPing: $ping_val\nDownload: $dl_val\nUpload: $ul_val" > .st_result.txt
+
+	# EKRANA RENKLİ RAPOR BASKI ALANI
+	echo -e "  ${CC}=======================================================${WW}"
+	echo -e "   ${CC}[${YY}WAN${CC}]${GG} IP Address : ${YY}$my_ip"
+	echo -e "   ${CC}[${YY}ISP${CC}]${GG} Provider   : ${YY}$provider"
+	echo -e "   ${CC}[${YY}SRV${CC}]${GG} Server     : ${YY}$server_info"
+	echo -e "   ${CC}[${YY}LAT${CC}]${GG} Ping       : ${YY}$ping_val"
+	echo -e "   ${CC}[${YY}OUT${CC}]${GG} Download   : ${YY}$dl_val"
+	echo -e "   ${CC}[${YY}INP${CC}]${GG} Upload     : ${YY}$ul_val"
+	echo -e "  ${CC}-------------------------------------------------------${WW}"
+	echo -e "   ${CC}[${YY}»${CC}]${MM} Browsing Quality  : ${b_qual}"
+	echo -e "   ${CC}[${YY}»${CC}]${MM} Gaming Quality    : ${g_qual}"
+	echo -e "   ${CC}[${YY}»${CC}]${MM} Streaming Quality : ${s_qual}"
+	echo -e "   ${CC}[${YY}»${CC}]${MM} Video Call Quality: ${v_qual}"
+	echo -e "  ${CC}=======================================================${WW}"
+
+	rm -f .st_raw.txt
+
+	# Sonuçları kaydetme aşaması
+	read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Do you want to save the results to a file? (Y/n): ${YY}")" save_choice
+
+	if [[ -z $save_choice || $save_choice == Y || $save_choice == y ]]; then
+		log_file="speedtest_result_$(date +%Y%m%d_%H%M%S).txt"
+		mv .st_result.txt ~/Tdr-Tool/"$log_file"
+		echo -e "\n  ${CC}[${GG}✓${CC}]${GG} Saved successfully as: ${YY}~/Tdr-Tool/$log_file"
+	else
+		rm -f .st_result.txt
+		echo -e "\n  ${CC}[${RR}x${CC}]${RR} Results deleted."
+	fi
+}
+
 while true; do
 clear;echo -e "
 $CC #######$YY ##################$CC #######$YY ####################
@@ -107,8 +179,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == AIO || $pn == aio ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Starting AIO (All-in-One) Configuration..."
-	
-	# 1. İnternet Kontrolü
+
 	ping -c 1 8.8.8.8 &> /dev/null
 	if [ $? -eq 0 ]; then
 		echo -e " $CC [$GG✓$CC]$GG Internet connection detected. Starting automation..."
@@ -119,30 +190,25 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 		#Termux Packages Installing
 		( pkg install termux-tools termux-api coreutils binutils -y; pkg install git curl wget sed grep awk bc jq ncurses-utils -y; pkg install python python-pip ruby php -y; pkg install clang make openssh openssl openssl-tool -y; pkg install zip unzip tar proot crunch -y; pkg install neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet -y; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Packages Installing..." " $WW⟫$GG Complete."
 		#Termux Tools Installing
-		( 
-		  # 1. Pip Yükseltme ve Temel Kütüphaneler
+		(
 		  pip install --upgrade pip setuptools wheel;
-		  # 2. Python tabanlı araçlar (İnternet ve güvenlik kütüphaneleri)
 		  pip install bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest-cli;
-		  # 3. Node.js ve NPM paketleri
 		  pkg install nodejs -y;
-		  npm install -g npm@latest; # NPM'i en güncel sürüme çeker
+		  npm install -g npm@latest;
 		  npm install -g readline-sync speed-test;
-		  # 4. Ruby araçları
 		  gem install lolcat;
 		) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tools Installing..." " $WW⟫$GG Complete."
-	#Termux Tdr-Tool Updating
-	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
-		
-		# 3. Final: İnternet Hız Testi (Otomatik Başlatma)
+		#Termux Tdr-Tool Updating
+		( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
+
 		echo -e "\n $CC [$YY!$CC]$GG AIO Configuration finished! Starting Final Speed Test..."
-		# Hız testi kodunu direkt burada çağırıyoruz
-		curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -
-		
+		# Ortak fonksiyonu otomatik olarak çağırıyoruz
+		run_speedtest
+
 	else
 		echo -e "\n $CC [$RR!$CC]$RR AIO Failed: No Internet connection."
 	fi
-	
+
 	elif [[ $pn == UT || $pn == ut ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: Fast updating program...";
 	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
@@ -150,7 +216,6 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	elif [[ $pn == I || $pn == i ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Checking internet connection...";
 
-	# İnternet durumunu test ediyoruz
 	ping -c 1 8.8.8.8 &> /dev/null
 	if [ $? -eq 0 ]; then
 		status="$WW⟫$GG ONLINE"
@@ -160,85 +225,15 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 		is_online=false
 	fi
 
-	# İnternet kontrol animasyonu dönüyor
 	( sleep 1.5 ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Internet control..." "$status"
 
-	# Eğer internet varsa Hız Testi aşamasına geçiyoruz
 	if [ "$is_online" = true ]; then
 		echo -e ""
-		# Kullanıcıya hız testi yapmak isteyip istemediğini soruyoruz
 		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Want to run an internet speed test? (Y/n): ${YY}")" st_choice
 
 		if [[ -z $st_choice || $st_choice == Y || $st_choice == y ]]; then
-			echo -e "\n $CC [${YY}i$CC]$GG Starting the speed test..."
-
-			# Ham verileri filtreleyebilmek için --simple yerine normal çıktı alıyoruz ve uyarıları gizliyoruz
-			( curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -W ignore - > .st_raw.txt 2>&1 ) & spin "$CC[$YY↓$CC]$GG Testing network speed..." " $WW⟫$GG Complete."
-
-			# Alınan ham verileri ayıklıyoruz
-			my_ip=$(grep -oE "Testing from .* \([0-9.]+\)" .st_raw.txt | grep -oE "[0-9.]+" | head -n 1)
-			provider=$(grep -oE "Testing from .* \(" .st_raw.txt | sed 's/Testing from //' | sed 's/ ($//' | sed 's/ (//')
-			server_info=$(grep "Hosted by" .st_raw.txt | sed 's/Hosted by //' | cut -d '[' -f1 | sed 's/ *$//')
-			
-			# Ping ayıklama yapısını daha esnek ve kararlı hale getirdik
-			ping_val=$(grep "Hosted by" .st_raw.txt | grep -oE "\[[0-9.]+ ms\]" | sed 's/\[//g' | sed 's/\]//g')
-			[[ -z $ping_val ]] && ping_val=$(grep "Hosted by" .st_raw.txt | grep -oE "[0-9.]+ ms")
-			
-			dl_val=$(grep "Download:" .st_raw.txt | sed 's/Download: //')
-			ul_val=$(grep "Upload:" .st_raw.txt | sed 's/Upload: //')
-
-			# Değerleri sayısal formata çevirip kalite kontrolü yapıyoruz
-			dl_num=$(echo "$dl_val" | awk '{print $1}')
-			ul_num=$(echo "$ul_val" | awk '{print $1}')
-			ping_num=$(echo "$ping_val" | awk '{print $1}')
-
-			[[ -z $dl_num ]] && dl_num=0
-			[[ -z $ul_num ]] && ul_num=0
-			[[ -z $ping_num ]] && ping_num=0
-
-			# Dinamik Kalite Hesaplama Alanı
-			b_qual="$RR Poor" && g_qual="$RR Poor" && s_qual="$RR Poor" && v_qual="$RR Poor"
-
-			# Browsing (Webde Gezinme) Kalitesi
-			if (( $(echo "$dl_num >= 15" | bc -l) )); then b_qual="$GG Great"; elif (( $(echo "$dl_num >= 5" | bc -l) )); then b_qual="$YY Good"; fi
-			# Gaming (Oyun) Kalitesi
-			if (( $(echo "$ping_num <= 30 && $ping_num > 0" | bc -l) && $(echo "$ul_num >= 5" | bc -l) )); then g_qual="$GG Great"; elif (( $(echo "$ping_num <= 60" | bc -l) )); then g_qual="$YY Good"; fi
-			# Streaming (Video İzleme) Kalitesi
-			if (( $(echo "$dl_num >= 25" | bc -l) )); then s_qual="$GG Great"; elif (( $(echo "$dl_num >= 10" | bc -l) )); then s_qual="$YY Good"; fi
-			# Video Call (Görüntülü Görüşme) Kalitesi
-			if (( $(echo "$ul_num >= 8" | bc -l) && $(echo "$ping_num <= 40" | bc -l) )); then v_qual="$GG Great"; elif (( $(echo "$ul_num >= 3" | bc -l) )); then v_qual="$YY Good"; fi
-
-			# Orijinal .st_result.txt dosyasını kalıcı kaydetmek için düz metin olarak hazırlıyoruz
-			echo -e "IP Address: $my_ip\nProvider: $provider\nServer: $server_info\nPing: $ping_val\nDownload: $dl_val\nUpload: $ul_val" > .st_result.txt
-
-			# EKRANA RENKLİ, AYARLANMIŞ VE TERMİNAL UYUMLU ASCII LOGOLU BASKI ALANI
-			echo -e "  ${CC}=======================================================${WW}"
-			echo -e "   ${CC}[${YY}WAN${CC}]${GG} IP Address : ${YY}$my_ip"
-			echo -e "   ${CC}[${YY}ISP${CC}]${GG} Provider   : ${YY}$provider"
-			echo -e "   ${CC}[${YY}SRV${CC}]${GG} Server     : ${YY}$server_info"
-			echo -e "   ${CC}[${YY}LAT${CC}]${GG} Ping       : ${YY}$ping_val"
-			echo -e "   ${CC}[${YY}OUT${CC}]${GG} Download   : ${YY}$dl_val"
-			echo -e "   ${CC}[${YY}INP${CC}]${GG} Upload     : ${YY}$ul_val"
-			echo -e "  ${CC}-------------------------------------------------------${WW}"
-			echo -e "   ${CC}[${YY}»${CC}]${MM} Browsing Quality  : ${b_qual}"
-			echo -e "   ${CC}[${YY}»${CC}]${MM} Gaming Quality    : ${g_qual}"
-			echo -e "   ${CC}[${YY}»${CC}]${MM} Streaming Quality : ${s_qual}"
-			echo -e "   ${CC}[${YY}»${CC}]${MM} Video Call Quality: ${v_qual}"
-			echo -e "  ${CC}=======================================================${WW}"
-
-			rm -f .st_raw.txt
-
-			# Sonuçları kaydetme aşaması
-			read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Do you want to save the results to a file? (Y/n): ${YY}")" save_choice
-
-			if [[ -z $save_choice || $save_choice == Y || $save_choice == y ]]; then
-				log_file="speedtest_result_$(date +%Y%m%d_%H%M%S).txt"
-				mv .st_result.txt ~/Tdr-Tool/"$log_file"
-				echo -e "\n  ${CC}[${GG}✓${CC}]${GG} Saved successfully as: ${YY}~/Tdr-Tool/$log_file"
-			else
-				rm -f .st_result.txt
-				echo -e "\n  ${CC}[${RR}x${CC}]${RR} Results deleted."
-			fi
+			# Ortak fonksiyonu çağırıyoruz
+			run_speedtest
 		else
 			echo -e "\n  ${CC}[${YY}i${CC}]${GG} Speedtest skipped."
 		fi
@@ -299,11 +294,11 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
     fi
 
 	if [[ $pn != Q && $pn != q && $pn != "" ]]; then
-        if [[ $pn =~ ^(U|u|UT|ut|P|p|T|t|K|k|X|x|[1-7]|0[1-7]|I|i)$ ]]; then
+        if [[ $pn =~ ^(U|u|UT|ut|AIO|aio|P|p|T|t|K|k|X|x|[1-7]|0[1-7]|I|i)$ ]]; then
 
             read -n 1 -s -p " $(echo -e "\n  ${CC}[${YY}~${CC}]${MM} Press any key to return to main menu...${YY}")"
 
-            if [[ $pn == U || $pn == u || $pn == UT || $pn == ut ]]; then
+            if [[ $pn == U || $pn == u || $pn == UT || $pn == ut || $pn == AIO || $pn == aio ]]; then
                 exec bash ~/Tdr-Tool/Tdr-Tool.sh
             fi
         fi
