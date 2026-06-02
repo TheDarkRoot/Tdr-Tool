@@ -80,10 +80,12 @@ $CC      └─⊸ [$YY »$GG Tdr-Tool exit.$CC]\n"
 read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	if [[ $pn == U || $pn == u ]]; then
+	#Termux Permissions
+	( termux-setup-storage; termux-wake-lock; sleep 3 ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Permission..." " $WW⟫$GG Complete."
 	#Termux Update
 	( apt update -y;apt upgrade -y; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Updating..." " $WW⟫$GG Complete."
 	#Termux Packages Installing
-	( pkg install ruby git python python2 python3 python-pip php zip unzip cowsay figlet wget curl vim proot crunch neofetch nano cmatrix toilet zsh sl tmate bash tor privoxy -y;pkg install termux-api termux-tools play-audio mpv openssh openssl-tool crunch -y; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Packages Installing..." " $WW⟫$GG Complete."
+	( pkg install termux-tools termux-api coreutils binutils -y; pkg install git curl wget sed grep awk bc jq ncurses-utils -y; pkg install python python-pip ruby php -y; pkg install clang make openssh openssl openssl-tool -y; pkg install zip unzip tar proot crunch -y; pkg install neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet -y; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Packages Installing..." " $WW⟫$GG Complete."
 	#Termux Tools Installing
 	( gem install lolcat;pip3 install --upgrade pip;pip3 install bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest speedtest-cli;pkg install nodejs -y;pkg install nodejs-lts -y;npm install readline-sync;npm install;npm install --global speed-test; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tools Installing..." " $WW⟫$GG Complete."
 	#Termux Tdr-Tool Updating
@@ -159,12 +161,12 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 			# EKRANA RENKLİ, AYARLANMIŞ VE TERMİNAL UYUMLU ASCII LOGOLU BASKI ALANI
 			echo -e "  ${CC}=======================================================${WW}"
-			echo -e "   ${CC}[${YY} WAN ${CC}]${GG} IP Address : ${YY}$my_ip"
-			echo -e "   ${CC}[${YY} ISP ${CC}]${GG} Provider   : ${YY}$provider"
-			echo -e "   ${CC}[${YY} SRV ${CC}]${GG} Server     : ${YY}$server_info"
-			echo -e "   ${CC}[${YY} LAT ${CC}]${GG} Ping       : ${YY}$ping_val"
-			echo -e "   ${CC}[${YY} OUT ${CC}]${GG} Download   : ${YY}$dl_val"
-			echo -e "   ${CC}[${YY} INP ${CC}]${GG} Upload     : ${YY}$ul_val"
+			echo -e "   ${CC}[${YY}WAN${CC}]${GG} IP Address : ${YY}$my_ip"
+			echo -e "   ${CC}[${YY}ISP${CC}]${GG} Provider   : ${YY}$provider"
+			echo -e "   ${CC}[${YY}SRV${CC}]${GG} Server     : ${YY}$server_info"
+			echo -e "   ${CC}[${YY}LAT${CC}]${GG} Ping       : ${YY}$ping_val"
+			echo -e "   ${CC}[${YY}OUT${CC}]${GG} Download   : ${YY}$dl_val"
+			echo -e "   ${CC}[${YY}INP${CC}]${GG} Upload     : ${YY}$ul_val"
 			echo -e "  ${CC}-------------------------------------------------------${WW}"
 			echo -e "   ${CC}[${YY}»${CC}]${MM} Browsing Quality  : ${b_qual}"
 			echo -e "   ${CC}[${YY}»${CC}]${MM} Gaming Quality    : ${g_qual}"
