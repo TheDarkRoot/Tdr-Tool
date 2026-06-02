@@ -113,7 +113,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	if [ "$is_online" = true ]; then
 		echo -e ""
 		# Kullanıcıya hız testi yapmak isteyip istemediğini soruyoruz
-		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Do you want to run a speed test via speedtest.net? (Y/n): ${YY}")" st_choice
+		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Want to run an internet speed test? (Y/n): ${YY}")" st_choice
 
 		if [[ -z $st_choice || $st_choice == Y || $st_choice == y ]]; then
 			echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: Checking Speedtest dependency..."
@@ -149,7 +149,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 				echo -e "\n ${CC}[${RR}x${CC}]${RR} Results deleted."
 			fi
 		else
-			echo -e "\n ${CC}[${YY}i${CC}]${GG} Speedtest skipped."
+			echo -e "\n  ${CC}[${YY}i${CC}]${GG} Speedtest skipped."
 		fi
 	fi
 
