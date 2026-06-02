@@ -190,14 +190,14 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 		is_online=false
 	fi
 
-	( sleep 1.5 ) &> /dev/null & spin "$CC[${YY}i$CC]$GG Internet control..." "$status"
+	( sleep 1.5 ) &> /dev/null & spin "$CC[${YY}i$CC]$GG Network control..." "$status"
 
 	if [ "$is_online" = true ]; then
 		run_update
 
 		echo -e "\n $CC [$YY!$CC]$GG Update completed!\n"
 
-		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Want to run an internet speed test? (Y/n): ${YY}")" st_choice_aio
+		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Want to run an network speed test? (Y/n): ${YY}")" st_choice_aio
 
 		if [[ -z $st_choice_aio || $st_choice_aio == Y || $st_choice_aio == y ]]; then
 			run_speedtest
@@ -206,7 +206,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 		fi
 
 	else
-		echo -e "\n $CC [$RR!$CC]$RR Check your internet connection."
+		echo -e "\n $CC [$RR!$CC]$RR Check your network connection."
 	fi
 
 	elif [[ $pn == UT || $pn == ut ]]; then
