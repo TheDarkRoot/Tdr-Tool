@@ -201,12 +201,49 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 		#Termux Tdr-Tool Updating
 		( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
 
-		echo -e "\n $CC [$YY!$CC]$GG AIO Configuration finished! Starting Final Speed Test..."
-		# Ortak fonksiyonu otomatik olarak çağırıyoruz
-		run_speedtest
+		echo -e "\n $CC [$YY!$CC]$GG AIO Configuration finished!"
+
+		# Otomatik başlatmak yerine onay mekanizması ekledik
+		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Want to run an internet speed test? (Y/n): ${YY}")" st_choice_aio
+
+		if [[ -z $st_choice_aio || $st_choice_aio == Y || $st_choice_aio == y ]]; then
+			run_speedtest
+		else
+			echo -e "\n  ${CC}[${YY}i${CC}]${GG} Speedtest skipped."
+		fi
 
 	else
 		echo -e "\n $CC [$RR!$CC]$RR AIO Failed: No Internet connection."
+	fi
+
+	elif [[ $pn == UT || $pn == ut ]]; then
+	echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: Fast updating program...";
+	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
+
+	elif [[ $pn == I || $pn == i ]]; then
+	echo -e "\n $CC [${YY}i$CC]$GG Checking internet connection...";
+
+	ping -c 1 8.8.8.8 &> /dev/null
+	if [ $? -eq 0 ]; then
+		status="$WW⟫$GG ONLINE"
+		is_online=true
+	else
+		status="$WW⟫$RR OFFLINE"
+		is_online=false
+	fi
+
+	( sleep 1.5 ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Internet control..." "$status"
+
+	if [ "$is_online" = true ]; then
+		echo -e ""
+		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Want to run an internet speed test? (Y/n): ${YY}")" st_choice
+
+		if [[ -z $st_choice || $st_choice == Y || $st_choice == y ]]; then
+			# Ortak fonksiyonu çağırıyoruz
+			run_speedtest
+		else
+			echo -e "\n  ${CC}[${YY}i${CC}]${GG} Speedtest skipped."
+		fi
 	fi
 
 	elif [[ $pn == UT || $pn == ut ]]; then
