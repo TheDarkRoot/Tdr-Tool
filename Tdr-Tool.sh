@@ -343,7 +343,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
     fi
 
-	if [[ $pn != Q && $pn != q && $pn != "" ]]; then
+	if [[ $pn != Q && $pn != q && $pn != UT && $pn != ut $pn != "" ]]; then
         if [[ $pn =~ ^(U|u|AIO|aio|P|p|T|t|K|k|X|x|[1-7]|0[1-7]|I|i)$ ]]; then
 
             read -n 1 -s -p " $(echo -e "\n  ${CC}[${YY}~${CC}]${MM} Press any key to return to main menu...${YY}")"
