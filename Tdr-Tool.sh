@@ -121,26 +121,26 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 			# Ham verileri filtreleyebilmek için --simple yerine normal çıktı alıyoruz ve uyarıları gizliyoruz
 			( curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -W ignore - > .st_raw.txt 2>&1 ) & spin "$CC[$YY↓$CC]$GG Testing network speed..." " $WW⟫$GG Complete."
 
-			# Alınan ham verileri değişkenlere atıyoruz
-			local my_ip=$(cat .st_raw.txt | grep -oE "Testing from .* \([0-9.]+\)" | grep -oE "\([0-9.]+\)" | tr -d '()')
-			local provider=$(cat .st_raw.txt | grep -oE "Testing from .* \(" | sed 's/Testing from //' | sed 's/ ($//' | sed 's/ (//')
-			local server_info=$(cat .st_raw.txt | grep "Hosted by" | sed 's/Hosted by //')
+			# Alınan ham verileri ayıklıyoruz (local kelimeleri kaldırıldı)
+			my_ip=$(grep -oE "Testing from .* \([0-9.]+\)" .st_raw.txt | grep -oE "[0-9.]+" | head -n 1)
+			provider=$(grep -oE "Testing from .* \(" .st_raw.txt | sed 's/Testing from //' | sed 's/ ($//' | sed 's/ (//')
+			server_info=$(grep "Hosted by" .st_raw.txt | sed 's/Hosted by //' | cut -d '[' -f1 | sed 's/ *$//')
+			
+			ping_val=$(grep "Hosted by" .st_raw.txt | grep -oE "\[[0-9.]+ ms\]" | tr -d '[]')
+			dl_val=$(grep "Download:" .st_raw.txt | sed 's/Download: //')
+			ul_val=$(grep "Upload:" .st_raw.txt | sed 's/Upload: //')
 
-			local ping_val=$(cat .st_raw.txt | grep "Hosted by" | grep -oE "\[[0-9.]+ ms\]" | tr -d '[]')
-			local dl_val=$(cat .st_raw.txt | grep "Download:" | sed 's/Download: //')
-			local ul_val=$(cat .st_raw.txt | grep "Upload:" | sed 's/Upload: //')
-
-			# Değerleri sayısal formata çevirip kalite kontrolü yapıyoruz (Eğer boş kalırsa çökmemesi için varsayılan atıyoruz)
-			local dl_num=$(echo $dl_val | awk '{print $1}')
-			local ul_num=$(echo $ul_val | awk '{print $1}')
-			local ping_num=$(echo $ping_val | awk '{print $1}')
+			# Değerleri sayısal formata çevirip kalite kontrolü yapıyoruz
+			dl_num=$(echo "$dl_val" | awk '{print $1}')
+			ul_num=$(echo "$ul_val" | awk '{print $1}')
+			ping_num=$(echo "$ping_val" | awk '{print $1}')
 
 			[[ -z $dl_num ]] && dl_num=0
 			[[ -z $ul_num ]] && ul_num=0
 			[[ -z $ping_num ]] && ping_num=0
 
-			# Dinamik Kalite Hesaplama Algoritması
-			local b_qual="$RR Poor" && local g_qual="$RR Poor" && local s_qual="$RR Poor" && local v_qual="$RR Poor"
+			# Dinamik Kalite Hesaplama Alanı
+			b_qual="$RR Poor" && g_qual="$RR Poor" && s_qual="$RR Poor" && v_qual="$RR Poor"
 
 			# Browsing (Webde Gezinme) Kalitesi
 			if (( $(echo "$dl_num >= 15" | bc -l) )); then b_qual="$GG Great"; elif (( $(echo "$dl_num >= 5" | bc -l) )); then b_qual="$YY Good"; fi
@@ -163,10 +163,10 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 			echo -e "   ${CC}[${YY}▼${CC}]${GG} Download   : ${YY}$dl_val"
 			echo -e "   ${CC}[${YY}▲${CC}]${GG} Upload     : ${YY}$ul_val"
 			echo -e "  ${CC}-------------------------------------------------------${WW}"
-			echo -e "   ${CC}[${YY}»${CC}]${MM} Browsing Quality  :${b_qual}"
-			echo -e "   ${CC}[${YY}»${CC}]${MM} Gaming Quality    :${g_qual}"
-			echo -e "   ${CC}[${YY}»${CC}]${MM} Streaming Quality :${s_qual}"
-			echo -e "   ${CC}[${YY}»${CC}]${MM} Video Call Quality:${v_qual}"
+			echo -e "   ${CC}[${YY}»${CC}]${MM} Browsing Quality  : ${b_qual}"
+			echo -e "   ${CC}[${YY}»${CC}]${MM} Gaming Quality    : ${g_qual}"
+			echo -e "   ${CC}[${YY}»${CC}]${MM} Streaming Quality : ${s_qual}"
+			echo -e "   ${CC}[${YY}»${CC}]${MM} Video Call Quality: ${v_qual}"
 			echo -e "  ${CC}=======================================================${WW}"
 
 			rm -f .st_raw.txt
