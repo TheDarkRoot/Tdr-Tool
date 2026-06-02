@@ -171,10 +171,6 @@ $CC      └─⊸ [$YY »$GG Tdr-Tool exit.$CC]\n"
 read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	if [[ $pn == U || $pn == u ]]; then
-	run_update
-
-	elif [[ $pn == AIO || $pn == aio ]]; then
-	echo -e "\n $CC [${YY}i$CC]$GG Starting All-in-One Configuration..."
 
 	ping -c 1 8.8.8.8 &> /dev/null
 	if [ $? -eq 0 ]; then
@@ -190,7 +186,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	if [ "$is_online" = true ]; then
 		run_update
 
-		echo -e "\n $CC [$YY!$CC]$GG AIO Configuration finished!\n"
+		echo -e "\n $CC [$YY!$CC]$GG Update completed!\n"
 
 		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Want to run an internet speed test? (Y/n): ${YY}")" st_choice_aio
 
@@ -316,7 +312,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
     fi
 
 	if [[ $pn != Q && $pn != q && $pn != "" ]]; then
-        if [[ $pn =~ ^(U|u|AIO|aio|P|p|T|t|K|k|X|x|[1-7]|0[1-7]|I|i)$ ]]; then
+        if [[ $pn =~ ^(U|u|P|p|T|t|K|k|X|x|[1-7]|0[1-7]|I|i)$ ]]; then
 
             read -n 1 -s -p " $(echo -e "\n  ${CC}[${YY}~${CC}]${MM} Press any key to return to main menu...${YY}")"
 
