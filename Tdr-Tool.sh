@@ -87,7 +87,21 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	#Termux Packages Installing
 	( pkg install termux-tools termux-api coreutils binutils -y; pkg install git curl wget sed grep awk bc jq ncurses-utils -y; pkg install python python-pip ruby php -y; pkg install clang make openssh openssl openssl-tool -y; pkg install zip unzip tar proot crunch -y; pkg install neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet -y; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Packages Installing..." " $WW⟫$GG Complete."
 	#Termux Tools Installing
-	( gem install lolcat;pip3 install --upgrade pip;pip3 install bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest speedtest-cli;pkg install nodejs -y;pkg install nodejs-lts -y;npm install readline-sync;npm install;npm install --global speed-test; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tools Installing..." " $WW⟫$GG Complete."
+	( 
+	  # 1. Pip Yükseltme ve Temel Kütüphaneler
+	  pip install --upgrade pip setuptools wheel;
+	  
+	  # 2. Python tabanlı araçlar (İnternet ve güvenlik kütüphaneleri)
+	  pip install bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest-cli;
+	  
+	  # 3. Node.js ve NPM paketleri
+	  pkg install nodejs -y;
+	  npm install -g npm@latest; # NPM'i en güncel sürüme çeker
+	  npm install -g readline-sync speed-test;
+	  
+	  # 4. Ruby araçları
+	  gem install lolcat;
+	) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tools Installing..." " $WW⟫$GG Complete."
 	#Termux Tdr-Tool Updating
 	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
 
