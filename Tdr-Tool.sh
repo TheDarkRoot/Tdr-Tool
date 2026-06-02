@@ -68,6 +68,17 @@ run_update () {
 }
 
 run_speedtest () {
+	# Bağımlılık Kontrolü
+    local dependencies=("python3" "awk" "bc" "curl")
+    for cmd in "${dependencies[@]}"; do
+        if ! command -v "$cmd" &> /dev/null; then
+            echo -e "\n  ${CC}[${RR}!${CC}]${RR} Hata: '$cmd' paketi eksik!"
+            echo -e "  ${YY}[${CC}i${YY}]${GG} Lütfen ana menüden 'U' (Update) seçeneğini çalıştırarak gerekli paketleri yükleyin."
+            sleep 2
+            return 1 # Fonksiyonu iptal et ve menüye dön
+        fi
+    done
+
 	# Ham verileri filtreleyebilmek için normal çıktı alıyoruz ve uyarıları gizliyoruz
 	(
 		if command -v speedtest-cli &> /dev/null; then
