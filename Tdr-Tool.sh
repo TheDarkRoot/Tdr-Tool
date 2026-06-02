@@ -95,14 +95,63 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == I || $pn == i ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Checking internet connection...";
+
+	# İnternet durumunu test ediyoruz
 	ping -c 1 8.8.8.8 &> /dev/null
 	if [ $? -eq 0 ]; then
 		status="$WW⟫$GG ONLINE"
+		is_online=true
 	else
 		status="$WW⟫$RR OFFLINE"
+		is_online=false
 	fi
 
+	# İnternet kontrol animasyonu dönüyor
 	( sleep 1.5 ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Internet control..." "$status"
+	
+	# Eğer internet varsa Hız Testi aşamasına geçiyoruz
+	if [ "$is_online" = true ]; then
+		echo -e ""
+		# Kullanıcıya hız testi yapmak isteyip istemediğini soruyoruz
+		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Do you want to run a speed test via speedtest.net? (Y/n): ${YY}")" st_choice
+
+		if [[ -z $st_choice || $st_choice == Y || $st_choice == y ]]; then
+			echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: Checking Speedtest dependency..."
+
+			# Eğer sistemde Ookla'nın resmi speedtest aracı yüklü değilse otomatik yüklüyoruz
+			if ! command -v speedtest &> /dev/null; then
+				echo -e " $CC [${YY}i$CC]$YY Installing official speedtest-cli tool..."
+				pkg install nodejs-lts -y &> /dev/null
+				npm install --global speed-test &> /dev/null
+			fi
+
+			echo -e "\n $CC [${YY}i$CC]$GG Running Speedtest..."
+			echo -e "${CC}======================================================${WW}"
+
+			# Resmi speed-test aracını çalıştırıp çıktıyı hem ekrana basıyoruz hem geçici dosyaya kaydediyoruz
+			# Bu araç direkt speedtest.net üzerinden harika bir görselle çalışır
+			speed-test | tee .st_result.txt
+
+			echo -e "${CC}======================================================${WW}"
+
+			# Sonuçları kalıcı olarak kaydetmek isteyip istemediğini soruyoruz
+			read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Do you want to save the results to a file? (Y/n): ${YY}")" save_choice
+
+			if [[ -z $save_choice || $save_choice == Y || $save_choice == y ]]; then
+				# Sonuçları Tdr-Tool klasörünün içine tarih damgasıyla kaydeder ve içindeki renk kodlarını temizler
+				local log_file="speedtest_result_$(date +%Y%m%d_%H%M%S).txt"
+				cat .st_result.txt | sed 's/\x1b\[[0-9;]*m//g' > ~/Tdr-Tool/$log_file
+				rm -f .st_result.txt
+				echo -e "\n ${CC}[${GG}✓${CC}]${GG} Saved successfully as: ${YY}~/Tdr-Tool/$log_file"
+			else
+				# Kaydetmek istemezse geçici dosyayı temizler
+				rm -f .st_result.txt
+				echo -e "\n ${CC}[${RR}x${CC}]${RR} Results deleted."
+			fi
+		else
+			echo -e "\n ${CC}[${YY}i${CC}]${GG} Speedtest skipped."
+		fi
+	fi
 
 	elif [[ $pn == P || $pn == p ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG ParrotOS-T: Parrot OS theme for Termux.";
