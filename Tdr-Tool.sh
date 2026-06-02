@@ -68,7 +68,7 @@ run_update () {
 	#Termux Permissions
 	( termux-setup-storage; termux-wake-lock; sleep 3 ) &> /dev/null & spin "${CC}[${YY}↓${CC}]${GG} Permission..." " ${WW}⟫${GG} Complete."
 	#Termux Update
-	( echo "--- Updating ---" >> "$Log"; pkg update -y; pkg upgrade -y; ) >> "$Log" 2>&1 & spin "${CC}[${YY}↓${CC}]${GG} Updating..." " ${WW}⟫${GG} Complete."
+	( echo "--- Updating ---" > "$Log"; pkg update -y; pkg upgrade -y; ) >> "$Log" 2>&1 & spin "${CC}[${YY}↓${CC}]${GG} Updating..." " ${WW}⟫${GG} Complete."
 	#Termux Packages Installing
 	( pkg install termux-tools termux-api coreutils binutils -y; pkg install git curl wget sed grep awk bc jq ncurses-utils -y; pkg install python python-pip ruby php -y; pkg install clang make openssh openssl openssl-tool -y; pkg install zip unzip tar proot crunch -y; pkg install neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet -y; ) &> /dev/null & spin "${CC}[${YY}↓${CC}]${GG} Packages Installing..." " ${WW}⟫${GG} Complete."
 	#Termux Tools Installing
@@ -277,11 +277,9 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	(
 	  cd ~/;
 	  curl -sLf "$Raw/ParrotOS-T/master/ParrotOS-T.sh?t=$(date +%s)" -o ParrotOS-T.sh;
-	  chmod +x ParrotOS-T.sh;bash ParrotOS-T.sh;
-	  cd ~/;rm -rf ParrotOS-T.sh;
 	  curl -sLf "$Raw/Terkey/master/Terkey.sh?t=$(date +%s)" -o Terkey.sh;
-	  chmod +x Terkey.sh;bash Terkey.sh;
-	  cd ~/;rm -rf Terkey.sh;
+	  chmod +x ParrotOS-T.sh; bash ParrotOS-T.sh; chmod +x Terkey.sh; bash Terkey.sh;
+	  cd ~/;rm -rf ParrotOS-T.sh; cd ~/;rm -rf Terkey.sh;
 	) &> /dev/null & spin "${CC}[$YY↓${CC}]${GG} Downloading TheDarkRoot-T..." " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == T || $pn == t ]]; then
@@ -289,11 +287,9 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	(
 	  cd ~/;
 	  curl -sLf "$Raw/TheDarkRoot-T/master/TheDarkRoot-T.sh?t=$(date +%s)" -o TheDarkRoot-T.sh;
-	  chmod +x TheDarkRoot-T.sh;bash TheDarkRoot-T.sh;
-	  cd ~/;rm -rf TheDarkRoot-T.sh;
 	  curl -sLf "$Raw/Terkey/master/Terkey.sh?t=$(date +%s)" -o Terkey.sh;
-	  chmod +x Terkey.sh;bash Terkey.sh;
-	  cd ~/;rm -rf Terkey.sh;
+	  chmod +x TheDarkRoot-T.sh; bash TheDarkRoot-T.sh; chmod +x Terkey.sh; bash Terkey.sh;
+	  cd ~/;rm -rf TheDarkRoot-T.sh; cd ~/;rm -rf Terkey.sh;
 	) &> /dev/null & spin "${CC}[$YY↓${CC}]${GG} Downloading TheDarkRoot-T..." " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == X || $pn == x ]]; then
