@@ -88,12 +88,10 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	( gem install lolcat;pip3 install --upgrade pip;pip3 install bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest speedtest-cli;pkg install nodejs -y;pkg install nodejs-lts -y;npm install readline-sync;npm install;npm install --global speed-test; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tools Installing..." " $WW⟫$GG Complete."
 	#Termux Tdr-Tool Updating
 	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
-	exec bash ~/Tdr-Tool/Tdr-Tool.sh
 
 	elif [[ $pn == UT || $pn == ut ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: Fast updating program...";
 	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
-	exec bash ~/Tdr-Tool/Tdr-Tool.sh
 
 	elif [[ $pn == I || $pn == i ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Checking internet connection...";
@@ -165,13 +163,10 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
     fi
 
 	if [[ $pn != Q && $pn != q && $pn != "" ]]; then
-        # Kullanıcı geçersiz bir şey (Invalid Action) yazmadıysa bekletme uyarısını çıkar
         if [[ $pn =~ ^(U|u|UT|ut|P|p|T|t|K|k|BASH|bash|X|x|[1-7]|0[1-7]|I|i)$ ]]; then
 
-            # Kullanıcı herhangi bir tuşa basana kadar bekler
             read -n 1 -s -p " $(echo -e "\n  ${CC}[${YY}~${CC}]${MM} Press any key to return to main menu...${YY}")"
 
-            # EĞER GÜNCELLEME YAPILDIYSA PROGRAMI ŞİMDİ YENİDEN BAŞLAT:
             if [[ $pn == U || $pn == u || $pn == UT || $pn == ut ]]; then
                 exec bash ~/Tdr-Tool/Tdr-Tool.sh
             fi
