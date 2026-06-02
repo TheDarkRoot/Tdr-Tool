@@ -179,10 +179,22 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == AIO || $pn == aio ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Starting AIO (All-in-One) Configuration..."
+	echo -e "\n $CC [${YY}i$CC]$GG Checking internet connection...";
 
+	# i parametresindeki gelişmiş internet kontrol yapısı
 	ping -c 1 8.8.8.8 &> /dev/null
 	if [ $? -eq 0 ]; then
-		echo -e " $CC [$GG✓$CC]$GG Internet connection detected. Starting automation..."
+		status="$WW⟫$GG ONLINE"
+		is_online=true
+	else
+		status="$WW⟫$RR OFFLINE"
+		is_online=false
+	fi
+
+	( sleep 1.5 ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Internet control..." "$status"
+
+	if [ "$is_online" = true ]; then
+		echo -e "\n $CC [$GG✓$CC]$GG Internet connection detected. Starting automation..."
 		#Termux Permissions
 		( termux-setup-storage; termux-wake-lock; sleep 3 ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Permission..." " $WW⟫$GG Complete."
 		#Termux Update
@@ -203,7 +215,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 		echo -e "\n $CC [$YY!$CC]$GG AIO Configuration finished!"
 
-		# Otomatik başlatmak yerine onay mekanizması ekledik
+		# Hız testi onay mekanizması
 		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Want to run an internet speed test? (Y/n): ${YY}")" st_choice_aio
 
 		if [[ -z $st_choice_aio || $st_choice_aio == Y || $st_choice_aio == y ]]; then
@@ -213,6 +225,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 		fi
 
 	else
+		# Eğer internet yoksa senin istediğin bu hata mesajı basılacak
 		echo -e "\n $CC [$RR!$CC]$RR AIO Failed: No Internet connection."
 	fi
 
