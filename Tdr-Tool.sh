@@ -1,5 +1,21 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
+#Colors
+BB="\033[34;1m" # Blue Light
+YY="\033[33;1m" # Yellow Light
+GG="\033[32;1m" # Green Light
+WW="\033[0;1m"  # White Light
+RR="\033[31;1m" # Red Light
+CC="\033[36;1m" # Cyan Light
+MM="\033[35;1m" # Magenta Light
+B="\033[34;1m"  # Blue
+Y="\033[33;1m"  # Yellow
+G="\033[32;1m"  # Green
+W="\033[0;1m"   # White
+R="\033[31;1m"  # Red
+C="\033[36;1m"  # Cyan
+M="\033[35;1m"  # Magenta
+
 spin () {
 local pid=$!
 local delay=0.10
@@ -21,28 +37,17 @@ done
 echo -e "\r  $msg_loading \033[K$msg_done"
 }
 
-#Colors
-BB="\033[34;1m" # Blue Light
-YY="\033[33;1m" # Yellow Light
-GG="\033[32;1m" # Green Light
-WW="\033[0;1m"  # White Light
-RR="\033[31;1m" # Red Light
-CC="\033[36;1m" # Cyan Light
-MM="\033[35;1m" # Magenta Light
-B="\033[34;1m"  # Blue
-Y="\033[33;1m"  # Yellow
-G="\033[32;1m"  # Green
-W="\033[0;1m"   # White
-R="\033[31;1m"  # Red
-C="\033[36;1m"  # Cyan
-M="\033[35;1m"  # Magenta
+# Klasör kontrolü ve otomatik oluşturma
+if [ ! -d ~/Tdr-Tool ]; then
+    mkdir -p ~/Tdr-Tool
+fi
 
 run_update () {
 	echo -e "\n $CC [${YY}i$CC]$GG Starting the update..."
 	#Termux Permissions
 	( termux-setup-storage; termux-wake-lock; sleep 3 ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Permission..." " $WW⟫$GG Complete."
 	#Termux Update
-	( apt update -y;apt upgrade -y; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Updating..." " $WW⟫$GG Complete."
+	( pkg update -y;pkg upgrade -y; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Updating..." " $WW⟫$GG Complete."
 	#Termux Packages Installing
 	( pkg install termux-tools termux-api coreutils binutils -y; pkg install git curl wget sed grep awk bc jq ncurses-utils -y; pkg install python python-pip ruby php -y; pkg install clang make openssh openssl openssl-tool -y; pkg install zip unzip tar proot crunch -y; pkg install neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet -y; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Packages Installing..." " $WW⟫$GG Complete."
 	#Termux Tools Installing
@@ -55,12 +60,18 @@ run_update () {
 	  gem install lolcat;
 	) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tools Installing..." " $WW⟫$GG Complete."
 	#Termux Tdr-Tool Updating
-	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
+	( cd ~/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
 }
 
 run_speedtest () {
 	# Ham verileri filtreleyebilmek için normal çıktı alıyoruz ve uyarıları gizliyoruz
-	( curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -W ignore - > .st_raw.txt 2>&1 ) & spin "$CC[$YY↓$CC]$GG Testing network speed..." " $WW⟫$GG Complete."
+	(
+		if command -v speedtest-cli &> /dev/null; then
+			python3 -W ignore $(command -v speedtest-cli) > .st_raw.txt 2>&1
+		else
+			curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -W ignore - > .st_raw.txt 2>&1
+		fi
+	) & spin "$CC[$YY↓$CC]$GG Testing network speed..." " $WW⟫$GG Complete."
 
 	# Alınan ham verileri ayıklıyoruz
 	my_ip=$(grep -oE "Testing from .* \([0-9.]+\)" .st_raw.txt | grep -oE "[0-9.]+" | head -n 1)
@@ -120,8 +131,8 @@ run_speedtest () {
 
 	if [[ -z $save_choice || $save_choice == Y || $save_choice == y ]]; then
 		log_file="speedtest_result_$(date +%Y%m%d_%H%M%S).txt"
-		mv .st_result.txt ~/Tdr-Tool/"$log_file"
-		echo -e "\n  ${CC}[${GG}✓${CC}]${GG} Saved successfully as: ${YY}~/Tdr-Tool/$log_file"
+		mv .st_result.txt ~/"$log_file"
+		echo -e "\n  ${CC}[${GG}✓${CC}]${GG} Saved successfully as: ${YY}~/$log_file"
 	else
 		rm -f .st_result.txt
 		echo -e "\n  ${CC}[${RR}x${CC}]${RR} Results deleted."
@@ -200,7 +211,11 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == UT || $pn == ut ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: Fast updating program...";
-	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
+	(
+	  cd ~/;
+	  curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh;
+	  chmod +x Tdr-Tool.sh;
+	) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
 
 	elif [[ $pn == N || $pn == n ]]; then
 
@@ -218,35 +233,6 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	if [ "$is_online" = true ]; then
 		echo -e ""
 		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Want to run an network speed test? (Y/n): ${YY}")" st_choice
-
-		if [[ -z $st_choice || $st_choice == Y || $st_choice == y ]]; then
-			run_speedtest
-		else
-			echo -e "\n  ${CC}[${YY}i${CC}]${GG} Speedtest skipped."
-		fi
-	fi
-
-	elif [[ $pn == UT || $pn == ut ]]; then
-	echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: Fast updating program...";
-	( cd ~/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
-
-	elif [[ $pn == I || $pn == i ]]; then
-	echo -e "\n $CC [${YY}i$CC]$GG Checking internet connection...";
-
-	ping -c 1 8.8.8.8 &> /dev/null
-	if [ $? -eq 0 ]; then
-		status="$WW⟫$GG ONLINE"
-		is_online=true
-	else
-		status="$WW⟫$RR OFFLINE"
-		is_online=false
-	fi
-
-	( sleep 1.5 ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Internet control..." "$status"
-
-	if [ "$is_online" = true ]; then
-		echo -e ""
-		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Want to run an internet speed test? (Y/n): ${YY}")" st_choice
 
 		if [[ -z $st_choice || $st_choice == Y || $st_choice == y ]]; then
 			run_speedtest
@@ -281,7 +267,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == X || $pn == x ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG X: Code in the trial period.";
-	( cd ~/Tdr-Tool && rm -rf .x_temp && git clone --quiet https://github.com/TheDarkRoot/x.git .x_temp && chmod +x .x_temp && chmod +x .x_temp/* && rm -rf x && mv .x_temp x ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading X..."
+	( cd ~/Tdr-Tool && rm -rf .x_temp && git clone --quiet https://github.com/TheDarkRoot/x.git .x_temp && chmod +x .x_temp && chmod +x .x_temp/* && rm -rf x && mv .x_temp x ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading X..." " $WW⟫$GG Complete."
 
 	elif [[ $pn == 1 || $pn == 01 ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG AnonSMS: Anonymous SMS sending tool.";
@@ -322,13 +308,14 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
     fi
 
 	if [[ $pn != Q && $pn != q && $pn != "" ]]; then
-        if [[ $pn =~ ^(U|u|P|p|T|t|K|k|X|x|[1-7]|0[1-7]|N|n)$ ]]; then
+		# Regex içine UT ve ut eklendi
+		if [[ $pn =~ ^(U|u|UT|ut|P|p|T|t|X|x|[1-7]|0[1-7]|N|n)$ ]]; then
 
-            read -n 1 -s -p " $(echo -e "\n  ${CC}[${YY}~${CC}]${MM} Press any key to return to main menu...${YY}")"
+			read -n 1 -s -p " $(echo -e "\n  ${CC}[${YY}~${CC}]${MM} Press any key to return to main menu...${YY}")"
 
-            if [[ $pn == U || $pn == u || $pn == UT || $pn == ut || $pn == AIO || $pn == aio ]]; then
-                exec bash ~/Tdr-Tool.sh
-            fi
-        fi
-    fi
+			if [[ $pn == U || $pn == u || $pn == UT || $pn == ut ]]; then
+				exec bash ~/Tdr-Tool.sh
+			fi
+		fi
+	fi
 done
