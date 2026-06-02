@@ -40,7 +40,6 @@ M="\033[35;1m"  # Magenta
 # --- ORTAK GÜNCELLEME VE KURULUM FONKSİYONU ---
 run_update () {
 	echo -e "\n $CC [${YY}i$CC]$GG Starting the update..."
-
 	#Termux Permissions
 	( termux-setup-storage; termux-wake-lock; sleep 3 ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Permission..." " $WW⟫$GG Complete."
 	#Termux Update
