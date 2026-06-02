@@ -118,29 +118,58 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 		if [[ -z $st_choice || $st_choice == Y || $st_choice == y ]]; then
 			echo -e "\n $CC [${YY}i$CC]$GG Starting the speed test..."
 
-			# Python veya npm bağımlılığı olmadan doğrudan resmi altyapıyı kullanan saf bash scripti indirip çalıştırıyoruz
-			( curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -W ignore - --simple > .st_result.txt 2>&1 ) & spin "$CC[$YY↓$CC]$GG Testing network speed..." " $WW⟫$GG Complete."
+			# Ham verileri filtreleyebilmek için --simple yerine normal çıktı alıyoruz ve uyarıları gizliyoruz
+			( curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -W ignore - > .st_raw.txt 2>&1 ) & spin "$CC[$YY↓$CC]$GG Testing network speed..." " $WW⟫$GG Complete."
 
+			# Alınan ham verileri değişkenlere atıyoruz
+			local my_ip=$(cat .st_raw.txt | grep -oE "Testing from .* \([0-9.]+\)" | grep -oE "\([0-9.]+\)" | tr -d '()')
+			local provider=$(cat .st_raw.txt | grep -oE "Testing from .* \(" | sed 's/Testing from //' | sed 's/ ($//' | sed 's/ (//')
+			local server_info=$(cat .st_raw.txt | grep "Hosted by" | sed 's/Hosted by //')
+
+			local ping_val=$(cat .st_raw.txt | grep "Hosted by" | grep -oE "\[[0-9.]+ ms\]" | tr -d '[]')
+			local dl_val=$(cat .st_raw.txt | grep "Download:" | sed 's/Download: //')
+			local ul_val=$(cat .st_raw.txt | grep "Upload:" | sed 's/Upload: //')
+
+			# Değerleri sayısal formata çevirip kalite kontrolü yapıyoruz (Eğer boş kalırsa çökmemesi için varsayılan atıyoruz)
+			local dl_num=$(echo $dl_val | awk '{print $1}')
+			local ul_num=$(echo $ul_val | awk '{print $1}')
+			local ping_num=$(echo $ping_val | awk '{print $1}')
+
+			[[ -z $dl_num ]] && dl_num=0
+			[[ -z $ul_num ]] && ul_num=0
+			[[ -z $ping_num ]] && ping_num=0
+
+			# Dinamik Kalite Hesaplama Algoritması
+			local b_qual="$RR Poor" && local g_qual="$RR Poor" && local s_qual="$RR Poor" && local v_qual="$RR Poor"
+
+			# Browsing (Webde Gezinme) Kalitesi
+			if (( $(echo "$dl_num >= 15" | bc -l) )); then b_qual="$GG Great"; elif (( $(echo "$dl_num >= 5" | bc -l) )); then b_qual="$YY Good"; fi
+			# Gaming (Oyun) Kalitesi
+			if (( $(echo "$ping_num <= 30 && $ping_num > 0" | bc -l) && $(echo "$ul_num >= 5" | bc -l) )); then g_qual="$GG Great"; elif (( $(echo "$ping_num <= 60" | bc -l) )); then g_qual="$YY Good"; fi
+			# Streaming (Video İzleme) Kalitesi
+			if (( $(echo "$dl_num >= 25" | bc -l) )); then s_qual="$GG Great"; elif (( $(echo "$dl_num >= 10" | bc -l) )); then s_qual="$YY Good"; fi
+			# Video Call (Görüntülü Görüşme) Kalitesi
+			if (( $(echo "$ul_num >= 8" | bc -l) && $(echo "$ping_num <= 40" | bc -l) )); then v_qual="$GG Great"; elif (( $(echo "$ul_num >= 3" | bc -l) )); then v_qual="$YY Good"; fi
+
+			# Orijinal .st_result.txt dosyasını kalıcı kaydetmek için düz metin olarak hazırlıyoruz
+			echo -e "IP Address: $my_ip\nProvider: $provider\nServer: $server_info\nPing: $ping_val\nDownload: $dl_val\nUpload: $ul_val" > .st_result.txt
+
+			# EKRANA RENKLİ VE İÇERİDEN HİZALANMIŞ BASKI ALANI
+			echo -e "  ${CC}=======================================================${WW}"
+			echo -e "   ${CC}[${YY}🌐${CC}]${GG} IP Address : ${YY}$my_ip"
+			echo -e "   ${CC}[${YY}🏢${CC}]${GG} Provider   : ${YY}$provider"
+			echo -e "   ${CC}[${YY}🖥️${CC}]${GG} Server     : ${YY}$server_info"
+			echo -e "   ${CC}[${YY}✦${CC}]${GG} Ping       : ${YY}$ping_val"
+			echo -e "   ${CC}[${YY}▼${CC}]${GG} Download   : ${YY}$dl_val"
+			echo -e "   ${CC}[${YY}▲${CC}]${GG} Upload     : ${YY}$ul_val"
+			echo -e "  ${CC}-------------------------------------------------------${WW}"
+			echo -e "   ${CC}[${YY}»${CC}]${MM} Browsing Quality  :${b_qual}"
+			echo -e "   ${CC}[${YY}»${CC}]${MM} Gaming Quality    :${g_qual}"
+			echo -e "   ${CC}[${YY}»${CC}]${MM} Streaming Quality :${s_qual}"
+			echo -e "   ${CC}[${YY}»${CC}]${MM} Video Call Quality:${v_qual}"
 			echo -e "  ${CC}=======================================================${WW}"
 
-			# Dosyadan verileri okuyup renklendirerek ve içeriden başlatarak ekrana basıyoruz
-			while IFS= read -r line; do
-				if [[ $line == Ping* ]]; then
-					# Ping değerini Cyan ikon ve Yeşil metin ile basar
-					echo -e "   ${CC}[${YY}✦${CC}]${GG} ${line}"
-				elif [[ $line == Download* ]]; then
-					# Download değerini Cyan ikon ve Yeşil metin ile basar
-					echo -e "   ${CC}[${YY}▼${CC}]${GG} ${line}"
-				elif [[ $line == Upload* ]]; then
-					# Upload değerini Cyan ikon ve Yeşil metin ile basar
-					echo -e "   ${CC}[${YY}▲${CC}]${GG} ${line}"
-				else
-					# Eğer ekstra bir satır gelirse şablonu bozmasın diye düz yeşil basar
-					echo -e "   ${GG}${line}"
-				fi
-			done < .st_result.txt
-
-			echo -e "  ${CC}=======================================================${WW}"
+			rm -f .st_raw.txt
 
 			# Sonuçları kaydetme aşaması
 			read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Do you want to save the results to a file? (Y/n): ${YY}")" save_choice
