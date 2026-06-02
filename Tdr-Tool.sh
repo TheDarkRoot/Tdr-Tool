@@ -222,7 +222,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	else
 		# Eğer internet yoksa senin istediğin bu hata mesajı basılacak
-		echo -e "\n $CC [$RR!$CC]$RR AIO Failed: No Internet connection."
+		echo -e "\n $CC [$RR!$CC]$RR Check your internet connection."
 	fi
 
 	elif [[ $pn == UT || $pn == ut ]]; then
