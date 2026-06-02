@@ -37,7 +37,6 @@ R="\033[31;1m"  # Red
 C="\033[36;1m"  # Cyan
 M="\033[35;1m"  # Magenta
 
-# --- ORTAK GÜNCELLEME VE KURULUM FONKSİYONU ---
 run_update () {
 	echo -e "\n $CC [${YY}i$CC]$GG Starting the update..."
 	#Termux Permissions
@@ -59,7 +58,6 @@ run_update () {
 	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
 }
 
-# --- ORTAK İNTERNET HIZ TESTİ FONKSİYONU ---
 run_speedtest () {
 	# Ham verileri filtreleyebilmek için normal çıktı alıyoruz ve uyarıları gizliyoruz
 	( curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -W ignore - > .st_raw.txt 2>&1 ) & spin "$CC[$YY↓$CC]$GG Testing network speed..." " $WW⟫$GG Complete."
@@ -173,13 +171,11 @@ $CC      └─⊸ [$YY »$GG Tdr-Tool exit.$CC]\n"
 read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	if [[ $pn == U || $pn == u ]]; then
-	# Ortak fonksiyon çağrılıyor
 	run_update
 
 	elif [[ $pn == AIO || $pn == aio ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Starting All-in-One Configuration..."
 
-	# i parametresindeki gelişmiş internet kontrol yapısı
 	ping -c 1 8.8.8.8 &> /dev/null
 	if [ $? -eq 0 ]; then
 		status="$WW⟫$GG ONLINE"
@@ -192,12 +188,10 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	( sleep 1.5 ) &> /dev/null & spin "$CC[${YY}i$CC]$GG Internet control..." "$status"
 
 	if [ "$is_online" = true ]; then
-		# Ortak fonksiyon çağrılıyor
 		run_update
 
 		echo -e "\n $CC [$YY!$CC]$GG AIO Configuration finished!\n"
 
-		# Hız testi onay mekanizması
 		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Want to run an internet speed test? (Y/n): ${YY}")" st_choice_aio
 
 		if [[ -z $st_choice_aio || $st_choice_aio == Y || $st_choice_aio == y ]]; then
@@ -207,7 +201,6 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 		fi
 
 	else
-		# Eğer internet yoksa senin istediğin bu hata mesajı basılacak
 		echo -e "\n $CC [$RR!$CC]$RR Check your internet connection."
 	fi
 
@@ -233,7 +226,6 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Want to run an internet speed test? (Y/n): ${YY}")" st_choice
 
 		if [[ -z $st_choice || $st_choice == Y || $st_choice == y ]]; then
-			# Ortak fonksiyonu çağırıyoruz
 			run_speedtest
 		else
 			echo -e "\n  ${CC}[${YY}i${CC}]${GG} Speedtest skipped."
@@ -263,7 +255,6 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Want to run an internet speed test? (Y/n): ${YY}")" st_choice
 
 		if [[ -z $st_choice || $st_choice == Y || $st_choice == y ]]; then
-			# Ortak fonksiyonu çağırıyoruz
 			run_speedtest
 		else
 			echo -e "\n  ${CC}[${YY}i${CC}]${GG} Speedtest skipped."
