@@ -163,8 +163,6 @@ $CC    ├─┬─⊸ [$YY›P$YY‹$RR ParrotOS-T$CC]
 $CC    │ └─⊸ [$YY »$GG Parrot OS theme for Termux.$CC]
 $CC    ├─┬─⊸ [$YY›T$YY‹$RR TheDarkRoot-T$CC]
 $CC    │ └─⊸ [$YY »$GG TheDarkRoot theme for Termux.$CC]
-$CC    ├─┬─⊸ [$YY›K$YY‹$RR Terkey$CC]
-$CC    │ └─⊸ [$YY »$GG Utility to add direction keys to Termux.$CC]
 $CC    └─┬─⊸ [$YY›Q$YY‹$RR Exit$CC]
 $CC      └─⊸ [$YY »$GG Tdr-Tool exit.$CC]\n"
 
@@ -259,15 +257,27 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == P || $pn == p ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG ParrotOS-T: Parrot OS theme for Termux.";
-	( cd ~/Tdr-Tool;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/ParrotOS-T/master/ParrotOS-T.sh?t=$(date +%s)" -o ParrotOS-T.sh;chmod +x ParrotOS-T.sh;bash ParrotOS-T.sh;cd ~/Tdr-Tool;rm -rf ParrotOS-T.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading ParrotOS-T..." " $WW⟫$GG Complete."
-	echo -e "\n $CC [${YY}i$CC]$GG Terkey: Utility to add direction keys to Termux.";
-	( cd ~/Tdr-Tool;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Terkey/master/Terkey.sh?t=$(date +%s)" -o Terkey.sh;chmod +x Terkey.sh;bash Terkey.sh;cd ~/Tdr-Tool;rm -rf Terkey.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Terkey..." " $WW⟫$GG Complete."
+	(
+	  cd ~/;
+	  curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/ParrotOS-T/master/ParrotOS-T.sh?t=$(date +%s)" -o ParrotOS-T.sh;
+	  chmod +x ParrotOS-T.sh;bash ParrotOS-T.sh;
+	  cd ~/;rm -rf ParrotOS-T.sh;
+	  curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Terkey/master/Terkey.sh?t=$(date +%s)" -o Terkey.sh;
+	  chmod +x Terkey.sh;bash Terkey.sh;
+	  cd ~/;rm -rf Terkey.sh;
+	) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading TheDarkRoot-T..." " $WW⟫$GG Complete."
 
 	elif [[ $pn == T || $pn == t ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG TheDarkRoot-T: TheDarkRoot theme for Termux.";
-	( cd ~/Tdr-Tool;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/TheDarkRoot-T/master/TheDarkRoot-T.sh?t=$(date +%s)" -o TheDarkRoot-T.sh;chmod +x TheDarkRoot-T.sh;bash TheDarkRoot-T.sh;cd ~/Tdr-Tool;rm -rf TheDarkRoot-T.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading TheDarkRoot-T..." " $WW⟫$GG Complete."
-	echo -e "\n $CC [${YY}i$CC]$GG Terkey: Utility to add direction keys to Termux.";
-	( cd ~/Tdr-Tool;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Terkey/master/Terkey.sh?t=$(date +%s)" -o Terkey.sh;chmod +x Terkey.sh;bash Terkey.sh;cd ~/Tdr-Tool;rm -rf Terkey.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Terkey..." " $WW⟫$GG Complete."
+	(
+	  cd ~/;
+	  curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/TheDarkRoot-T/master/TheDarkRoot-T.sh?t=$(date +%s)" -o TheDarkRoot-T.sh;
+	  chmod +x TheDarkRoot-T.sh;bash TheDarkRoot-T.sh;
+	  cd ~/;rm -rf TheDarkRoot-T.sh;
+	  curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Terkey/master/Terkey.sh?t=$(date +%s)" -o Terkey.sh;
+	  chmod +x Terkey.sh;bash Terkey.sh;
+	  cd ~/;rm -rf Terkey.sh;
+	) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading TheDarkRoot-T..." " $WW⟫$GG Complete."
 
 	elif [[ $pn == X || $pn == x ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG X: Code in the trial period.";
