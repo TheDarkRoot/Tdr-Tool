@@ -38,8 +38,6 @@ C="\033[36;1m"  # Cyan
 M="\033[35;1m"  # Magenta
 
 run_speedtest () {
-	echo -e "\n $CC [${YY}i$CC]$GG Starting the speed test..."
-
 	# Ham verileri filtreleyebilmek için normal çıktı alıyoruz ve uyarıları gizliyoruz
 	( curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -W ignore - > .st_raw.txt 2>&1 ) & spin "$CC[$YY↓$CC]$GG Testing network speed..." " $WW⟫$GG Complete."
 
