@@ -72,9 +72,8 @@ run_speedtest () {
     local dependencies=("python3" "awk" "bc" "curl")
     for cmd in "${dependencies[@]}"; do
         if ! command -v "$cmd" &> /dev/null; then
-            echo -e "\n  ${CC}[${RR}!${CC}]${RR} Hata: '$cmd' paketi eksik!"
-            echo -e "  ${YY}[${CC}i${YY}]${GG} Lütfen ana menüden 'U' (Update) seçeneğini çalıştırarak gerekli paketleri yükleyin."
-            sleep 2
+            echo -e "\n  $CC[${RR}!$CC]$RR Error: '$cmd' package missing!"
+            echo -e "\n  $CC[${YY}i$CC]$GG You can install packages with the ('U' Update) option."
             return 1 # Fonksiyonu iptal et ve menüye dön
         fi
     done
