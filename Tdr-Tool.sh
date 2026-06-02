@@ -303,7 +303,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	else
 	echo -e "\n  ${YY}[${RR}⦸${YY}]${RR} Invalid Action."	
-	sleep 1
+	sleep 1.5
 
     fi
 
