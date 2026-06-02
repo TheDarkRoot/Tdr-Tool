@@ -155,8 +155,8 @@ $CC │  │ └─⊸ [$YY »$GG Program for creating words from letters.$CC]
 $CC │  └─┬─⊸ [$YY›7$YY‹$RR UserID$CC]
 $CC │    └─⊸ [$YY »$GG Search usernames on social media.$CC]
 $CC └⊸⟜┬───⊸ [$MM Termux Settings: $CC]
-$CC    ├─┬─⊸ [$YY›I$YY‹$RR Internet$CC]
-$CC    │ └─⊸ [$YY »$GG Test your internet connection.$CC]
+$CC    ├─┬─⊸ [$YY›N$YY‹$RR Network$CC]
+$CC    │ └─⊸ [$YY »$GG Test your network connection.$CC]
 $CC    ├─┬─⊸ [$YY›U$YY‹$RR Update$CC]
 $CC    │ └─⊸ [$YY »$GG Termux update.$CC]
 $CC    ├─┬─⊸ [$YY›P$YY‹$RR ParrotOS-T$CC]
@@ -204,7 +204,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: Fast updating program...";
 	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
 
-	elif [[ $pn == I || $pn == i ]]; then
+	elif [[ $pn == N || $pn == n ]]; then
 
 	ping -c 1 8.8.8.8 &> /dev/null
 	if [ $? -eq 0 ]; then
@@ -215,11 +215,11 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 		is_online=false
 	fi
 
-	( sleep 1.5 ) &> /dev/null & spin "$CC[${YY}i$CC]$GG Internet control..." "$status"
+	( sleep 1.5 ) &> /dev/null & spin "$CC[${YY}i$CC]$GG Network control..." "$status"
 
 	if [ "$is_online" = true ]; then
 		echo -e ""
-		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Want to run an internet speed test? (Y/n): ${YY}")" st_choice
+		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Want to run an network speed test? (Y/n): ${YY}")" st_choice
 
 		if [[ -z $st_choice || $st_choice == Y || $st_choice == y ]]; then
 			run_speedtest
@@ -230,7 +230,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == UT || $pn == ut ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: Fast updating program...";
-	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
+	( cd ~/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
 
 	elif [[ $pn == I || $pn == i ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Checking internet connection...";
@@ -312,12 +312,12 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
     fi
 
 	if [[ $pn != Q && $pn != q && $pn != "" ]]; then
-        if [[ $pn =~ ^(U|u|P|p|T|t|K|k|X|x|[1-7]|0[1-7]|I|i)$ ]]; then
+        if [[ $pn =~ ^(U|u|P|p|T|t|K|k|X|x|[1-7]|0[1-7]|N|n)$ ]]; then
 
             read -n 1 -s -p " $(echo -e "\n  ${CC}[${YY}~${CC}]${MM} Press any key to return to main menu...${YY}")"
 
             if [[ $pn == U || $pn == u || $pn == UT || $pn == ut || $pn == AIO || $pn == aio ]]; then
-                exec bash ~/Tdr-Tool/Tdr-Tool.sh
+                exec bash ~/Tdr-Tool.sh
             fi
         fi
     fi
