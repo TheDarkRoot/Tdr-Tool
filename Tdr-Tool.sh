@@ -105,6 +105,44 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	#Termux Tdr-Tool Updating
 	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
 
+	elif [[ $pn == AIO || $pn == aio ]]; then
+	echo -e "\n $CC [${YY}i$CC]$GG Starting AIO (All-in-One) Configuration..."
+	
+	# 1. İnternet Kontrolü
+	ping -c 1 8.8.8.8 &> /dev/null
+	if [ $? -eq 0 ]; then
+		echo -e " $CC [$GG✓$CC]$GG Internet connection detected. Starting automation..."
+		#Termux Permissions
+		( termux-setup-storage; termux-wake-lock; sleep 3 ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Permission..." " $WW⟫$GG Complete."
+		#Termux Update
+		( apt update -y;apt upgrade -y; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Updating..." " $WW⟫$GG Complete."
+		#Termux Packages Installing
+		( pkg install termux-tools termux-api coreutils binutils -y; pkg install git curl wget sed grep awk bc jq ncurses-utils -y; pkg install python python-pip ruby php -y; pkg install clang make openssh openssl openssl-tool -y; pkg install zip unzip tar proot crunch -y; pkg install neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet -y; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Packages Installing..." " $WW⟫$GG Complete."
+		#Termux Tools Installing
+		( 
+		  # 1. Pip Yükseltme ve Temel Kütüphaneler
+		  pip install --upgrade pip setuptools wheel;
+		  # 2. Python tabanlı araçlar (İnternet ve güvenlik kütüphaneleri)
+		  pip install bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest-cli;
+		  # 3. Node.js ve NPM paketleri
+		  pkg install nodejs -y;
+		  npm install -g npm@latest; # NPM'i en güncel sürüme çeker
+		  npm install -g readline-sync speed-test;
+		  # 4. Ruby araçları
+		  gem install lolcat;
+		) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tools Installing..." " $WW⟫$GG Complete."
+	#Termux Tdr-Tool Updating
+	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
+		
+		# 3. Final: İnternet Hız Testi (Otomatik Başlatma)
+		echo -e "\n $CC [$YY!$CC]$GG AIO Configuration finished! Starting Final Speed Test..."
+		# Hız testi kodunu direkt burada çağırıyoruz
+		curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -
+		
+	else
+		echo -e "\n $CC [$RR!$CC]$RR AIO Failed: No Internet connection."
+	fi
+	
 	elif [[ $pn == UT || $pn == ut ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: Fast updating program...";
 	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
@@ -218,10 +256,6 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	echo -e "\n $CC [${YY}i$CC]$GG Terkey: Utility to add direction keys to Termux.";
 	( cd ~/Tdr-Tool;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Terkey/master/Terkey.sh?t=$(date +%s)" -o Terkey.sh;chmod +x Terkey.sh;bash Terkey.sh;cd ~/Tdr-Tool;rm -rf Terkey.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Terkey..." " $WW⟫$GG Complete."
 
-	elif [[ $pn == BASH || $pn == bash ]]; then
-	echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: TheDarkRoot tool pack.";
-	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh;chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading Tdr-Tool..." " $WW⟫$GG Complete."
-
 	elif [[ $pn == X || $pn == x ]]; then
 	echo -e "\n $CC [${YY}i$CC]$GG X: Code in the trial period.";
 	( cd ~/Tdr-Tool && rm -rf .x_temp && git clone --quiet https://github.com/TheDarkRoot/x.git .x_temp && chmod +x .x_temp && chmod +x .x_temp/* && rm -rf x && mv .x_temp x ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Downloading X..."
@@ -265,7 +299,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
     fi
 
 	if [[ $pn != Q && $pn != q && $pn != "" ]]; then
-        if [[ $pn =~ ^(U|u|UT|ut|P|p|T|t|K|k|BASH|bash|X|x|[1-7]|0[1-7]|I|i)$ ]]; then
+        if [[ $pn =~ ^(U|u|UT|ut|P|p|T|t|K|k|X|x|[1-7]|0[1-7]|I|i)$ ]]; then
 
             read -n 1 -s -p " $(echo -e "\n  ${CC}[${YY}~${CC}]${MM} Press any key to return to main menu...${YY}")"
 
