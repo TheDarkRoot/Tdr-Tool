@@ -118,33 +118,29 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 		if [[ -z $st_choice || $st_choice == Y || $st_choice == y ]]; then
 			echo -e "\n $CC [${YY}i$CC]$GG Tdr-Tool: Checking Speedtest dependency..."
 
-			# Eğer sistemde Ookla'nın resmi speedtest aracı yüklü değilse otomatik yüklüyoruz
-			if ! command -v speedtest &> /dev/null; then
-				echo -e " $CC [${YY}i$CC]$YY Installing official speedtest-cli tool..."
-				pkg install nodejs-lts -y &> /dev/null
-				npm install --global speed-test &> /dev/null
+			# Kararsız npm paketi yerine kararlı Python bağımlılığını kontrol edip kuruyoruz
+			if ! command -v speedtest-cli &> /dev/null; then
+				echo -e " $CC [${YY}i$CC]$YY Installing speedtest-cli..."
+				pip3 install speedtest-cli &> /dev/null
 			fi
 
-			echo -e "\n $CC [${YY}i$CC]$GG Running Speedtest..."
-			echo -e "${CC}======================================================${WW}"
-
-			# Resmi speed-test aracını çalıştırıp çıktıyı hem ekrana basıyoruz hem geçici dosyaya kaydediyoruz
-			# Bu araç direkt speedtest.net üzerinden harika bir görselle çalışır
-			speed-test | tee .st_result.txt
+			# Arka planda speedtest.net üzerinden test yaparken senin spin animasyonunu oynatıyoruz
+			speedtest-cli > .st_result.txt 2>&1 & spin "$CC[$YY↓$CC]$GG Running Speedtest via speedtest.net..." " $WW⟫$GG Complete."
 
 			echo -e "${CC}======================================================${WW}"
+			# Alınan tüm resmi verileri ekrana listeliyoruz
+			cat .st_result.txt
+			echo -e "${CC}======================================================${WW}"
 
-			# Sonuçları kalıcı olarak kaydetmek isteyip istemediğini soruyoruz
+			# Sonuçları kaydetme aşaması
 			read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Do you want to save the results to a file? (Y/n): ${YY}")" save_choice
 
 			if [[ -z $save_choice || $save_choice == Y || $save_choice == y ]]; then
-				# Sonuçları Tdr-Tool klasörünün içine tarih damgasıyla kaydeder ve içindeki renk kodlarını temizler
-				local log_file="speedtest_result_$(date +%Y%m%d_%H%M%S).txt"
-				cat .st_result.txt | sed 's/\x1b\[[0-9;]*m//g' > ~/Tdr-Tool/$log_file
-				rm -f .st_result.txt
+				# local ibaresini kaldırdık, hata düzeldi. Dosya adı tarih damgalı oluşturuluyor.
+				log_file="speedtest_result_$(date +%Y%m%d_%H%M%S).txt"
+				mv .st_result.txt ~/Tdr-Tool/"$log_file"
 				echo -e "\n ${CC}[${GG}✓${CC}]${GG} Saved successfully as: ${YY}~/Tdr-Tool/$log_file"
 			else
-				# Kaydetmek istemezse geçici dosyayı temizler
 				rm -f .st_result.txt
 				echo -e "\n ${CC}[${RR}x${CC}]${RR} Results deleted."
 			fi
