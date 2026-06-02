@@ -121,12 +121,15 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 			# Ham verileri filtreleyebilmek için --simple yerine normal çıktı alıyoruz ve uyarıları gizliyoruz
 			( curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -W ignore - > .st_raw.txt 2>&1 ) & spin "$CC[$YY↓$CC]$GG Testing network speed..." " $WW⟫$GG Complete."
 
-			# Alınan ham verileri ayıklıyoruz (local kelimeleri kaldırıldı)
+			# Alınan ham verileri ayıklıyoruz
 			my_ip=$(grep -oE "Testing from .* \([0-9.]+\)" .st_raw.txt | grep -oE "[0-9.]+" | head -n 1)
 			provider=$(grep -oE "Testing from .* \(" .st_raw.txt | sed 's/Testing from //' | sed 's/ ($//' | sed 's/ (//')
 			server_info=$(grep "Hosted by" .st_raw.txt | sed 's/Hosted by //' | cut -d '[' -f1 | sed 's/ *$//')
 			
-			ping_val=$(grep "Hosted by" .st_raw.txt | grep -oE "\[[0-9.]+ ms\]" | tr -d '[]')
+			# Ping ayıklama yapısını daha esnek ve kararlı hale getirdik
+			ping_val=$(grep "Hosted by" .st_raw.txt | grep -oE "\[[0-9.]+ ms\]" | sed 's/\[//g' | sed 's/\]//g')
+			[[ -z $ping_val ]] && ping_val=$(grep "Hosted by" .st_raw.txt | grep -oE "[0-9.]+ ms")
+			
 			dl_val=$(grep "Download:" .st_raw.txt | sed 's/Download: //')
 			ul_val=$(grep "Upload:" .st_raw.txt | sed 's/Upload: //')
 
@@ -154,14 +157,14 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 			# Orijinal .st_result.txt dosyasını kalıcı kaydetmek için düz metin olarak hazırlıyoruz
 			echo -e "IP Address: $my_ip\nProvider: $provider\nServer: $server_info\nPing: $ping_val\nDownload: $dl_val\nUpload: $ul_val" > .st_result.txt
 
-			# EKRANA RENKLİ VE İÇERİDEN HİZALANMIŞ BASKI ALANI
+			# EKRANA RENKLİ, AYARLANMIŞ VE TERMİNAL UYUMLU ASCII LOGOLU BASKI ALANI
 			echo -e "  ${CC}=======================================================${WW}"
-			echo -e "   ${CC}[${YY}🌐${CC}]${GG} IP Address : ${YY}$my_ip"
-			echo -e "   ${CC}[${YY}🏢${CC}]${GG} Provider   : ${YY}$provider"
-			echo -e "   ${CC}[${YY}🖥️${CC}]${GG} Server     : ${YY}$server_info"
-			echo -e "   ${CC}[${YY}✦${CC}]${GG} Ping       : ${YY}$ping_val"
-			echo -e "   ${CC}[${YY}▼${CC}]${GG} Download   : ${YY}$dl_val"
-			echo -e "   ${CC}[${YY}▲${CC}]${GG} Upload     : ${YY}$ul_val"
+			echo -e "   ${CC}[${YY} WAN ${CC}]${GG} IP Address : ${YY}$my_ip"
+			echo -e "   ${CC}[${YY} ISP ${CC}]${GG} Provider   : ${YY}$provider"
+			echo -e "   ${CC}[${YY} SRV ${CC}]${GG} Server     : ${YY}$server_info"
+			echo -e "   ${CC}[${YY} LAT ${CC}]${GG} Ping       : ${YY}$ping_val"
+			echo -e "   ${CC}[${YY} OUT ${CC}]${GG} Download   : ${YY}$dl_val"
+			echo -e "   ${CC}[${YY} INP ${CC}]${GG} Upload     : ${YY}$ul_val"
 			echo -e "  ${CC}-------------------------------------------------------${WW}"
 			echo -e "   ${CC}[${YY}»${CC}]${MM} Browsing Quality  : ${b_qual}"
 			echo -e "   ${CC}[${YY}»${CC}]${MM} Gaming Quality    : ${g_qual}"
