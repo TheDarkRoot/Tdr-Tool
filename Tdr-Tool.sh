@@ -47,11 +47,11 @@ run_speedtest () {
 	my_ip=$(grep -oE "Testing from .* \([0-9.]+\)" .st_raw.txt | grep -oE "[0-9.]+" | head -n 1)
 	provider=$(grep -oE "Testing from .* \(" .st_raw.txt | sed 's/Testing from //' | sed 's/ ($//' | sed 's/ (//')
 	server_info=$(grep "Hosted by" .st_raw.txt | sed 's/Hosted by //' | cut -d '[' -f1 | sed 's/ *$//')
-	
+
 	# Ping ayıklama yapısı
 	ping_val=$(grep "Hosted by" .st_raw.txt | grep -oE "\[[0-9.]+ ms\]" | sed 's/\[//g' | sed 's/\]//g')
 	[[ -z $ping_val ]] && ping_val=$(grep "Hosted by" .st_raw.txt | grep -oE "[0-9.]+ ms")
-	
+
 	dl_val=$(grep "Download:" .st_raw.txt | sed 's/Download: //')
 	ul_val=$(grep "Upload:" .st_raw.txt | sed 's/Upload: //')
 
@@ -159,18 +159,18 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	#Termux Packages Installing
 	( pkg install termux-tools termux-api coreutils binutils -y; pkg install git curl wget sed grep awk bc jq ncurses-utils -y; pkg install python python-pip ruby php -y; pkg install clang make openssh openssl openssl-tool -y; pkg install zip unzip tar proot crunch -y; pkg install neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet -y; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Packages Installing..." " $WW⟫$GG Complete."
 	#Termux Tools Installing
-	( 
+	(
 	  # 1. Pip Yükseltme ve Temel Kütüphaneler
 	  pip install --upgrade pip setuptools wheel;
-	  
+
 	  # 2. Python tabanlı araçlar (İnternet ve güvenlik kütüphaneleri)
 	  pip install bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest-cli;
-	  
+
 	  # 3. Node.js ve NPM paketleri
 	  pkg install nodejs -y;
 	  npm install -g npm@latest; # NPM'i en güncel sürüme çeker
 	  npm install -g readline-sync speed-test;
-	  
+
 	  # 4. Ruby araçları
 	  gem install lolcat;
 	) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tools Installing..." " $WW⟫$GG Complete."
@@ -178,8 +178,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
 
 	elif [[ $pn == AIO || $pn == aio ]]; then
-	echo -e "\n $CC [${YY}i$CC]$GG Starting AIO (All-in-One) Configuration..."
-	echo -e "\n $CC [${YY}i$CC]$GG Checking internet connection...";
+	echo -e "\n $CC [${YY}i$CC]$GG Starting All-in-One Configuration..."
 
 	# i parametresindeki gelişmiş internet kontrol yapısı
 	ping -c 1 8.8.8.8 &> /dev/null
@@ -191,10 +190,9 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 		is_online=false
 	fi
 
-	( sleep 1.5 ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Internet control..." "$status"
+	( sleep 1.5 ) &> /dev/null & spin "$CC[${YY}i$CC]$GG Internet control..." "$status"
 
 	if [ "$is_online" = true ]; then
-		echo -e "\n $CC [$GG✓$CC]$GG Internet connection detected. Starting automation..."
 		#Termux Permissions
 		( termux-setup-storage; termux-wake-lock; sleep 3 ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Permission..." " $WW⟫$GG Complete."
 		#Termux Update
@@ -213,7 +211,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 		#Termux Tdr-Tool Updating
 		( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
 
-		echo -e "\n $CC [$YY!$CC]$GG AIO Configuration finished!"
+		echo -e "\n $CC [$YY!$CC]$GG AIO Configuration finished!\n"
 
 		# Hız testi onay mekanizması
 		read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Want to run an internet speed test? (Y/n): ${YY}")" st_choice_aio
@@ -234,7 +232,6 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	( cd ~/Tdr-Tool/;curl -sLf "https://raw.githubusercontent.com/TheDarkRoot/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Tdr-Tool Updating...$YY" " $WW⟫$GG Complete."
 
 	elif [[ $pn == I || $pn == i ]]; then
-	echo -e "\n $CC [${YY}i$CC]$GG Checking internet connection...";
 
 	ping -c 1 8.8.8.8 &> /dev/null
 	if [ $? -eq 0 ]; then
@@ -245,7 +242,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 		is_online=false
 	fi
 
-	( sleep 1.5 ) &> /dev/null & spin "$CC[$YY↓$CC]$GG Internet control..." "$status"
+	( sleep 1.5 ) &> /dev/null & spin "$CC[${YY}i$CC]$GG Internet control..." "$status"
 
 	if [ "$is_online" = true ]; then
 		echo -e ""
