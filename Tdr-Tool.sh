@@ -121,10 +121,26 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 			# Python veya npm bağımlılığı olmadan doğrudan resmi altyapıyı kullanan saf bash scripti indirip çalıştırıyoruz
 			( curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -W ignore - --simple > .st_result.txt 2>&1 ) & spin "$CC[$YY↓$CC]$GG Testing network speed..." " $WW⟫$GG Complete."
 
-			echo -e "  ${CC}======================================================${WW}"
-			# Alınan tüm resmi verileri ekrana listeliyoruz
-			cat .st_result.txt
-			echo -e "  ${CC}======================================================${WW}"
+			echo -e "  ${CC}=======================================================${WW}"
+
+			# Dosyadan verileri okuyup renklendirerek ve içeriden başlatarak ekrana basıyoruz
+			while IFS= read -r line; do
+				if [[ $line == Ping* ]]; then
+					# Ping değerini Cyan ikon ve Yeşil metin ile basar
+					echo -e "   ${CC}[${YY}✦${CC}]${GG} ${line}"
+				elif [[ $line == Download* ]]; then
+					# Download değerini Cyan ikon ve Yeşil metin ile basar
+					echo -e "   ${CC}[${YY}▼${CC}]${GG} ${line}"
+				elif [[ $line == Upload* ]]; then
+					# Upload değerini Cyan ikon ve Yeşil metin ile basar
+					echo -e "   ${CC}[${YY}▲${CC}]${GG} ${line}"
+				else
+					# Eğer ekstra bir satır gelirse şablonu bozmasın diye düz yeşil basar
+					echo -e "   ${GG}${line}"
+				fi
+			done < .st_result.txt
+
+			echo -e "  ${CC}=======================================================${WW}"
 
 			# Sonuçları kaydetme aşaması
 			read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Do you want to save the results to a file? (Y/n): ${YY}")" save_choice
