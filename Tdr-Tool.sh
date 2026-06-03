@@ -76,7 +76,7 @@ run_update () {
 	#Termux Update
 	( echo "--- Updating ---" > "$Log"; pkg update -y; pkg upgrade -y && $Reload; ) &>> ~/.TermuxUpdate_debug.log & spin "${CC}[${YY}↓${CC}]${GG} Updating..." " ${WW}⟫${GG} Complete."
 	#Termux Packages Installing
-	( install_missing_packages termux-tools coreutils binutils git curl wget sed grep awk bc jq ncurses-utils python ruby php clang make openssh openssl zip unzip tar proot crunch neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet nodejs && $Reload; ) &>> ~/.TermuxPackages_debug.log & spin "${CC}[${YY}↓${CC}]${GG} Packages Installing..." " ${WW}⟫${GG} Complete."
+	( install_missing_packages termux-tools coreutils binutils git curl wget sed grep gawk bc jq ncurses-utils python ruby php clang make openssh openssl zip unzip tar proot crunch neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet nodejs && $Reload; ) &>> ~/.TermuxPackages_debug.log & spin "${CC}[${YY}↓${CC}]${GG} Packages Installing..." " ${WW}⟫${GG} Complete."
 	#Termux Tools Installing
 	(
 	  pip install --upgrade pip setuptools wheel bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest-cli;
@@ -84,7 +84,7 @@ run_update () {
 	  gem install lolcat && $Reload;
 	) &>> ~/.TheDarkRoot_debug.log & spin "${CC}[${YY}↓${CC}]${GG} Tools Installing..." " ${WW}⟫${GG} Complete."
 	#Termux Tdr-Tool Updating
-	( cd "$Tool" && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> ~/.TheDarkRootTool_debug.log & spin "${CC}[$YY↓${CC}]${GG} Tdr-Tool Updating...$YY" " ${WW}⟫${GG} Complete."
+	( cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> ~/.TheDarkRootTool_debug.log & spin "${CC}[$YY↓${CC}]${GG} Tdr-Tool Updating...$YY" " ${WW}⟫${GG} Complete."
 }
 
 run_speedtest () {
@@ -381,7 +381,6 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
     fi
 
 	if [[ $pn != Q && $pn != q && $pn != "" ]]; then
-		# Regex içine UT ve ut eklendi
 		if [[ $pn =~ ^(U|u|UT|ut|P|p|T|t|X|x|[1-4]|0[1-4]|N|n)$ ]]; then
 
 			read -n 1 -s -p " $(echo -e "\n  ${CC}[${YY}~${CC}]${MM} Press any key to return to main menu...${YY}")"
