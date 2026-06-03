@@ -395,7 +395,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 			read -n 1 -s -p " $(echo -e "\n  ${CC}[${YY}~${CC}]${MM} Press any key to return to main menu...${YY}")"
 
-			if [[ $pn == U || $pn == u || $pn == UT || $pn == ut ]]; then
+			if [[ $pn == U || $pn == u || $pn == UT || $pn == ut || $pn == X || $pn == x ]]; then
 				exec bash ~/Tdr-Tool.sh
 			fi
 		fi
