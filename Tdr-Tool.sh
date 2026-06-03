@@ -21,6 +21,37 @@ Github="https://github.com/TheDarkRoot"
 Raw="https://raw.githubusercontent.com/TheDarkRoot"
 Log="$HOME/.tdr_error.log"
 
+case "$1" in
+    --info)
+        echo -e "
+		$CC #######$YY ##################$CC #######$YY ####################
+		$CC    #    #####  #####          #     ####   ####  #
+		$CC    #    #    # #    #         #    #    # #    # #
+		$CC    #    #    # #    #  #####  #    #    # #    # #
+		$CC    #    #    # #####          #    #    # #    # #
+		$CC    #    #    # #   #          #    #    # #    # #
+		$CC    #    #####  #    #         #     ####   ####  ######
+		$YY ###################[›$GG TheDarkRoot $YY‹]###################
+		$CC -------------------------------------------------------
+		$GG 0{======================$WW INFO $GG=======================}0
+		$GG |$YY [$CC=$YY]$WW Name     $CC:$WW Tdr-Tool$GG                             |
+		$GG |$YY [$CC=$YY]$WW Code     $CC:$WW Shell$GG                                |
+		$GG |$YY [$CC=$YY]$WW Version  $CC:$WW v1.2.7 (Alpha)$GG                       |
+		$GG |$YY [$CC=$YY]$WW Author   $CC:$WW Tdr-Tool$GG                             |
+		$GG |$YY [$CC=$YY]$WW Github   $CC:$WW https://github.com/TheDarkRoot$GG       |
+		$GG |$YY [$CC=$YY]$WW Telegram $CC:$WW @TheDarkRoot (t.me/TheDarkRoot)$GG      |
+		$GG 0{===================================================}0\n"
+        exit 0
+        ;;
+    --version)
+        echo "Tdr-Tool v1.2.7"
+        exit 0
+        ;;
+    *)
+        # Eğer parametre yoksa veya tanınmıyorsa menüye devam et
+        ;;
+esac
+
 if [ ! -d "$Tool" ]; then
     mkdir -p "$Tool"
 fi
@@ -325,7 +356,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	( cd $Tool && rm -rf .UserID_temp && git clone --quiet $Github/UserID.git .UserID_temp && chmod +x .UserID_temp && chmod +x .UserID_temp/* && rm -rf UserID && mv .UserID_temp UserID ) &> /dev/null & spin "${CC}[$YY↓${CC}]${GG} Downloading UserID..." " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == Q || $pn == q ]]; then
-	echo -e "\n ${CC} [$YY»${CC}]${RR} Good Bye...";
+	echo -e "\n ${CC} [$YY»${CC}]${RR} Good Bye...\n";
 	sleep 0;exit;
 
 	else
