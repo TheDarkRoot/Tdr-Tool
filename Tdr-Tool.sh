@@ -56,7 +56,7 @@ while kill -0 $pid 2>/dev/null; do
   for i in "${spinner[@]}"
   do
     echo -ne "\r  $msg_loading ${CC}【$i${CC}】\033[K";
-    sleep $delay
+    sleep $delay 2>/dev/null
   done
 done
 
@@ -149,10 +149,10 @@ run_speedtest () {
 	echo -e "   ${CC}[${YY}OUT${CC}]${GG} Download   : ${YY}$dl_val"
 	echo -e "   ${CC}[${YY}INP${CC}]${GG} Upload     : ${YY}$ul_val"
 	echo -e "  ${CC}-------------------------------------------------------${WW}"
-	echo -e "   ${CC}[${YY}»${CC}]${MM} Browsing Quality  : ${b_qual}"
-	echo -e "   ${CC}[${YY}»${CC}]${MM} Gaming Quality    : ${g_qual}"
-	echo -e "   ${CC}[${YY}»${CC}]${MM} Streaming Quality : ${s_qual}"
-	echo -e "   ${CC}[${YY}»${CC}]${MM} Video Call Quality: ${v_qual}"
+	echo -e "   ${CC}[${YY} » ${CC}]${MM} Browsing Quality  : ${b_qual}"
+	echo -e "   ${CC}[${YY} » ${CC}]${MM} Gaming Quality    : ${g_qual}"
+	echo -e "   ${CC}[${YY} » ${CC}]${MM} Streaming Quality : ${s_qual}"
+	echo -e "   ${CC}[${YY} » ${CC}]${MM} Video Call Quality: ${v_qual}"
 	echo -e "  ${CC}=======================================================${WW}"
 
 	rm -f .st_raw.txt
