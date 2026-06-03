@@ -171,7 +171,7 @@ run_speedtest () {
 	if [[ -z $save_choice || $save_choice == Y || $save_choice == y ]]; then
 		log_file="speedtest_result_$(date +%Y%m%d_%H%M%S).txt"
 		mv "$RESULT_FILE" ~/"$log_file"
-		echo -e "\n  ${CC}[${GG}✓${CC}]${GG} Saved successfully as: ${YY}~/$log_file"
+		echo -e "\n  ${CC}[${GG}✓${CC}]${GG} Saved successfully as:\n  ${CC}[${GG}🛈${CC}]${YY}~/$log_file"
 	else
 		rm -f "$RESULT_FILE"
 		echo -e "\n  ${CC}[${RR}x${CC}]${RR} Results deleted."
