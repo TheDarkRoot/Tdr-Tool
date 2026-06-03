@@ -84,7 +84,7 @@ run_update () {
 	  gem install lolcat && $Reload;
 	) &>> ~/.TheDarkRoot_debug.log & spin "${CC}[${YY}↓${CC}]${GG} Tools Installing..." " ${WW}⟫${GG} Complete."
 	#Termux Tdr-Tool Updating
-	( $Tool && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> ~/.TheDarkRootTool_debug.log & spin "${CC}[$YY↓${CC}]${GG} Tdr-Tool Updating...$YY" " ${WW}⟫${GG} Complete."
+	( cd "$Tool" && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> ~/.TheDarkRootTool_debug.log & spin "${CC}[$YY↓${CC}]${GG} Tdr-Tool Updating...$YY" " ${WW}⟫${GG} Complete."
 }
 
 run_speedtest () {
@@ -299,7 +299,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == UT || $pn == ut ]]; then
 	echo -e "\n ${CC} [${YY}i${CC}]${GG} Tdr-Tool: Fast updating program...";
-	( cd $Tool && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> ~/.TheDarkRootTool_debug.log & spin "${CC}[$YY↓${CC}]${GG} Tdr-Tool Updating...$YY" " ${WW}⟫${GG} Complete."
+	( cd "$Tool" && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> ~/.TheDarkRootTool_debug.log & spin "${CC}[$YY↓${CC}]${GG} Tdr-Tool Updating...$YY" " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == N || $pn == n ]]; then
 
@@ -348,27 +348,27 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	elif [[ $pn == X || $pn == x ]]; then
 	echo -e "\n ${CC} [${YY}i${CC}]${GG} X: TheDarkRoot All-in-One Repositories.";
 	(
-	  cd $Tool && rm -rf .Hasher_temp && git clone --quiet $TheDarkRoot/Hasher.git .Hasher_temp && rm -rf Hasher && mv .Hasher_temp Hasher && chmod +x Hasher && chmod +x Hasher/*;
-	  cd $Tool && rm -rf .Hashgen_temp && git clone --quiet $TheDarkRoot/Hashgen.git .Hashgen_temp && rm -rf Hashgen && mv .Hashgen_temp Hashgen && chmod +x Hashgen && chmod +x Hashgen/*;
-	  cd $Tool && rm -rf .Tertext_temp && git clone --quiet $TheDarkRoot/Tertext.git .Tertext_temp && rm -rf Tertext && mv .Tertext_temp Tertext && chmod +x Tertext && chmod +x Tertext/*;
-	  cd $Tool && rm -rf .UserID_temp && git clone --quiet $TheDarkRoot/UserID.git .UserID_temp && rm -rf UserID && mv .UserID_temp UserID && chmod +x UserID && chmod +x UserID/* && $Reload;
+	  cd "$Tool" && rm -rf .Hasher_temp && git clone --quiet $TheDarkRoot/Hasher.git .Hasher_temp && rm -rf Hasher && mv .Hasher_temp Hasher && chmod +x Hasher && chmod +x Hasher/*;
+	  cd "$Tool" && rm -rf .Hashgen_temp && git clone --quiet $TheDarkRoot/Hashgen.git .Hashgen_temp && rm -rf Hashgen && mv .Hashgen_temp Hashgen && chmod +x Hashgen && chmod +x Hashgen/*;
+	  cd "$Tool" && rm -rf .Tertext_temp && git clone --quiet $TheDarkRoot/Tertext.git .Tertext_temp && rm -rf Tertext && mv .Tertext_temp Tertext && chmod +x Tertext && chmod +x Tertext/*;
+	  cd "$Tool" && rm -rf .UserID_temp && git clone --quiet $TheDarkRoot/UserID.git .UserID_temp && rm -rf UserID && mv .UserID_temp UserID && chmod +x UserID && chmod +x UserID/* && $Reload;
 	) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading X..." " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == 1 || $pn == 01 ]]; then
 	echo -e "\n ${CC} [${YY}i${CC}]${GG} Hasher: This is a Hash Cracker.";
-	( cd $Tool && rm -rf .Hasher_temp && git clone --quiet $TheDarkRoot/Hasher.git .Hasher_temp && rm -rf Hasher && mv .Hasher_temp Hasher && chmod +x Hasher && chmod +x Hasher/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading Hasher..." " ${WW}⟫${GG} Complete."
+	( cd "$Tool" && rm -rf .Hasher_temp && git clone --quiet $TheDarkRoot/Hasher.git .Hasher_temp && rm -rf Hasher && mv .Hasher_temp Hasher && chmod +x Hasher && chmod +x Hasher/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading Hasher..." " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == 2 || $pn == 02 ]]; then
 	echo -e "\n ${CC} [${YY}i${CC}]${GG} Hashgen: Generate more 39 type hash.";
-	( cd $Tool && rm -rf .Hashgen_temp && git clone --quiet $TheDarkRoot/Hashgen.git .Hashgen_temp && rm -rf Hashgen && mv .Hashgen_temp Hashgen && chmod +x Hashgen && chmod +x Hashgen/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading Hashgen..." " ${WW}⟫${GG} Complete."
+	( cd "$Tool" && rm -rf .Hashgen_temp && git clone --quiet $TheDarkRoot/Hashgen.git .Hashgen_temp && rm -rf Hashgen && mv .Hashgen_temp Hashgen && chmod +x Hashgen && chmod +x Hashgen/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading Hashgen..." " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == 3 || $pn == 03 ]]; then
 	echo -e "\n ${CC} [${YY}i${CC}]${GG} Tertext: Program for creating words from letters.";
-	( cd $Tool && rm -rf .Tertext_temp && git clone --quiet $TheDarkRoot/Tertext.git .Tertext_temp && rm -rf Tertext && mv .Tertext_temp Tertext && chmod +x Tertext && chmod +x Tertext/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading Tertext..." " ${WW}⟫${GG} Complete."
+	( cd "$Tool" && rm -rf .Tertext_temp && git clone --quiet $TheDarkRoot/Tertext.git .Tertext_temp && rm -rf Tertext && mv .Tertext_temp Tertext && chmod +x Tertext && chmod +x Tertext/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading Tertext..." " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == 4 || $pn == 04 ]]; then
 	echo -e "\n ${CC} [${YY}i${CC}]${GG} UserID: Search usernames on social media.";
-	( cd $Tool && rm -rf .UserID_temp && git clone --quiet $TheDarkRoot/UserID.git .UserID_temp && rm -rf UserID && mv .UserID_temp UserID && chmod +x UserID && chmod +x UserID/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading UserID..." " ${WW}⟫${GG} Complete."
+	( cd "$Tool" && rm -rf .UserID_temp && git clone --quiet $TheDarkRoot/UserID.git .UserID_temp && rm -rf UserID && mv .UserID_temp UserID && chmod +x UserID && chmod +x UserID/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading UserID..." " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == Q || $pn == q ]]; then
 	echo -e "\n ${CC} [$YY»${CC}]${RR} Good Bye...\n";
