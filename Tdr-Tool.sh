@@ -299,7 +299,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == UT || $pn == ut ]]; then
 	echo -e "\n ${CC} [${YY}i${CC}]${GG} Tdr-Tool: Fast updating program...";
-	( cd "$Tool" && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; ) &> ~/.TheDarkRootTool_debug.log & spin "${CC}[$YY↓${CC}]${GG} Tdr-Tool Updating...$YY" " ${WW}⟫${GG} Complete."
+	( cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; ) &> ~/.TheDarkRootTool_debug.log & spin "${CC}[$YY↓${CC}]${GG} Tdr-Tool Updating...$YY" " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == N || $pn == n ]]; then
 
