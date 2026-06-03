@@ -111,6 +111,14 @@ run_speedtest () {
 		fi
 	) & spin "${CC}[$YY↓${CC}]${GG} Testing network speed..." " ${WW}⟫${GG} Complete."
 
+	# --- GÜVENLİK KİLİDİ BAŞLANGICI ---
+	# İşlem başarısız olduysa VEYA geçerli bir indirme verisi gelmediyse işlemi iptal et
+	if [ $? -ne 0 ] || ! grep -q "Download:" "$RAW_FILE"; then
+		echo -e "\n  ${CC}[${RR}!${CC}]${RR} Cut! Please check your network connection."
+		rm -f "$RAW_FILE" "$RESULT_FILE"
+		return 1
+	fi
+
 	# Alınan ham verileri RAW_FILE üzerinden ayıklıyoruz
 	my_ip=$(grep -oE "Testing from .* \([0-9.]+\)" "$RAW_FILE" | grep -oE "[0-9.]+" | head -n 1)
 	provider=$(grep -oE "Testing from .* \(" "$RAW_FILE" | sed 's/Testing from //' | sed 's/ ($//' | sed 's/ (//')
@@ -171,7 +179,7 @@ run_speedtest () {
 	if [[ -z $save_choice || $save_choice == Y || $save_choice == y ]]; then
 		log_file="speedtest_result_$(date +%Y%m%d_%H%M%S).txt"
 		mv "$RESULT_FILE" ~/"$log_file"
-		echo -e "\n  ${CC}[${GG}✓${CC}]${GG} Saved successfully as:\n  ${CC}\n[${GG}i${CC}]${YY}~/$log_file"
+		echo -e "\n  ${CC}[${GG}✓${CC}]${GG} Saved successfully as:\n\n  ${CC}[${GG}i${CC}] ${YY}~/$log_file"
 	else
 		rm -f "$RESULT_FILE"
 		echo -e "\n  ${CC}[${RR}x${CC}]${RR} Results deleted."
@@ -225,9 +233,10 @@ spin () {
 
     if [ $exit_code -eq 0 ]; then
         echo -e "\r  $msg_loading \033[K$msg_done"
+        return 0
     else
         echo -e "\r  $msg_loading \033[K$msg_fail"
-        # İsteğe bağlı: Hata durumunda betiği durdurmak istersen buraya 'exit 1' eklenebilir.
+        return $exit_code
     fi
 }
 
@@ -244,26 +253,26 @@ $YY ###################[›${GG} TheDarkRoot $YY‹]###################
 ${CC} =======================================================
 ${CC} ┌⊸⟜┬───⊸ [${MM} TheDarkRoot Repositories: ${CC}]
 ${CC} │  ├─┬─⊸ [$YY~1${RR} Hasher${CC}]
-${CC} │  │ └─⊸ [$YY i${GG} This is a Hash Cracker.${CC}]
+${CC} │  │ └─⊸ [$YY »${GG} This is a Hash Cracker.${CC}]
 ${CC} │  ├─┬─⊸ [$YY~2${RR} Hashgen${CC}]
-${CC} │  │ └─⊸ [$YY i${GG} Generate more 39 type hash.${CC}]
+${CC} │  │ └─⊸ [$YY »${GG} Generate more 39 type hash.${CC}]
 ${CC} │  ├─┬─⊸ [$YY~3${RR} Tertext${CC}]
-${CC} │  │ └─⊸ [$YY i${GG} Program for creating words from letters.${CC}]
+${CC} │  │ └─⊸ [$YY »${GG} Program for creating words from letters.${CC}]
 ${CC} │  └─┬─⊸ [$YY~4${RR} UserID${CC}]
-${CC} │    └─⊸ [$YY i${GG} Search usernames on social media.${CC}]
+${CC} │    └─⊸ [$YY »${GG} Search usernames on social media.${CC}]
 ${CC} │  └─┬─⊸ [$YY~X${RR} X${CC}]
-${CC} │    └─⊸ [$YY i${GG} TheDarkRoot All-in-One Repositories.${CC}]
+${CC} │    └─⊸ [$YY »${GG} TheDarkRoot All-in-One Repositories.${CC}]
 ${CC} └⊸⟜┬───⊸ [${MM} Termux Settings: ${CC}]
 ${CC}    ├─┬─⊸ [$YY~N${RR} Network${CC}]
-${CC}    │ └─⊸ [$YY i${GG} Test your network connection.${CC}]
+${CC}    │ └─⊸ [$YY »${GG} Test your network connection.${CC}]
 ${CC}    ├─┬─⊸ [$YY~U${RR} Update${CC}]
-${CC}    │ └─⊸ [$YY i${GG} Termux update.${CC}]
+${CC}    │ └─⊸ [$YY »${GG} Termux update.${CC}]
 ${CC}    ├─┬─⊸ [$YY~P${RR} ParrotOS-T${CC}]
-${CC}    │ └─⊸ [$YY i${GG} Parrot OS theme for Termux.${CC}]
+${CC}    │ └─⊸ [$YY »${GG} Parrot OS theme for Termux.${CC}]
 ${CC}    ├─┬─⊸ [$YY~T${RR} TheDarkRoot-T${CC}]
-${CC}    │ └─⊸ [$YY i${GG} TheDarkRoot theme for Termux.${CC}]
+${CC}    │ └─⊸ [$YY »${GG} TheDarkRoot theme for Termux.${CC}]
 ${CC}    └─┬─⊸ [$YY~Q${RR} Exit${CC}]
-${CC}      └─⊸ [$YY i${GG} Tdr-Tool exit.${CC}]\n"
+${CC}      └─⊸ [$YY »${GG} Tdr-Tool exit.${CC}]\n"
 
 read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
@@ -352,7 +361,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	  cd "$Tool" && rm -rf .Hashgen_temp && git clone --quiet $TheDarkRoot/Hashgen.git .Hashgen_temp && rm -rf Hashgen && mv .Hashgen_temp Hashgen && chmod +x Hashgen && chmod +x Hashgen/*;
 	  cd "$Tool" && rm -rf .Tertext_temp && git clone --quiet $TheDarkRoot/Tertext.git .Tertext_temp && rm -rf Tertext && mv .Tertext_temp Tertext && chmod +x Tertext && chmod +x Tertext/*;
 	  cd "$Tool" && rm -rf .UserID_temp && git clone --quiet $TheDarkRoot/UserID.git .UserID_temp && rm -rf UserID && mv .UserID_temp UserID && chmod +x UserID && chmod +x UserID/*;
-	  cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh && bash  Tdr-Tool.sh &&$Reload;
+	  cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh && $Reload;
 	) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading X..." " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == 1 || $pn == 01 ]]; then
