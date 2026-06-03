@@ -84,7 +84,7 @@ run_update () {
 	  gem install lolcat && $Reload;
 	) &>> ~/.TheDarkRoot_debug.log & spin "${CC}[${YY}↓${CC}]${GG} Tools Installing..." " ${WW}⟫${GG} Complete."
 	#Termux Tdr-Tool Updating
-	( cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> ~/.TheDarkRootTool_debug.log & spin "${CC}[$YY↓${CC}]${GG} Tdr-Tool Updating...$YY" " ${WW}⟫${GG} Complete."
+	( cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; ) &> ~/.TheDarkRootTool_debug.log & spin "${CC}[$YY↓${CC}]${GG} Tdr-Tool Updating...$YY" " ${WW}⟫${GG} Complete."
 }
 
 run_speedtest () {
@@ -243,27 +243,27 @@ ${CC}    #    #####  #    #         #     ####   ####  ######
 $YY ###################[›${GG} TheDarkRoot $YY‹]###################
 ${CC} =======================================================
 ${CC} ┌⊸⟜┬───⊸ [${MM} TheDarkRoot Repositories: ${CC}]
-${CC} │  ├─┬─⊸ [$YY›1$YY‹${RR} Hasher${CC}]
-${CC} │  │ └─⊸ [$YY »${GG} This is a Hash Cracker.${CC}]
-${CC} │  ├─┬─⊸ [$YY›2$YY‹${RR} Hashgen${CC}]
-${CC} │  │ └─⊸ [$YY »${GG} Generate more 39 type hash.${CC}]
-${CC} │  ├─┬─⊸ [$YY›3$YY‹${RR} Tertext${CC}]
-${CC} │  │ └─⊸ [$YY »${GG} Program for creating words from letters.${CC}]
-${CC} │  └─┬─⊸ [$YY›4$YY‹${RR} UserID${CC}]
-${CC} │    └─⊸ [$YY »${GG} Search usernames on social media.${CC}]
-${CC} │  └─┬─⊸ [$YY›X$YY‹${RR} X${CC}]
-${CC} │    └─⊸ [$YY »${GG} TheDarkRoot All-in-One Repositories.${CC}]
+${CC} │  ├─┬─⊸ [$YY~1${RR} Hasher${CC}]
+${CC} │  │ └─⊸ [$YY 🛈${GG} This is a Hash Cracker.${CC}]
+${CC} │  ├─┬─⊸ [$YY~2${RR} Hashgen${CC}]
+${CC} │  │ └─⊸ [$YY 🛈${GG} Generate more 39 type hash.${CC}]
+${CC} │  ├─┬─⊸ [$YY~3${RR} Tertext${CC}]
+${CC} │  │ └─⊸ [$YY 🛈${GG} Program for creating words from letters.${CC}]
+${CC} │  └─┬─⊸ [$YY~4${RR} UserID${CC}]
+${CC} │    └─⊸ [$YY 🛈${GG} Search usernames on social media.${CC}]
+${CC} │  └─┬─⊸ [$YY~X${RR} X${CC}]
+${CC} │    └─⊸ [$YY 🛈${GG} TheDarkRoot All-in-One Repositories.${CC}]
 ${CC} └⊸⟜┬───⊸ [${MM} Termux Settings: ${CC}]
-${CC}    ├─┬─⊸ [$YY›N$YY‹${RR} Network${CC}]
-${CC}    │ └─⊸ [$YY »${GG} Test your network connection.${CC}]
-${CC}    ├─┬─⊸ [$YY›U$YY‹${RR} Update${CC}]
-${CC}    │ └─⊸ [$YY »${GG} Termux update.${CC}]
-${CC}    ├─┬─⊸ [$YY›P$YY‹${RR} ParrotOS-T${CC}]
-${CC}    │ └─⊸ [$YY »${GG} Parrot OS theme for Termux.${CC}]
-${CC}    ├─┬─⊸ [$YY›T$YY‹${RR} TheDarkRoot-T${CC}]
-${CC}    │ └─⊸ [$YY »${GG} TheDarkRoot theme for Termux.${CC}]
-${CC}    └─┬─⊸ [$YY›Q$YY‹${RR} Exit${CC}]
-${CC}      └─⊸ [$YY »${GG} Tdr-Tool exit.${CC}]\n"
+${CC}    ├─┬─⊸ [$YY~N${RR} Network${CC}]
+${CC}    │ └─⊸ [$YY 🛈${GG} Test your network connection.${CC}]
+${CC}    ├─┬─⊸ [$YY~U${RR} Update${CC}]
+${CC}    │ └─⊸ [$YY 🛈${GG} Termux update.${CC}]
+${CC}    ├─┬─⊸ [$YY~P${RR} ParrotOS-T${CC}]
+${CC}    │ └─⊸ [$YY 🛈${GG} Parrot OS theme for Termux.${CC}]
+${CC}    ├─┬─⊸ [$YY~T${RR} TheDarkRoot-T${CC}]
+${CC}    │ └─⊸ [$YY 🛈${GG} TheDarkRoot theme for Termux.${CC}]
+${CC}    └─┬─⊸ [$YY~Q${RR} Exit${CC}]
+${CC}      └─⊸ [$YY 🛈${GG} Tdr-Tool exit.${CC}]\n"
 
 read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
@@ -299,7 +299,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == UT || $pn == ut ]]; then
 	echo -e "\n ${CC} [${YY}i${CC}]${GG} Tdr-Tool: Fast updating program...";
-	( cd "$Tool" && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> ~/.TheDarkRootTool_debug.log & spin "${CC}[$YY↓${CC}]${GG} Tdr-Tool Updating...$YY" " ${WW}⟫${GG} Complete."
+	( cd "$Tool" && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; ) &> ~/.TheDarkRootTool_debug.log & spin "${CC}[$YY↓${CC}]${GG} Tdr-Tool Updating...$YY" " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == N || $pn == n ]]; then
 
@@ -351,7 +351,8 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	  cd "$Tool" && rm -rf .Hasher_temp && git clone --quiet $TheDarkRoot/Hasher.git .Hasher_temp && rm -rf Hasher && mv .Hasher_temp Hasher && chmod +x Hasher && chmod +x Hasher/*;
 	  cd "$Tool" && rm -rf .Hashgen_temp && git clone --quiet $TheDarkRoot/Hashgen.git .Hashgen_temp && rm -rf Hashgen && mv .Hashgen_temp Hashgen && chmod +x Hashgen && chmod +x Hashgen/*;
 	  cd "$Tool" && rm -rf .Tertext_temp && git clone --quiet $TheDarkRoot/Tertext.git .Tertext_temp && rm -rf Tertext && mv .Tertext_temp Tertext && chmod +x Tertext && chmod +x Tertext/*;
-	  cd "$Tool" && rm -rf .UserID_temp && git clone --quiet $TheDarkRoot/UserID.git .UserID_temp && rm -rf UserID && mv .UserID_temp UserID && chmod +x UserID && chmod +x UserID/* && $Reload;
+	  cd "$Tool" && rm -rf .UserID_temp && git clone --quiet $TheDarkRoot/UserID.git .UserID_temp && rm -rf UserID && mv .UserID_temp UserID && chmod +x UserID && chmod +x UserID/*;
+	  cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh && bash  Tdr-Tool.sh &&$Reload;
 	) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading X..." " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == 1 || $pn == 01 ]]; then
