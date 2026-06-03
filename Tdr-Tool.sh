@@ -102,14 +102,11 @@ run_update () {
 	#Termux Update
 	( echo "--- Updating ---" > "$Log"; pkg update -y; pkg upgrade -y && $Reload; ) &>> ~/.TermuxUpdate_debug.log & spin "${CC}[${YY}↓${CC}]${GG} Updating..." " ${WW}⟫${GG} Complete."
 	#Termux Packages Installing
-	( pkg install termux-tools termux-api coreutils binutils -y; pkg install git curl wget sed grep awk bc jq ncurses-utils -y; pkg install python python-pip ruby php -y; pkg install clang make openssh openssl openssl-tool -y; pkg install zip unzip tar proot crunch -y; pkg install neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet -y && $Reload; ) &>> ~/.TermuxPackages_debug.log & spin "${CC}[${YY}↓${CC}]${GG} Packages Installing..." " ${WW}⟫${GG} Complete."
+	( pkg install termux-tools termux-api coreutils binutils git curl wget sed grep awk bc jq ncurses-utils python python-pip ruby php clang make openssh openssl openssl-tool zip unzip tar proot crunch neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet nodejs -y && $Reload; ) &>> ~/.TermuxPackages_debug.log & spin "${CC}[${YY}↓${CC}]${GG} Packages Installing..." " ${WW}⟫${GG} Complete."
 	#Termux Tools Installing
 	(
-	  pip install --upgrade pip setuptools wheel;
-	  pip install bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest-cli;
-	  pkg install nodejs -y;
-	  npm install -g npm@latest;
-	  npm install -g readline-sync speed-test;
+	  pip install --upgrade pip setuptools wheel bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest-cli;
+	  npm install -g npm@latest readline-sync speed-test;
 	  gem install lolcat && $Reload;
 	) &>> ~/.TheDarkRoot_debug.log & spin "${CC}[${YY}↓${CC}]${GG} Tools Installing..." " ${WW}⟫${GG} Complete."
 	#Termux Tdr-Tool Updating
@@ -130,7 +127,7 @@ run_speedtest () {
 	# Ham verileri filtreleyebilmek için normal çıktı alıyoruz ve uyarıları gizliyoruz
 	(
 		if command -v speedtest-cli &> /dev/null; then
-			python3 -W ignore $(command -v speedtest-cli) > .st_raw.txt 2>&1
+			speedtest-cli > .st_raw.txt 2>&1
 		else
 			curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -W ignore - > .st_raw.txt 2>&1
 		fi
