@@ -53,46 +53,20 @@ $GG 0{===================================================}0\n"
         ;;
 esac
 
-if [ ! -d "$Tool" ]; then
-    mkdir -p "$Tool"
-fi
-
-spin () {
-local pid=$!
-local delay=0.10
-local spinner=(
-    "${BB}■■■■■■■"
-    "${GG}█${YY}■■■■■■"
-    "${YY}■${GG}█${YY}■■■■■"
-    "${YY}■■${GG}█${YY}■■■■"
-    "${YY}■■■${GG}█${YY}■■■"
-    "${YY}■■■■${GG}█${YY}■■"
-    "${YY}■■■■■${GG}█${YY}■"
-    "${YY}■■■■■■${GG}█"
-    "${BB}■■■■■■■"
-    "${YY}■■■■■■${GG}█"
-    "${YY}■■■■■${GG}█${YY}■"
-    "${YY}■■■■${GG}█${YY}■■"
-    "${YY}■■■${GG}█${YY}■■■"
-    "${YY}■■${GG}█${YY}■■■■"
-    "${YY}■${GG}█${YY}■■■■■"
-    "${GG}█${YY}■■■■■■"
-)
-
-local msg_loading="$1"
-local msg_done="$2"
-
-echo -e ""
-
-while kill -0 $pid 2>/dev/null; do
-  for i in "${spinner[@]}"
-  do
-    echo -ne "\r  $msg_loading ${CC}【$i${CC}】\033[K";
-    sleep $delay 2>/dev/null
-  done
-done
-
-echo -e "\r  $msg_loading \033[K$msg_done"
+install_missing_packages() {
+    local missing_pkgs=()
+    # Girdi olarak verilen tüm paketleri kontrol et
+    for pkg in "$@"; do
+        # dpkg ile paketin kurulu olup olmadığına bak
+        if ! dpkg -s "$pkg" &> /dev/null; then
+            missing_pkgs+=("$pkg")
+        fi
+    done
+    
+    # Sadece eksik paket varsa kurulum komutunu çalıştır
+    if [ ${#missing_pkgs[@]} -gt 0 ]; then
+        pkg install -y "${missing_pkgs[@]}"
+    fi
 }
 
 run_update () {
@@ -102,7 +76,7 @@ run_update () {
 	#Termux Update
 	( echo "--- Updating ---" > "$Log"; pkg update -y; pkg upgrade -y && $Reload; ) &>> ~/.TermuxUpdate_debug.log & spin "${CC}[${YY}↓${CC}]${GG} Updating..." " ${WW}⟫${GG} Complete."
 	#Termux Packages Installing
-	( pkg install termux-tools termux-api coreutils binutils git curl wget sed grep awk bc jq ncurses-utils python python-pip ruby php clang make openssh openssl openssl-tool zip unzip tar proot crunch neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet nodejs -y && $Reload; ) &>> ~/.TermuxPackages_debug.log & spin "${CC}[${YY}↓${CC}]${GG} Packages Installing..." " ${WW}⟫${GG} Complete."
+	( install_missing_packages termux-tools coreutils binutils git curl wget sed grep awk bc jq ncurses-utils python ruby php clang make openssh openssl zip unzip tar proot crunch neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet nodejs && $Reload; ) &>> ~/.TermuxPackages_debug.log & spin "${CC}[${YY}↓${CC}]${GG} Packages Installing..." " ${WW}⟫${GG} Complete."
 	#Termux Tools Installing
 	(
 	  pip install --upgrade pip setuptools wheel bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest-cli;
@@ -124,26 +98,30 @@ run_speedtest () {
         fi
     done
 
+    # Çakışmaları önlemek için benzersiz geçici dosyaları oluşturuyoruz
+    local RAW_FILE=$(mktemp)
+    local RESULT_FILE=$(mktemp)
+
 	# Ham verileri filtreleyebilmek için normal çıktı alıyoruz ve uyarıları gizliyoruz
 	(
 		if command -v speedtest-cli &> /dev/null; then
-			speedtest-cli > .st_raw.txt 2>&1
+			speedtest-cli > "$RAW_FILE" 2>&1
 		else
-			curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -W ignore - > .st_raw.txt 2>&1
+			curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -W ignore - > "$RAW_FILE" 2>&1
 		fi
 	) & spin "${CC}[$YY↓${CC}]${GG} Testing network speed..." " ${WW}⟫${GG} Complete."
 
-	# Alınan ham verileri ayıklıyoruz
-	my_ip=$(grep -oE "Testing from .* \([0-9.]+\)" .st_raw.txt | grep -oE "[0-9.]+" | head -n 1)
-	provider=$(grep -oE "Testing from .* \(" .st_raw.txt | sed 's/Testing from //' | sed 's/ ($//' | sed 's/ (//')
-	server_info=$(grep "Hosted by" .st_raw.txt | sed 's/Hosted by //' | cut -d '[' -f1 | sed 's/ *$//')
+	# Alınan ham verileri RAW_FILE üzerinden ayıklıyoruz
+	my_ip=$(grep -oE "Testing from .* \([0-9.]+\)" "$RAW_FILE" | grep -oE "[0-9.]+" | head -n 1)
+	provider=$(grep -oE "Testing from .* \(" "$RAW_FILE" | sed 's/Testing from //' | sed 's/ ($//' | sed 's/ (//')
+	server_info=$(grep "Hosted by" "$RAW_FILE" | sed 's/Hosted by //' | cut -d '[' -f1 | sed 's/ *$//')
 
 	# Ping ayıklama yapısı
-	ping_val=$(grep "Hosted by" .st_raw.txt | grep -oE "\[[0-9.]+ ms\]" | sed 's/\[//g' | sed 's/\]//g')
-	[[ -z $ping_val ]] && ping_val=$(grep "Hosted by" .st_raw.txt | grep -oE "[0-9.]+ ms")
+	ping_val=$(grep "Hosted by" "$RAW_FILE" | grep -oE "\[[0-9.]+ ms\]" | sed 's/\[//g' | sed 's/\]//g')
+	[[ -z $ping_val ]] && ping_val=$(grep "Hosted by" "$RAW_FILE" | grep -oE "[0-9.]+ ms")
 
-	dl_val=$(grep "Download:" .st_raw.txt | sed 's/Download: //')
-	ul_val=$(grep "Upload:" .st_raw.txt | sed 's/Upload: //')
+	dl_val=$(grep "Download:" "$RAW_FILE" | sed 's/Download: //')
+	ul_val=$(grep "Upload:" "$RAW_FILE" | sed 's/Upload: //')
 
 	# Değerleri sayısal formata çevirip kalite kontrolü yapıyoruz
 	dl_num=$(echo "$dl_val" | awk '{print $1}')
@@ -166,8 +144,8 @@ run_speedtest () {
 	# Video Call (Görüntülü Görüşme) Kalitesi
 	if (( $(echo "$ul_num >= 8" | bc -l) && $(echo "$ping_num <= 40" | bc -l) )); then v_qual="${GG} Great"; elif (( $(echo "$ul_num >= 3" | bc -l) )); then v_qual="$YY Good"; fi
 
-	# Orijinal .st_result.txt dosyasını kaydetmek üzere düz metin hazırlıyoruz
-	echo -e "IP Address: $my_ip\nProvider: $provider\nServer: $server_info\nPing: $ping_val\nDownload: $dl_val\nUpload: $ul_val" > .st_result.txt
+	# Sonucu kaydetmek üzere düz metin hazırlıyoruz
+	echo -e "IP Address: $my_ip\nProvider: $provider\nServer: $server_info\nPing: $ping_val\nDownload: $dl_val\nUpload: $ul_val" > "$RESULT_FILE"
 
 	# EKRANA RENKLİ RAPOR BASKI ALANI
 	echo -e "  ${CC}=======================================================${WW}"
@@ -184,19 +162,73 @@ run_speedtest () {
 	echo -e "   ${CC}[${YY} » ${CC}]${MM} Video Call Quality: ${v_qual}"
 	echo -e "  ${CC}=======================================================${WW}"
 
-	rm -f .st_raw.txt
+    # İşimiz bitince ham veriyi siliyoruz
+	rm -f "$RAW_FILE"
 
 	# Sonuçları kaydetme aşaması
 	read -p " $(echo -e " ${CC}[${YY}?${CC}]${MM} Do you want to save the results to a file? (Y/n): ${YY}")" save_choice
 
 	if [[ -z $save_choice || $save_choice == Y || $save_choice == y ]]; then
 		log_file="speedtest_result_$(date +%Y%m%d_%H%M%S).txt"
-		mv .st_result.txt ~/"$log_file"
+		mv "$RESULT_FILE" ~/"$log_file"
 		echo -e "\n  ${CC}[${GG}✓${CC}]${GG} Saved successfully as: ${YY}~/$log_file"
 	else
-		rm -f .st_result.txt
+		rm -f "$RESULT_FILE"
 		echo -e "\n  ${CC}[${RR}x${CC}]${RR} Results deleted."
 	fi
+}
+
+if [ ! -d "$Tool" ]; then
+    mkdir -p "$Tool"
+fi
+
+spin () {
+    local pid=$!
+    local delay=0.10
+    local spinner=(
+    "${BB}■■■■■■■"
+    "${GG}█${YY}■■■■■■"
+    "${YY}■${GG}█${YY}■■■■■"
+    "${YY}■■${GG}█${YY}■■■■"
+    "${YY}■■■${GG}█${YY}■■■"
+    "${YY}■■■■${GG}█${YY}■■"
+    "${YY}■■■■■${GG}█${YY}■"
+    "${YY}■■■■■■${GG}█"
+    "${BB}■■■■■■■"
+    "${YY}■■■■■■${GG}█"
+    "${YY}■■■■■${GG}█${YY}■"
+    "${YY}■■■■${GG}█${YY}■■"
+    "${YY}■■■${GG}█${YY}■■■"
+    "${YY}■■${GG}█${YY}■■■■"
+    "${YY}■${GG}█${YY}■■■■■"
+    "${GG}█${YY}■■■■■■"
+	)
+
+    local msg_loading="$1"
+    local msg_done="$2"
+    local msg_fail="${3:-${WW}⟫${RR} Failed!}" # 3. parametre girilmezse varsayılan hata mesajı
+
+    echo -e ""
+
+    while kill -0 $pid 2>/dev/null; do
+      for i in "${spinner[@]}"; do
+        echo -ne "\r  $msg_loading ${CC}【$i${CC}】\033[K";
+        sleep $delay 2>/dev/null
+        # İşlem for döngüsü içindeyken bittiyse anında çık
+        kill -0 $pid 2>/dev/null || break
+      done
+    done
+
+    # İşlemin çıkış kodunu (0: Başarılı, >0: Hata) yakala
+    wait $pid 2>/dev/null
+    local exit_code=$?
+
+    if [ $exit_code -eq 0 ]; then
+        echo -e "\r  $msg_loading \033[K$msg_done"
+    else
+        echo -e "\r  $msg_loading \033[K$msg_fail"
+        # İsteğe bağlı: Hata durumunda betiği durdurmak istersen buraya 'exit 1' eklenebilir.
+    fi
 }
 
 while true; do
@@ -267,7 +299,7 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 
 	elif [[ $pn == UT || $pn == ut ]]; then
 	echo -e "\n ${CC} [${YY}i${CC}]${GG} Tdr-Tool: Fast updating program...";
-	( $Tool && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> ~/.TheDarkRootTool_debug.log & spin "${CC}[$YY↓${CC}]${GG} Tdr-Tool Updating...$YY" " ${WW}⟫${GG} Complete."
+	( cd $Tool && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; chmod +x Tdr-Tool.sh; ) &> ~/.TheDarkRootTool_debug.log & spin "${CC}[$YY↓${CC}]${GG} Tdr-Tool Updating...$YY" " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == N || $pn == n ]]; then
 
@@ -299,9 +331,9 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	  cd ~/;
 	  curl -sLf "$Raw/ParrotOS-T/master/ParrotOS-T.sh?t=$(date +%s)" -o ParrotOS-T.sh;
 	  curl -sLf "$Raw/Terkey/master/Terkey.sh?t=$(date +%s)" -o Terkey.sh;
-	  chmod +x ParrotOS-T.sh; bash ParrotOS-T.sh; chmod +x Terkey.sh; bash Terkey.sh;
-	  cd ~/;rm -rf ParrotOS-T.sh; cd ~/;rm -rf Terkey.sh && $Reload;
-	) &> /dev/null & spin "${CC}[$YY↓${CC}]${GG} Downloading TheDarkRoot-T..." " ${WW}⟫${GG} Complete."
+	  chmod +x ParrotOS-T.sh && bash ParrotOS-T.sh && chmod +x Terkey.sh && bash Terkey.sh;
+	  cd ~/ && rm -rf ParrotOS-T.sh && cd ~/ && rm -rf Terkey.sh && $Reload;
+	) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading TheDarkRoot-T..." " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == T || $pn == t ]]; then
 	echo -e "\n ${CC} [${YY}i${CC}]${GG} TheDarkRoot-T: TheDarkRoot theme for Termux.";
@@ -309,35 +341,34 @@ read -p " $(echo -e " ${CC}[${YY}~${CC}]${MM} Program Number: ${YY}")" pn
 	  cd ~/;
 	  curl -sLf "$Raw/TheDarkRoot-T/master/TheDarkRoot-T.sh?t=$(date +%s)" -o TheDarkRoot-T.sh;
 	  curl -sLf "$Raw/Terkey/master/Terkey.sh?t=$(date +%s)" -o Terkey.sh;
-	  chmod +x TheDarkRoot-T.sh; bash TheDarkRoot-T.sh; chmod +x Terkey.sh; bash Terkey.sh;
-	  cd ~/;rm -rf TheDarkRoot-T.sh; cd ~/;rm -rf Terkey.sh && $Reload;
-	) &> /dev/null & spin "${CC}[$YY↓${CC}]${GG} Downloading TheDarkRoot-T..." " ${WW}⟫${GG} Complete."
+	  chmod +x TheDarkRoot-T.sh && bash TheDarkRoot-T.sh && chmod +x Terkey.sh && bash Terkey.sh;
+	  cd ~/ && rm -rf TheDarkRoot-T.sh && cd ~/ && rm -rf Terkey.sh && $Reload;
+	) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading TheDarkRoot-T..." " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == X || $pn == x ]]; then
 	echo -e "\n ${CC} [${YY}i${CC}]${GG} X: TheDarkRoot All-in-One Repositories.";
 	(
-	  $Tool && rm -rf .Hasher_temp && git clone --quiet $TheDarkRoot/Hasher.git .Hasher_temp && rm -rf Hasher && mv .Hasher_temp Hasher && chmod +x Hasher && chmod +x Hasher/*;
-	  $Tool && rm -rf .Hashgen_temp && git clone --quiet $TheDarkRoot/Hashgen.git .Hashgen_temp && rm -rf Hashgen && mv .Hashgen_temp Hashgen && chmod +x Hashgen && chmod +x Hashgen/*;
-	  $Tool && rm -rf .Tertext_temp && git clone --quiet $TheDarkRoot/Tertext.git .Tertext_temp && rm -rf Tertext && mv .Tertext_temp Tertext && chmod +x Tertext && chmod +x Tertext/*;
-	  $Tool && rm -rf .UserID_temp && git clone --quiet $TheDarkRoot/UserID.git .UserID_temp && rm -rf UserID && mv .UserID_temp UserID && chmod +x UserID && chmod +x UserID/*;
-	  $Reload;
+	  cd $Tool && rm -rf .Hasher_temp && git clone --quiet $TheDarkRoot/Hasher.git .Hasher_temp && rm -rf Hasher && mv .Hasher_temp Hasher && chmod +x Hasher && chmod +x Hasher/*;
+	  cd $Tool && rm -rf .Hashgen_temp && git clone --quiet $TheDarkRoot/Hashgen.git .Hashgen_temp && rm -rf Hashgen && mv .Hashgen_temp Hashgen && chmod +x Hashgen && chmod +x Hashgen/*;
+	  cd $Tool && rm -rf .Tertext_temp && git clone --quiet $TheDarkRoot/Tertext.git .Tertext_temp && rm -rf Tertext && mv .Tertext_temp Tertext && chmod +x Tertext && chmod +x Tertext/*;
+	  cd $Tool && rm -rf .UserID_temp && git clone --quiet $TheDarkRoot/UserID.git .UserID_temp && rm -rf UserID && mv .UserID_temp UserID && chmod +x UserID && chmod +x UserID/* && $Reload;
 	) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading X..." " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == 1 || $pn == 01 ]]; then
 	echo -e "\n ${CC} [${YY}i${CC}]${GG} Hasher: This is a Hash Cracker.";
-	( $Tool && rm -rf .Hasher_temp && git clone --quiet $TheDarkRoot/Hasher.git .Hasher_temp && rm -rf Hasher && mv .Hasher_temp Hasher && chmod +x Hasher && chmod +x Hasher/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading Hasher..." " ${WW}⟫${GG} Complete."
+	( cd $Tool && rm -rf .Hasher_temp && git clone --quiet $TheDarkRoot/Hasher.git .Hasher_temp && rm -rf Hasher && mv .Hasher_temp Hasher && chmod +x Hasher && chmod +x Hasher/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading Hasher..." " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == 2 || $pn == 02 ]]; then
 	echo -e "\n ${CC} [${YY}i${CC}]${GG} Hashgen: Generate more 39 type hash.";
-	( $Tool && rm -rf .Hashgen_temp && git clone --quiet $TheDarkRoot/Hashgen.git .Hashgen_temp && rm -rf Hashgen && mv .Hashgen_temp Hashgen && chmod +x Hashgen && chmod +x Hashgen/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading Hashgen..." " ${WW}⟫${GG} Complete."
+	( cd $Tool && rm -rf .Hashgen_temp && git clone --quiet $TheDarkRoot/Hashgen.git .Hashgen_temp && rm -rf Hashgen && mv .Hashgen_temp Hashgen && chmod +x Hashgen && chmod +x Hashgen/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading Hashgen..." " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == 3 || $pn == 03 ]]; then
 	echo -e "\n ${CC} [${YY}i${CC}]${GG} Tertext: Program for creating words from letters.";
-	( $Tool && rm -rf .Tertext_temp && git clone --quiet $TheDarkRoot/Tertext.git .Tertext_temp && rm -rf Tertext && mv .Tertext_temp Tertext && chmod +x Tertext && chmod +x Tertext/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading Tertext..." " ${WW}⟫${GG} Complete."
+	( cd $Tool && rm -rf .Tertext_temp && git clone --quiet $TheDarkRoot/Tertext.git .Tertext_temp && rm -rf Tertext && mv .Tertext_temp Tertext && chmod +x Tertext && chmod +x Tertext/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading Tertext..." " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == 4 || $pn == 04 ]]; then
 	echo -e "\n ${CC} [${YY}i${CC}]${GG} UserID: Search usernames on social media.";
-	( $Tool && rm -rf .UserID_temp && git clone --quiet $TheDarkRoot/UserID.git .UserID_temp && rm -rf UserID && mv .UserID_temp UserID && chmod +x UserID && chmod +x UserID/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading UserID..." " ${WW}⟫${GG} Complete."
+	( cd $Tool && rm -rf .UserID_temp && git clone --quiet $TheDarkRoot/UserID.git .UserID_temp && rm -rf UserID && mv .UserID_temp UserID && chmod +x UserID && chmod +x UserID/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${CC}[$YY↓${CC}]${GG} Downloading UserID..." " ${WW}⟫${GG} Complete."
 
 	elif [[ $pn == Q || $pn == q ]]; then
 	echo -e "\n ${CC} [$YY»${CC}]${RR} Good Bye...\n";
