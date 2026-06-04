@@ -63,25 +63,67 @@ ${G} 0{===================================================}0\n"
         ;;
 esac
 
-install_missing_packages() {
+check_network() {
+    ping -c 1 8.8.8.8 &> /dev/null
+    if [ $? -eq 0 ]; then
+        status="${W}⟫${G} ONLINE"
+        is_online=true
+    else
+        status="${W}⟫${R} OFFLINE"
+        is_online=false
+    fi
+
+    ( sleep 1.5 ) &> /dev/null & spin "${C}[${Y}i${C}]${G} Network control..." "$status"
+}
+
+install_packages() {
+    local manager="$1"
+    shift # İlk parametreyi (manager) atla, geriye sadece paket isimleri kalsın
     local missing_pkgs=()
-    # Girdi olarak verilen tüm paketleri kontrol et
+
+    # Adım 1: Paket yöneticisine göre eksik paketleri tespit et
     for pkg in "$@"; do
-        # dpkg ile paketin kurulu olup olmadığına bak
-        if ! dpkg -s "$pkg" &> /dev/null; then
-            missing_pkgs+=("$pkg")
-        fi
+        case "$manager" in
+            pkg)
+                if ! dpkg -s "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi
+                ;;
+            pip)
+                if ! pip show "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi
+                ;;
+            npm)
+                if ! npm list -g "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi
+                ;;
+            gem)
+                if ! gem list -i "^${pkg}$" &> /dev/null; then missing_pkgs+=("$pkg"); fi
+                ;;
+            *)
+                echo -e "\n  ${C}[${R}!${C}]${R} Error: Unknown package manager '$manager'"
+                return 1
+                ;;
+        esac
     done
 
-    # Sadece eksik paket varsa kurulum komutunu çalıştır
+    # Adım 2: Sadece eksik paketler varsa doğru yöneticiyle kurulumu başlat
     if [ ${#missing_pkgs[@]} -gt 0 ]; then
-        pkg install -y "${missing_pkgs[@]}"
+        case "$manager" in
+            pkg)
+                pkg install -y "${missing_pkgs[@]}"
+                ;;
+            pip)
+                pip install --upgrade "${missing_pkgs[@]}"
+                ;;
+            npm)
+                npm install -g "${missing_pkgs[@]}"
+                ;;
+            gem)
+                gem install "${missing_pkgs[@]}"
+                ;;
+        esac
     fi
 }
 
 install_tool() {
     local tool_name="$1"
-    # Geçici klasörü temizle ve yeni sürümü klonla
     cd "$Tool" && rm -rf ".${tool_name}_temp" && \
     git clone --quiet "$TheDarkRoot/$tool_name.git" ".${tool_name}_temp" && \
     rm -rf "$tool_name" && mv ".${tool_name}_temp" "$tool_name" && \
@@ -95,18 +137,23 @@ run_update () {
 	#Termux Update
 	( echo "--- Updating ---" > "$Log"; pkg update -y; pkg upgrade -y && $Reload; ) &>> ~/.TermuxUpdate_debug.log & spin "${C}[${Y}↓${C}]${G} Updating..." " ${W}⟫${G} Complete."
 	#Termux Packages Installing
-	( install_missing_packages termux-tools coreutils binutils git curl wget sed grep gawk bc jq ncurses-utils python ruby php clang make openssh openssl zip unzip tar proot crunch neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet nodejs && $Reload; ) &>> ~/.TermuxPackages_debug.log & spin "${C}[${Y}↓${C}]${G} Packages Installing..." " ${W}⟫${G} Complete."
-	#Termux Tools Installing
+	( 
+      install_packages pkg termux-tools coreutils binutils git curl wget sed grep gawk bc jq ncurses-utils python ruby php clang make openssh openssl zip unzip tar proot crunch neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet nodejs
+      $Reload
+    ) &>> ~/.TermuxPackages_debug.log & spin "${C}[${Y}↓${C}]${G} Packages Installing..." " ${W}⟫${G} Complete."
+
+	# Termux Tools Installing
 	(
-	  pip install --upgrade pip setuptools wheel bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest-cli;
-	  npm install -g npm@latest readline-sync speed-test;
-	  gem install lolcat && $Reload;
+	  install_packages pip setuptools wheel bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest-cli
+	  install_packages npm npm@latest readline-sync speed-test
+	  install_packages gem lolcat
+      $Reload
 	) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Tools Installing..." " ${W}⟫${G} Complete."
 	#Termux Tdr-Tool Updating
 	(
 	 cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh;
 	 rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh;
-	) &> ~/.TheDarkRootTool_debug.log & spin "${C}[${Y}↓${C}]${G} Tdr-Tool Updating...${Y}" " ${W}⟫${G} Complete."
+	) &>> ~/.TheDarkRootTool_debug.log & spin "${C}[${Y}↓${C}]${G} Tdr-Tool Updating...${Y}" " ${W}⟫${G} Complete."
 }
 
 run_speedtest () {
@@ -129,7 +176,12 @@ run_speedtest () {
 		if command -v speedtest-cli &> /dev/null; then
 			speedtest-cli > "$RAW_FILE" 2>&1
 		else
-			curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -W ignore - > "$RAW_FILE" 2>&1
+            # Eğer yerelde yoksa bir kereye mahsus indir ve kaydet
+            if [ ! -f "$Tool/speedtest.py" ]; then
+                curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py -o "$Tool/speedtest.py"
+            fi
+            # Yerel dosyayı çalıştır
+			python3 -W ignore "$Tool/speedtest.py" > "$RAW_FILE" 2>&1
 		fi
 	) & spin "${C}[${Y}↓${C}]${G} Testing network speed..." " ${W}⟫${G} Complete."
 
@@ -292,134 +344,128 @@ ${C}    │ └─⊸ [${Y} »${G} TheDarkRoot theme for Termux.${C}]
 ${C}    └─┬─⊸ [${Y}~Q${R} Exit${C}]
 ${C}      └─⊸ [${Y} »${G} Tdr-Tool exit.${C}]\n"
 
+# Kullanıcıdan girdiyi alıyoruz
 read -p " $(echo -e " ${C}[${Y}~${C}]${M} Program Number: ${Y}")" pn
 
-	if [[ $pn == U || $pn == u ]]; then
+# Girdiyi tamamen küçük harfe çeviriyoruz (Örn: "UT" -> "ut")
+pn_lower="${pn,,}"
 
-	ping -c 1 8.8.8.8 &> /dev/null
-	if [ $? -eq 0 ]; then
-		status="${W}⟫${G} ONLINE"
-		is_online=true
-	else
-		status="${W}⟫${R} OFFLINE"
-		is_online=false
-	fi
+case "$pn_lower" in
+    u)
+        check_network # Fonksiyonu çağırıyoruz
 
-	( sleep 1.5 ) &> /dev/null & spin "${C}[${Y}i${C}]${G} Network control..." "$status"
+        if [ "$is_online" = true ]; then
+            run_update
 
-	if [ "$is_online" = true ]; then
-		run_update
+            echo -e "\n ${C} [${Y}!${C}]${G} Update completed!\n"
 
-		echo -e "\n ${C} [${Y}!${C}]${G} Update completed!\n"
+            read -p " $(echo -e " ${C}[${Y}?${C}]${M} Want to run a network speed test? (Y/n): ${Y}")" st_choice_aio
 
-		read -p " $(echo -e " ${C}[${Y}?${C}]${M} Want to run an network speed test? (Y/n): ${Y}")" st_choice_aio
+            if [[ -z $st_choice_aio || "${st_choice_aio,,}" == "y" ]]; then
+                run_speedtest
+            else
+                echo -e "\n  ${C}[${Y}i${C}]${G} Speedtest skipped."
+            fi
+        else
+            echo -e "\n ${C} [${R}!${C}]${R} Check your network connection."
+        fi
+        ;;
 
-		if [[ -z $st_choice_aio || $st_choice_aio == Y || $st_choice_aio == y ]]; then
-			run_speedtest
-		else
-			echo -e "\n  ${C}[${Y}i${C}]${G} Speedtest skipped."
-		fi
+    ut)
+        echo -e "\n ${C} [${Y}i${C}]${G} Tdr-Tool: Fast updating program..."
+        (
+         cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh;
+         rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; 
+        ) &>> ~/.TheDarkRootTool_debug.log & spin "${C}[${Y}↓${C}]${G} Tdr-Tool Updating...${Y}" " ${W}⟫${G} Complete."
+        ;;
 
-	else
-		echo -e "\n ${C} [${R}!${C}]${R} Check your network connection."
-	fi
+    n)
+        check_network # Fonksiyonu çağırıyoruz
 
-	elif [[ $pn == UT || $pn == ut ]]; then
-	echo -e "\n ${C} [${Y}i${C}]${G} Tdr-Tool: Fast updating program...";
-	(
-	 cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh;
-	 rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; 
-	) &> ~/.TheDarkRootTool_debug.log & spin "${C}[${Y}↓${C}]${G} Tdr-Tool Updating...${Y}" " ${W}⟫${G} Complete."
+        if [ "$is_online" = true ]; then
+            echo -e ""
+            read -p " $(echo -e " ${C}[${Y}?${C}]${M} Want to run a network speed test? (Y/n): ${Y}")" st_choice
 
-	elif [[ $pn == N || $pn == n ]]; then
+            if [[ -z $st_choice || "${st_choice,,}" == "y" ]]; then
+                run_speedtest
+            else
+                echo -e "\n  ${C}[${Y}i${C}]${G} Speedtest skipped."
+            fi
+        fi
+        ;;
 
-	ping -c 1 8.8.8.8 &> /dev/null
-	if [ $? -eq 0 ]; then
-		status="${W}⟫${G} ONLINE"
-		is_online=true
-	else
-		status="${W}⟫${R} OFFLINE"
-		is_online=false
-	fi
+    p)
+        echo -e "\n ${C} [${Y}i${C}]${G} ParrotOS-T: Parrot OS theme for Termux."
+        (
+          cd $Etc && curl -sLf "$Raw/FileStore/master/Software%20Files/ParrotOS.trmx?t=$(date +%s)" -o bash.bashrc.tmp;
+          rm -rf bash.bashrc && mv bash.bashrc.tmp bash.bashrc;
+          cd ~/.termux && curl -sLf "$Raw/FileStore/master/Software%20Files/Terkey.trmx?t=$(date +%s)" -o termux.properties.tmp;
+          rm -rf termux.properties && mv termux.properties.tmp termux.properties;
+          cd ~/ && $Reload;
+        ) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading ParrotOS-T..." " ${W}⟫${G} Complete."
+        ;;
 
-	( sleep 1.5 ) &> /dev/null & spin "${C}[${Y}i${C}]${G} Network control..." "$status"
+    t)
+        echo -e "\n ${C} [${Y}i${C}]${G} TheDarkRoot-T: TheDarkRoot theme for Termux."
+        (
+          cd $Etc && curl -sLf "$Raw/FileStore/master/Software%20Files/TheDarkRoot.trmx?t=$(date +%s)" -o bash.bashrc.tmp;
+          rm -rf bash.bashrc && mv bash.bashrc.tmp bash.bashrc;
+          cd ~/.termux && curl -sLf "$Raw/FileStore/master/Software%20Files/Terkey.trmx?t=$(date +%s)" -o termux.properties.tmp;
+          rm -rf termux.properties && mv termux.properties.tmp termux.properties;
+          cd ~/ && $Reload;
+        ) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading TheDarkRoot-T..." " ${W}⟫${G} Complete."
+        ;;
 
-	if [ "$is_online" = true ]; then
-		echo -e ""
-		read -p " $(echo -e " ${C}[${Y}?${C}]${M} Want to run an network speed test? (Y/n): ${Y}")" st_choice
+    x)
+        echo -e "\n ${C} [${Y}i${C}]${G} X: TheDarkRoot All-in-One Repositories."
+        (
+          install_tool "Hasher"
+          install_tool "Hashgen"
+          install_tool "Tertext"
+          install_tool "UserID"
+          cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh;
+          rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh && $Reload;
+        ) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading X..." " ${W}⟫${G} Complete."
+        ;;
 
-		if [[ -z $st_choice || $st_choice == Y || $st_choice == y ]]; then
-			run_speedtest
-		else
-			echo -e "\n  ${C}[${Y}i${C}]${G} Speedtest skipped."
-		fi
-	fi
+    1|01)
+        echo -e "\n ${C} [${Y}i${C}]${G} Hasher: This is a Hash Cracker."
+        ( install_tool "Hasher" && $Reload; ) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading Hasher..." " ${W}⟫${G} Complete."
+        ;;
 
-	elif [[ $pn == P || $pn == p ]]; then
-	echo -e "\n ${C} [${Y}i${C}]${G} ParrotOS-T: Parrot OS theme for Termux.";
-	(
-	  cd $Etc && curl -sLf "$Raw/FileStore/master/Software%20Files/ParrotOS.trmx?t=$(date +%s)" -o bash.bashrc.tmp;
-	  rm -rf bash.bashrc && mv bash.bashrc.tmp bash.bashrc;
-	  cd ~/.termux && curl -sLf "$Raw/FileStore/master/Software%20Files/Terkey.trmx?t=$(date +%s)" -o termux.properties.tmp;
-	  rm -rf termux.properties && mv termux.properties.tmp termux.properties;
-	  cd ~/ && $Reload;
-	) &> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading ParrotOS-T..." " ${W}⟫${G} Complete."
+    2|02)
+        echo -e "\n ${C} [${Y}i${C}]${G} Hashgen: Generate more 39 type hash."
+        ( install_tool "Hashgen" && $Reload; ) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading Hashgen..." " ${W}⟫${G} Complete."
+        ;;
 
-	elif [[ $pn == T || $pn == t ]]; then
-	echo -e "\n ${C} [${Y}i${C}]${G} TheDarkRoot-T: TheDarkRoot theme for Termux.";
-	(
-	  cd $Etc && curl -sLf "$Raw/FileStore/master/Software%20Files/TheDarkRoot.trmx?t=$(date +%s)" -o bash.bashrc.tmp;
-	  rm -rf bash.bashrc && mv bash.bashrc.tmp bash.bashrc;
-	  cd ~/.termux && curl -sLf "$Raw/FileStore/master/Software%20Files/Terkey.trmx?t=$(date +%s)" -o termux.properties.tmp;
-	  rm -rf termux.properties && mv termux.properties.tmp termux.properties;
-	  cd ~/ && $Reload;
-	) &> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading TheDarkRoot-T..." " ${W}⟫${G} Complete."
+    3|03)
+        echo -e "\n ${C} [${Y}i${C}]${G} Tertext: Program for creating words from letters."
+        ( install_tool "Tertext" && $Reload; ) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading Tertext..." " ${W}⟫${G} Complete."
+        ;;
 
-	elif [[ $pn == X || $pn == x ]]; then
-	echo -e "\n ${C} [${Y}i${C}]${G} X: TheDarkRoot All-in-One Repositories.";
-	(
-	  install_tool "Hasher"
-	  install_tool "Hashgen"
-	  install_tool "Tertext"
-	  install_tool "UserID"
-	  cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh;
-	  rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh && $Reload;
-	) &> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading X..." " ${W}⟫${G} Complete."
+    4|04)
+        echo -e "\n ${C} [${Y}i${C}]${G} UserID: Search usernames on social media."
+        ( install_tool "UserID" && $Reload; ) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading UserID..." " ${W}⟫${G} Complete."
+        ;;
 
-	elif [[ $pn == 1 || $pn == 01 ]]; then
-	echo -e "\n ${C} [${Y}i${C}]${G} Hasher: This is a Hash Cracker.";
-	( install_tool "Hasher" && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading Hasher..." " ${W}⟫${G} Complete."
+    q)
+        echo -e "\n ${C} [${Y}»${C}]${R} Good Bye...\n"
+        exit 0
+        ;;
 
-	elif [[ $pn == 2 || $pn == 02 ]]; then
-	echo -e "\n ${C} [${Y}i${C}]${G} Hashgen: Generate more 39 type hash.";
-	( install_tool "Hashgen" && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading Hashgen..." " ${W}⟫${G} Complete."
+    *)
+        echo -e "\n  ${Y}[${R}⦸${Y}]${R} Invalid Action."	
+        sleep 1.5
+        ;;
+esac
 
-	elif [[ $pn == 3 || $pn == 03 ]]; then
-	echo -e "\n ${C} [${Y}i${C}]${G} Tertext: Program for creating words from letters.";
-	( install_tool "Tertext" && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading Tertext..." " ${W}⟫${G} Complete."
-
-	elif [[ $pn == 4 || $pn == 04 ]]; then
-	echo -e "\n ${C} [${Y}i${C}]${G} UserID: Search usernames on social media.";
-	( install_tool "UserID" && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading UserID..." " ${W}⟫${G} Complete."
-
-	elif [[ $pn == Q || $pn == q ]]; then
-	echo -e "\n ${C} [${Y}»${C}]${R} Good Bye...\n";
-	sleep 0;exit;
-
-	else
-	echo -e "\n  ${Y}[${R}⦸${Y}]${R} Invalid Action."	
-	sleep 1.5
-
+# Eğer çıkış veya hatalı tuş değilse, ana menüye dönmek için bekle
+if [[ "$pn_lower" != "q" && "$pn_lower" != "" && "$pn_lower" =~ ^(u|ut|p|t|x|1|01|2|02|3|03|4|04|n)$ ]]; then
+    read -n 1 -s -p " $(echo -e "\n  ${C}[${Y}~${C}]${M} Press any key to return to main menu...${Y}")"
+    
+    # Sadece aracı güncelleyen veya çoklu kurulum yapan işlemlerden sonra scripti yeniden başlat
+    if [[ "$pn_lower" =~ ^(u|ut|x)$ ]]; then
+        exec bash ~/Tdr-Tool.sh
     fi
-
-	if [[ $pn != Q && $pn != q && $pn != "" ]]; then
-		if [[ $pn =~ ^(U|u|UT|ut|P|p|T|t|X|x|[1-4]|0[1-4]|N|n)$ ]]; then
-
-			read -n 1 -s -p " $(echo -e "\n  ${C}[${Y}~${C}]${M} Press any key to return to main menu...${Y}")"
-
-			if [[ $pn == U || $pn == u || $pn == UT || $pn == ut || $pn == X || $pn == x ]]; then
-				exec bash ~/Tdr-Tool.sh
-			fi
-		fi
-	fi
+fi
 done
