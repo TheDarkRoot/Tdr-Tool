@@ -85,12 +85,27 @@ check_network() {
 # Bağımlılıkları kontrol eden fonksiyon
 check_dependencies() {
     local deps=("git" "curl" "awk" "bc" "grep")
+    local missing=()
+
+    # 1. Hangi paketler eksik tespit et
     for cmd in "${deps[@]}"; do
         if ! command -v "$cmd" &> /dev/null; then
-            echo -e "\n  ${C}[${R}!${C}]${R} Error! '$cmd' is not installed. Please install it with the 'pkg install $cmd' command."
-            exit 1
+            missing+=("$cmd")
         fi
     done
+
+    # 2. Eğer eksik varsa, uyarı vermek yerine arka planda kur
+    if [ ${#missing[@]} -gt 0 ]; then
+        echo -e "\n ${C}[${Y}i${C}]${G} Missing dependencies detected: ${missing[*]}"
+        echo -e "\n ${C}[${Y}i${C}]${G} Installing automatically, please wait..."
+        
+        # Sessizce kur
+        pkg install -y "${missing[@]}" &>> ~/.TheDarkRoot_debug.log
+        
+        echo -e " ${C}[${G}✓${C}]${G} Setup complete. Restarting..."
+        sleep 2
+        exec bash "$0" # Programı temiz bir şekilde yeniden başlat
+    fi
 }
 
 check_dependencies # Fonksiyonu çağırıyoruz
