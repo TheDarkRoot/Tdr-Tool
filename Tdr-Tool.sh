@@ -102,7 +102,7 @@ check_dependencies() {
         # Sessizce kur
         pkg install -y "${missing[@]}" &>> ~/.TheDarkRoot_debug.log
         
-        echo -e "\n\n ${C}[${G}✓${C}]${G} Setup complete. Restarting...\n"
+        echo -e "\n ${C}[${G}✓${C}]${G} Setup complete. Restarting...\n"
         sleep 2
         exec bash "$0" # Programı temiz bir şekilde yeniden başlat
     fi
