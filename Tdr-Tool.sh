@@ -23,29 +23,25 @@ Raw="https://raw.githubusercontent.com/TheDarkRoot"
 Reload="termux-reload-settings"
 
 case "$1" in
-    --info)
+    -i)
         echo -e "
-$CC #######$YY ##################$CC #######$YY ####################
-$CC    #    #####  #####          #     ####   ####  #
-$CC    #    #    # #    #         #    #    # #    # #
-$CC    #    #    # #    #  #####  #    #    # #    # #
-$CC    #    #    # #####          #    #    # #    # #
-$CC    #    #    # #   #          #    #    # #    # #
-$CC    #    #####  #    #         #     ####   ####  ######
-$YY ###################[›$GG TheDarkRoot $YY‹]###################
-$CC -------------------------------------------------------
-$GG 0{======================$WW INFO $GG=======================}0
-$GG |$YY [$CC=$YY]$WW Name     $CC:$WW Tdr-Tool$GG                             |
-$GG |$YY [$CC=$YY]$WW Code     $CC:$WW Shell$GG                                |
-$GG |$YY [$CC=$YY]$WW Version  $CC:$WW v1.2.7 (Alpha)$GG                       |
-$GG |$YY [$CC=$YY]$WW Author   $CC:$WW Tdr-Tool$GG                             |
-$GG |$YY [$CC=$YY]$WW Github   $CC:$WW https://github.com/TheDarkRoot$GG       |
-$GG |$YY [$CC=$YY]$WW Telegram $CC:$WW @TheDarkRoot (t.me/TheDarkRoot)$GG      |
-$GG 0{===================================================}0\n"
-        exit 0
-        ;;
-    --version)
-        echo "Tdr-Tool v1.2.7"
+${CC} #######${YY} ##################${CC} #######${YY} ####################
+${CC}    #    #####  #####          #     ####   ####  #
+${CC}    #    #    # #    #         #    #    # #    # #
+${CC}    #    #    # #    #  #####  #    #    # #    # #
+${CC}    #    #    # #####          #    #    # #    # #
+${CC}    #    #    # #   #          #    #    # #    # #
+${CC}    #    #####  #    #         #     ####   ####  ######
+${YY} ###################[›${GG} TheDarkRoot ${YY}‹]###################
+${CC} -------------------------------------------------------
+${GG} 0{======================${WW} INFO ${GG}=======================}0
+${GG} |${YY} [${CC}=${YY}]${WW} Name     ${CC}:${WW} Tdr-Tool$GG                             |
+${GG} |${YY} [${CC}=${YY}]${WW} Code     ${CC}:${WW} Shell$GG                                |
+${GG} |${YY} [${CC}=${YY}]${WW} Version  ${CC}:${WW} v1.2.7 (Alpha)$GG                       |
+${GG} |${YY} [${CC}=${YY}]${WW} Author   ${CC}:${WW} Tdr-Tool$GG                             |
+${GG} |${YY} [${CC}=${YY}]${WW} Github   ${CC}:${WW} https://github.com/TheDarkRoot$GG       |
+${GG} |${YY} [${CC}=${YY}]${WW} Telegram ${CC}:${WW} @TheDarkRoot (t.me/TheDarkRoot)$GG      |
+${GG} 0{===================================================}0\n"
         exit 0
         ;;
     *)
