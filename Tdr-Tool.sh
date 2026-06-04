@@ -9,11 +9,33 @@ R='\033[31;1m'  # Red Light
 C='\033[36;1m'  # Cyan Light
 M='\033[35;1m'  # Magenta Light
 
-Tool="$HOME/Tdr-Tool"
+Etc="$PREFIX/etc/" #/data/data/com.termux/files/usr/etc/
+Termux="$HOME/.termux/" #/data/data/com.termux/files/home/
+Tool="$HOME/Tdr-Tool/" #/data/data/com.termux/files/home/
 Github="https://github.com"
 TheDarkRoot="https://github.com/TheDarkRoot"
 Raw="https://raw.githubusercontent.com/TheDarkRoot"
 Reload="termux-reload-settings"
+
+# 1. Termux Depolama İzni Kontrolü
+if [ ! -d "$HOME/storage" ]; then
+    termux-setup-storage
+    sleep 5
+	$Reload
+fi
+
+# 2. Gerekli Tüm Klasörlerin Oluşturulması
+# İleride yeni bir klasör eklemek istersen sadece bu listeye yolunu yazman yeterli!
+setup_folders=(
+    "$Tool"
+    "$Termux"
+)
+
+for dir in "${setup_folders[@]}"; do
+    if [ ! -d "$dir" ]; then
+        mkdir -p "$dir"
+    fi
+done
 
 case "$1" in
     -i)
@@ -56,6 +78,15 @@ install_missing_packages() {
     if [ ${#missing_pkgs[@]} -gt 0 ]; then
         pkg install -y "${missing_pkgs[@]}"
     fi
+}
+
+install_tool() {
+    local tool_name="$1"
+    # Geçici klasörü temizle ve yeni sürümü klonla
+    cd "$Tool" && rm -rf ".${tool_name}_temp" && \
+    git clone --quiet "$TheDarkRoot/$tool_name.git" ".${tool_name}_temp" && \
+    rm -rf "$tool_name" && mv ".${tool_name}_temp" "$tool_name" && \
+    chmod +x "$tool_name" && chmod +x "$tool_name"/*
 }
 
 run_update () {
@@ -174,10 +205,6 @@ run_speedtest () {
 		echo -e "\n  ${C}[${R}x${C}]${R} Results deleted."
 	fi
 }
-
-if [ ! -d "$Tool" ]; then
-    mkdir -p "$Tool"
-fi
 
 spin () {
     local pid=$!
@@ -326,48 +353,44 @@ read -p " $(echo -e " ${C}[${Y}~${C}]${M} Program Number: ${Y}")" pn
 	elif [[ $pn == P || $pn == p ]]; then
 	echo -e "\n ${C} [${Y}i${C}]${G} ParrotOS-T: Parrot OS theme for Termux.";
 	(
-	  cd ~/;
-	  curl -sLf "$Raw/ParrotOS-T/master/ParrotOS-T.sh?t=$(date +%s)" -o ParrotOS-T.sh;
-	  curl -sLf "$Raw/Terkey/master/Terkey.sh?t=$(date +%s)" -o Terkey.sh;
-	  chmod +x ParrotOS-T.sh && bash ParrotOS-T.sh && chmod +x Terkey.sh && bash Terkey.sh;
-	  cd ~/ && rm -rf ParrotOS-T.sh && cd ~/ && rm -rf Terkey.sh && $Reload;
+	  cd $Etc && curl -sLf "$Raw/FileStore/master/Software%20Files/ParrotOS.trmx?t=$(date +%s)" -o bash.bashrc.tmp && rm -rf bash.bashrc && mv bash.bashrc.tmp bash.bashrc;
+	  cd ~/.termux && curl -sLf "$Raw/FileStore/master/Software%20Files/Terkey.trmx?t=$(date +%s)" -o termux.properties.tmp && rm -rf termux.properties && mv termux.properties.tmp termux.properties;
+	  cd ~/ && $Reload;
 	) &> ~/.TheDarkRoot_debug.log & spin "${C}[$YY↓${C}]${G} Downloading ParrotOS-T..." " ${W}⟫${G} Complete."
 
 	elif [[ $pn == T || $pn == t ]]; then
 	echo -e "\n ${C} [${Y}i${C}]${G} TheDarkRoot-T: TheDarkRoot theme for Termux.";
 	(
-	  cd ~/;
-	  curl -sLf "$Raw/TheDarkRoot-T/master/TheDarkRoot-T.sh?t=$(date +%s)" -o TheDarkRoot-T.sh;
-	  curl -sLf "$Raw/Terkey/master/Terkey.sh?t=$(date +%s)" -o Terkey.sh;
-	  chmod +x TheDarkRoot-T.sh && bash TheDarkRoot-T.sh && chmod +x Terkey.sh && bash Terkey.sh;
-	  cd ~/ && rm -rf TheDarkRoot-T.sh && cd ~/ && rm -rf Terkey.sh && $Reload;
+	  cd $Etc && curl -sLf "$Raw/FileStore/master/Software%20Files/TheDarkRoot.trmx?t=$(date +%s)" -o bash.bashrc.tmp && rm -rf bash.bashrc && mv bash.bashrc.tmp bash.bashrc;
+	  cd ~/.termux && curl -sLf "$Raw/FileStore/master/Software%20Files/Terkey.trmx?t=$(date +%s)" -o termux.properties.tmp && rm -rf termux.properties && mv termux.properties.tmp termux.properties;
+	  cd ~/ && $Reload;
 	) &> ~/.TheDarkRoot_debug.log & spin "${C}[$YY↓${C}]${G} Downloading TheDarkRoot-T..." " ${W}⟫${G} Complete."
 
 	elif [[ $pn == X || $pn == x ]]; then
 	echo -e "\n ${C} [${Y}i${C}]${G} X: TheDarkRoot All-in-One Repositories.";
 	(
-	  cd "$Tool" && rm -rf .Hasher_temp && git clone --quiet $TheDarkRoot/Hasher.git .Hasher_temp && rm -rf Hasher && mv .Hasher_temp Hasher && chmod +x Hasher && chmod +x Hasher/*;
-	  cd "$Tool" && rm -rf .Hashgen_temp && git clone --quiet $TheDarkRoot/Hashgen.git .Hashgen_temp && rm -rf Hashgen && mv .Hashgen_temp Hashgen && chmod +x Hashgen && chmod +x Hashgen/*;
-	  cd "$Tool" && rm -rf .Tertext_temp && git clone --quiet $TheDarkRoot/Tertext.git .Tertext_temp && rm -rf Tertext && mv .Tertext_temp Tertext && chmod +x Tertext && chmod +x Tertext/*;
-	  cd "$Tool" && rm -rf .UserID_temp && git clone --quiet $TheDarkRoot/UserID.git .UserID_temp && rm -rf UserID && mv .UserID_temp UserID && chmod +x UserID && chmod +x UserID/*;
+	  install_tool "Hasher"
+	  install_tool "Hashgen"
+	  install_tool "Tertext"
+	  install_tool "UserID"
 	  cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh && $Reload;
 	) &> ~/.TheDarkRoot_debug.log & spin "${C}[$YY↓${C}]${G} Downloading X..." " ${W}⟫${G} Complete."
 
 	elif [[ $pn == 1 || $pn == 01 ]]; then
 	echo -e "\n ${C} [${Y}i${C}]${G} Hasher: This is a Hash Cracker.";
-	( cd "$Tool" && rm -rf .Hasher_temp && git clone --quiet $TheDarkRoot/Hasher.git .Hasher_temp && rm -rf Hasher && mv .Hasher_temp Hasher && chmod +x Hasher && chmod +x Hasher/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[$YY↓${C}]${G} Downloading Hasher..." " ${W}⟫${G} Complete."
+	( install_tool "Hasher" && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[$YY↓${C}]${G} Downloading Hasher..." " ${W}⟫${G} Complete."
 
 	elif [[ $pn == 2 || $pn == 02 ]]; then
 	echo -e "\n ${C} [${Y}i${C}]${G} Hashgen: Generate more 39 type hash.";
-	( cd "$Tool" && rm -rf .Hashgen_temp && git clone --quiet $TheDarkRoot/Hashgen.git .Hashgen_temp && rm -rf Hashgen && mv .Hashgen_temp Hashgen && chmod +x Hashgen && chmod +x Hashgen/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[$YY↓${C}]${G} Downloading Hashgen..." " ${W}⟫${G} Complete."
+	( install_tool "Hashgen" && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[$YY↓${C}]${G} Downloading Hashgen..." " ${W}⟫${G} Complete."
 
 	elif [[ $pn == 3 || $pn == 03 ]]; then
 	echo -e "\n ${C} [${Y}i${C}]${G} Tertext: Program for creating words from letters.";
-	( cd "$Tool" && rm -rf .Tertext_temp && git clone --quiet $TheDarkRoot/Tertext.git .Tertext_temp && rm -rf Tertext && mv .Tertext_temp Tertext && chmod +x Tertext && chmod +x Tertext/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[$YY↓${C}]${G} Downloading Tertext..." " ${W}⟫${G} Complete."
+	( install_tool "Tertext" && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[$YY↓${C}]${G} Downloading Tertext..." " ${W}⟫${G} Complete."
 
 	elif [[ $pn == 4 || $pn == 04 ]]; then
 	echo -e "\n ${C} [${Y}i${C}]${G} UserID: Search usernames on social media.";
-	( cd "$Tool" && rm -rf .UserID_temp && git clone --quiet $TheDarkRoot/UserID.git .UserID_temp && rm -rf UserID && mv .UserID_temp UserID && chmod +x UserID && chmod +x UserID/* && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[$YY↓${C}]${G} Downloading UserID..." " ${W}⟫${G} Complete."
+	( install_tool "UserID" && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[$YY↓${C}]${G} Downloading UserID..." " ${W}⟫${G} Complete."
 
 	elif [[ $pn == Q || $pn == q ]]; then
 	echo -e "\n ${C} [$YY»${C}]${R} Good Bye...\n";
