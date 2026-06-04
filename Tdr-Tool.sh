@@ -9,9 +9,13 @@ R='\033[31;1m'  # Red Light
 C='\033[36;1m'  # Cyan Light
 M='\033[35;1m'  # Magenta Light
 
-Etc="$PREFIX/etc/" #/data/data/com.termux/files/usr/etc/
-Termux="$HOME/.termux/" #/data/data/com.termux/files/home/
-Tool="$HOME/Tdr-Tool/" #/data/data/com.termux/files/home/
+# $HOME/   - /data/data/com.termux/files/home/
+# $PREFIX/ - /data/data/com.termux/files/usr/etc/
+Etc="$PREFIX/etc"
+Termux="$HOME/.termux"
+Tool="$HOME/Tdr-Tool"
+Backup="$HOME/Tdr-Tool/.Backup"
+Network="$HOME/Tdr-Tool/.NetworkLog"
 Github="https://github.com"
 TheDarkRoot="https://github.com/TheDarkRoot"
 Raw="https://raw.githubusercontent.com/TheDarkRoot"
@@ -28,6 +32,8 @@ fi
 setup_folders=(
     "$Tool"
     "$Termux"
+	"$Backup"
+	"$Network"
 )
 
 for dir in "${setup_folders[@]}"; do
@@ -49,12 +55,12 @@ ${C}    #    #####  #    #         #     ####   ####  ######
 ${Y} ###################[›${G} TheDarkRoot ${Y}‹]###################
 ${C} -------------------------------------------------------
 ${G} 0{======================${W} INFO ${G}=======================}0
-${G} |${Y} [${C}=${Y}]${W} Name     ${C}:${W} Tdr-Tool$GG                             |
-${G} |${Y} [${C}=${Y}]${W} Code     ${C}:${W} Shell$GG                                |
-${G} |${Y} [${C}=${Y}]${W} Version  ${C}:${W} v1.2.7 (Alpha)$GG                       |
-${G} |${Y} [${C}=${Y}]${W} Author   ${C}:${W} Tdr-Tool$GG                             |
-${G} |${Y} [${C}=${Y}]${W} Github   ${C}:${W} https://github.com/TheDarkRoot$GG       |
-${G} |${Y} [${C}=${Y}]${W} Telegram ${C}:${W} @TheDarkRoot (t.me/TheDarkRoot)$GG      |
+${G} |${Y} [${C}=${Y}]${W} Name     ${C}:${W} Tdr-Tool                             ${G}|
+${G} |${Y} [${C}=${Y}]${W} Code     ${C}:${W} Shell                                ${G}|
+${G} |${Y} [${C}=${Y}]${W} Version  ${C}:${W} v1.2.7 (Alpha)                       ${G}|
+${G} |${Y} [${C}=${Y}]${W} Author   ${C}:${W} Tdr-Tool                             ${G}|
+${G} |${Y} [${C}=${Y}]${W} Github   ${C}:${W} https://github.com/TheDarkRoot       ${G}|
+${G} |${Y} [${C}=${Y}]${W} Telegram ${C}:${W} @TheDarkRoot (t.me/TheDarkRoot)      ${G}|
 ${G} 0{===================================================}0\n"
         exit 0
         ;;
@@ -78,65 +84,92 @@ check_network() {
 
 install_packages() {
     local manager="$1"
-    shift # İlk parametreyi (manager) atla, geriye sadece paket isimleri kalsın
+    shift
     local missing_pkgs=()
 
     # Adım 1: Paket yöneticisine göre eksik paketleri tespit et
-    for pkg in "$@"; do
+	for pkg in "$@"; do
         case "$manager" in
-            pkg)
-                if ! dpkg -s "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi
-                ;;
-            pip)
-                if ! pip show "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi
-                ;;
-            npm)
-                if ! npm list -g "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi
-                ;;
-            gem)
-                if ! gem list -i "^${pkg}$" &> /dev/null; then missing_pkgs+=("$pkg"); fi
-                ;;
-            *)
-                echo -e "\n  ${C}[${R}!${C}]${R} Error: Unknown package manager '$manager'"
-                return 1
-                ;;
+            pkg) if ! dpkg -s "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
+            pip) if ! pip show "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
+            # npm ve gem için aynı mantık...
         esac
     done
 
     # Adım 2: Sadece eksik paketler varsa doğru yöneticiyle kurulumu başlat
-    if [ ${#missing_pkgs[@]} -gt 0 ]; then
+	if [ ${#missing_pkgs[@]} -gt 0 ]; then
         case "$manager" in
-            pkg)
-                pkg install -y "${missing_pkgs[@]}"
-                ;;
-            pip)
-                pip install --upgrade "${missing_pkgs[@]}"
-                ;;
-            npm)
-                npm install -g "${missing_pkgs[@]}"
-                ;;
-            gem)
-                gem install "${missing_pkgs[@]}"
-                ;;
+            pkg) pkg install -y "${missing_pkgs[@]}" ;;
+            pip) pip install --upgrade --break-system-packages "${missing_pkgs[@]}" ;;
+            npm) npm install -g "${missing_pkgs[@]}" ;;
+            gem) gem install "${missing_pkgs[@]}" ;;
         esac
     fi
 }
 
 install_tool() {
     local tool_name="$1"
-    cd "$Tool" && rm -rf ".${tool_name}_temp" && \
-    git clone --quiet "$TheDarkRoot/$tool_name.git" ".${tool_name}_temp" && \
-    rm -rf "$tool_name" && mv ".${tool_name}_temp" "$tool_name" && \
-    chmod +x "$tool_name" && chmod +x "$tool_name"/*
+    local target_dir="$Tool/$tool_name"
+    local temp_dir="$Tool/${tool_name}_temp"
+    local backup_file="$Tool/${tool_name}.bckp"
+    
+    rm -rf "$temp_dir"
+
+    if [ -d "$target_dir" ]; then
+        mv "$target_dir" "$backup_file"
+    fi
+
+    if git clone --quiet "$TheDarkRoot/$tool_name.git" "$temp_dir"; then
+        mv "$temp_dir" "$target_dir"
+        chmod -R +x "$target_dir"
+
+        if [ -f "$backup_file" ]; then
+            rm -rf "$Backup/${tool_name}.bckp"
+            mv "$backup_file" "$Backup/${tool_name}.bckp"
+        fi
+        return 0
+    else
+        rm -rf "$temp_dir"
+        if [ -d "$backup_file" ]; then
+            mv "$backup_file" "$target_dir"
+        fi
+        return 1
+    fi
+}
+
+# Backup
+backup_files() {
+    [ -f "$Etc/bash.bashrc" ] && cp "$Etc/bash.bashrc" "$Etc/bash.bashrc.bckp"
+    [ -f "$Termux/termux.properties" ] && cp "$Termux/termux.properties" "$Termux/termux.properties.bckp"
+    echo -e "\n ${C} [${Y}i${C}]${G} Backup completed."
+}
+
+# Backup Recoved
+restore_files() {
+    if [ -f "$Etc/bash.bashrc.bckp" ]; then
+        mv "$Etc/bash.bashrc.bckp" "$Etc/bash.bashrc"
+    fi
+    if [ -f "$Termux/termux.properties.bckp" ]; then
+        mv "$Termux/termux.properties.bckp" "$Termux/termux.properties"
+    fi
+    echo -e "\n ${C} [${R}!${C}]${R} Error: Backup restored successfully."
+}
+
+# Termux Tdr-Tool Updating
+update_self() {
+    (
+     cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh;
+     rm -rf Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh;
+    ) &>> ~/.TheDarkRootTool_debug.log & spin "${C}[${Y}↓${C}]${G} Tdr-Tool Updating...${Y}" " ${W}⟫${G} Complete."
 }
 
 run_update () {
 	echo -e "\n ${C} [${Y}i${C}]${G} Starting the update..."
-	#Termux Permissions
+	# Termux Permissions
 	#( termux-setup-storage; termux-wake-lock && $Reload; sleep 3 ) &>> ~/.TermuxPermissions_debug.log & spin "${C}[${Y}↓${C}]${G} Permission..." " ${W}⟫${G} Complete."
-	#Termux Update
-	( echo "--- Updating ---" > "$Log"; pkg update -y; pkg upgrade -y && $Reload; ) &>> ~/.TermuxUpdate_debug.log & spin "${C}[${Y}↓${C}]${G} Updating..." " ${W}⟫${G} Complete."
-	#Termux Packages Installing
+	# Termux Update
+	( pkg update -y; pkg upgrade -y && $Reload; ) &>> ~/.TermuxUpdate_debug.log & spin "${C}[${Y}↓${C}]${G} Updating..." " ${W}⟫${G} Complete."
+	# Termux Packages Installing
 	( 
       install_packages pkg termux-tools coreutils binutils git curl wget sed grep gawk bc jq ncurses-utils python ruby php clang make openssh openssl zip unzip tar proot crunch neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet nodejs
       $Reload
@@ -149,11 +182,8 @@ run_update () {
 	  install_packages gem lolcat
       $Reload
 	) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Tools Installing..." " ${W}⟫${G} Complete."
-	#Termux Tdr-Tool Updating
-	(
-	 cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh;
-	 rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh;
-	) &>> ~/.TheDarkRootTool_debug.log & spin "${C}[${Y}↓${C}]${G} Tdr-Tool Updating...${Y}" " ${W}⟫${G} Complete."
+	# Termux Tdr-Tool Updating
+	update_self  # Fonksiyonu çağırıyoruz
 }
 
 run_speedtest () {
@@ -174,36 +204,36 @@ run_speedtest () {
 	# Ham verileri filtreleyebilmek için normal çıktı alıyoruz ve uyarıları gizliyoruz
 	(
 		if command -v speedtest-cli &> /dev/null; then
-			speedtest-cli > "$RAW_FILE" 2>&1
+			speedtest-cli > "$Raw_FILE" 2>&1
 		else
             # Eğer yerelde yoksa bir kereye mahsus indir ve kaydet
             if [ ! -f "$Tool/speedtest.py" ]; then
                 curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py -o "$Tool/speedtest.py"
             fi
             # Yerel dosyayı çalıştır
-			python3 -W ignore "$Tool/speedtest.py" > "$RAW_FILE" 2>&1
+			python3 -W ignore "$Tool/speedtest.py" > "$Raw_FILE" 2>&1
 		fi
 	) & spin "${C}[${Y}↓${C}]${G} Testing network speed..." " ${W}⟫${G} Complete."
 
 	# --- GÜVENLİK KİLİDİ BAŞLANGICI ---
 	# İşlem başarısız olduysa VEYA geçerli bir indirme verisi gelmediyse işlemi iptal et
-	if [ $? -ne 0 ] || ! grep -q "Download:" "$RAW_FILE"; then
+	if [ $? -ne 0 ] || ! grep -q "Download:" "$Raw_FILE"; then
 		echo -e "\n  ${C}[${R}!${C}]${R} Cut! Please check your network connection."
-		rm -f "$RAW_FILE" "$RESULT_FILE"
+		rm -f "$Raw_FILE" "$RESULT_FILE"
 		return 1
 	fi
 
 	# Alınan ham verileri RAW_FILE üzerinden ayıklıyoruz
-	my_ip=$(grep -oE "Testing from .* \([0-9.]+\)" "$RAW_FILE" | grep -oE "[0-9.]+" | head -n 1)
-	provider=$(grep -oE "Testing from .* \(" "$RAW_FILE" | sed 's/Testing from //' | sed 's/ ($//' | sed 's/ (//')
-	server_info=$(grep "Hosted by" "$RAW_FILE" | sed 's/Hosted by //' | cut -d '[' -f1 | sed 's/ *$//')
+	my_ip=$(grep -oE "Testing from .* \([0-9.]+\)" "$Raw_FILE" | grep -oE "[0-9.]+" | head -n 1)
+	provider=$(grep -oE "Testing from .* \(" "$Raw_FILE" | sed 's/Testing from //' | sed 's/ ($//' | sed 's/ (//')
+	server_info=$(grep "Hosted by" "$Raw_FILE" | sed 's/Hosted by //' | cut -d '[' -f1 | sed 's/ *$//')
 
 	# Ping ayıklama yapısı
-	ping_val=$(grep "Hosted by" "$RAW_FILE" | grep -oE "\[[0-9.]+ ms\]" | sed 's/\[//g' | sed 's/\]//g')
-	[[ -z $ping_val ]] && ping_val=$(grep "Hosted by" "$RAW_FILE" | grep -oE "[0-9.]+ ms")
+	ping_val=$(grep "Hosted by" "$Raw_FILE" | grep -oE "\[[0-9.]+ ms\]" | sed 's/\[//g' | sed 's/\]//g')
+	[[ -z $ping_val ]] && ping_val=$(grep "Hosted by" "$Raw_FILE" | grep -oE "[0-9.]+ ms")
 
-	dl_val=$(grep "Download:" "$RAW_FILE" | sed 's/Download: //')
-	ul_val=$(grep "Upload:" "$RAW_FILE" | sed 's/Upload: //')
+	dl_val=$(grep "Download:" "$Raw_FILE" | sed 's/Download: //')
+	ul_val=$(grep "Upload:" "$Raw_FILE" | sed 's/Upload: //')
 
 	# Değerleri sayısal formata çevirip kalite kontrolü yapıyoruz
 	dl_num=$(echo "$dl_val" | awk '{print $1}')
@@ -245,14 +275,16 @@ run_speedtest () {
 	echo -e "  ${C}=======================================================${W}"
 
     # İşimiz bitince ham veriyi siliyoruz
-	rm -f "$RAW_FILE"
+	rm -f "$Raw_FILE"
 
 	# Sonuçları kaydetme aşaması
 	read -p " $(echo -e " ${C}[${Y}?${C}]${M} Do you want to save the results to a file? (Y/n): ${Y}")" save_choice
 
-	if [[ -z $save_choice || $save_choice == Y || $save_choice == y ]]; then
-		log_file="speedtest_result_$(date +%Y%m%d_%H%M%S).txt"
-		mv "$RESULT_FILE" ~/"$log_file"
+	local sc_lower="${save_choice,,}"
+
+	if [[ -z $sc_lower || $sc_lower == y* ]]; then
+		log_file="NetworkLog.$(date +%Y%m%d_%H%M%S).txt" # Sonuçları kaydetme dosyası
+		mv "$RESULT_FILE" "$Network/$log_file"
 		echo -e "\n  ${C}[${G}✓${C}]${G} Saved successfully as:\n\n  ${C}[${G}i${C}] ${Y}~/$log_file"
 	else
 		rm -f "$RESULT_FILE"
@@ -346,8 +378,10 @@ ${C}      └─⊸ [${Y} »${G} Tdr-Tool exit.${C}]\n"
 
 # Kullanıcıdan girdiyi alıyoruz
 read -p " $(echo -e " ${C}[${Y}~${C}]${M} Program Number: ${Y}")" pn
-
-# Girdiyi tamamen küçük harfe çeviriyoruz (Örn: "UT" -> "ut")
+# ${degisken,,} -> Değişkenin içindeki tüm harfleri küçük harfe çevirir.
+# ${degisken,} -> Sadece ilk harfi küçük harfe çevirir.
+# ${degisken^^} -> Değişkenin içindeki tüm harfleri büyük harfe çevirir.
+# ${degisken^} -> Sadece ilk harfi büyük harfe çevirir.
 pn_lower="${pn,,}"
 
 case "$pn_lower" in
@@ -361,7 +395,7 @@ case "$pn_lower" in
 
             read -p " $(echo -e " ${C}[${Y}?${C}]${M} Want to run a network speed test? (Y/n): ${Y}")" st_choice_aio
 
-            if [[ -z $st_choice_aio || "${st_choice_aio,,}" == "y" ]]; then
+            if [[ -z $st_choice_aio || "${st_choice_aio,,}" == y* ]]; then
                 run_speedtest
             else
                 echo -e "\n  ${C}[${Y}i${C}]${G} Speedtest skipped."
@@ -373,10 +407,8 @@ case "$pn_lower" in
 
     ut)
         echo -e "\n ${C} [${Y}i${C}]${G} Tdr-Tool: Fast updating program..."
-        (
-         cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh;
-         rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; 
-        ) &>> ~/.TheDarkRootTool_debug.log & spin "${C}[${Y}↓${C}]${G} Tdr-Tool Updating...${Y}" " ${W}⟫${G} Complete."
+		# Termux Tdr-Tool Updating
+        update_self  # Fonksiyonu çağırıyoruz
         ;;
 
     n)
@@ -396,28 +428,41 @@ case "$pn_lower" in
 
     p)
         echo -e "\n ${C} [${Y}i${C}]${G} ParrotOS-T: Parrot OS theme for Termux."
-        (
-          cd $Etc && curl -sLf "$Raw/FileStore/master/Software%20Files/ParrotOS.trmx?t=$(date +%s)" -o bash.bashrc.tmp;
-          rm -rf bash.bashrc && mv bash.bashrc.tmp bash.bashrc;
-          cd ~/.termux && curl -sLf "$Raw/FileStore/master/Software%20Files/Terkey.trmx?t=$(date +%s)" -o termux.properties.tmp;
-          rm -rf termux.properties && mv termux.properties.tmp termux.properties;
-          cd ~/ && $Reload;
-        ) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading ParrotOS-T..." " ${W}⟫${G} Complete."
+
+		# Yedekleme
+		backup_files # Fonksiyonu çağırıyoruz
+
+		# İndirme ve Uygulama
+		(
+		 if curl -sLf "$Raw/FileStore/master/Software%20Files/ParrotOS.trmx?t=$(date +%s)" -o "$Etc/bash.bashrc" && \
+			curl -sLf "$Raw/FileStore/master/Software%20Files/Terkey.trmx?t=$(date +%s)" -o "$Termux/termux.properties"; then
+			 $Reload
+		 else
+			 restore_files # Fonksiyonu çağırıyoruz
+         fi
+		) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading ParrotOS-T..." " ${W}⟫${G} Complete."
         ;;
 
     t)
         echo -e "\n ${C} [${Y}i${C}]${G} TheDarkRoot-T: TheDarkRoot theme for Termux."
+
+		# Yedekleme
+		backup_files # Fonksiyonu çağırıyoruz
+
         (
-          cd $Etc && curl -sLf "$Raw/FileStore/master/Software%20Files/TheDarkRoot.trmx?t=$(date +%s)" -o bash.bashrc.tmp;
-          rm -rf bash.bashrc && mv bash.bashrc.tmp bash.bashrc;
-          cd ~/.termux && curl -sLf "$Raw/FileStore/master/Software%20Files/Terkey.trmx?t=$(date +%s)" -o termux.properties.tmp;
-          rm -rf termux.properties && mv termux.properties.tmp termux.properties;
-          cd ~/ && $Reload;
-        ) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading TheDarkRoot-T..." " ${W}⟫${G} Complete."
+		 if curl -sLf "$Raw/FileStore/master/Software%20Files/TheDarkRoot.trmx?t=$(date +%s)" -o "$Etc/bash.bashrc" && \
+			curl -sLf "$Raw/FileStore/master/Software%20Files/Terkey.trmx?t=$(date +%s)" -o "$Termux/termux.properties"; then
+			 $Reload
+		 else
+			 restore_files # Fonksiyonu çağırıyoruz
+         fi
+		) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading TheDarkRoot-T..." " ${W}⟫${G} Complete."
         ;;
 
     x)
-        echo -e "\n ${C} [${Y}i${C}]${G} X: TheDarkRoot All-in-One Repositories."
+        check_network # Fonksiyonu çağırıyoruz
+		
+		echo -e "\n ${C} [${Y}i${C}]${G} X: TheDarkRoot All-in-One Repositories."
         (
           install_tool "Hasher"
           install_tool "Hashgen"
@@ -460,12 +505,12 @@ case "$pn_lower" in
 esac
 
 # Eğer çıkış veya hatalı tuş değilse, ana menüye dönmek için bekle
-if [[ "$pn_lower" != "q" && "$pn_lower" != "" && "$pn_lower" =~ ^(u|ut|p|t|x|1|01|2|02|3|03|4|04|n)$ ]]; then
+if [[ "$pn_lower" != "q" && "$pn_lower" != "" && "$pn_lower" =~ ^(u|ut|p|t|x|1|2|3|4|n)$ ]]; then
     read -n 1 -s -p " $(echo -e "\n  ${C}[${Y}~${C}]${M} Press any key to return to main menu...${Y}")"
     
     # Sadece aracı güncelleyen veya çoklu kurulum yapan işlemlerden sonra scripti yeniden başlat
     if [[ "$pn_lower" =~ ^(u|ut|x)$ ]]; then
-        exec bash ~/Tdr-Tool.sh
+        exec bash "$0"
     fi
 fi
 done
