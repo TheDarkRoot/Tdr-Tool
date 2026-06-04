@@ -82,28 +82,54 @@ check_network() {
     ( sleep 1.5 ) &> /dev/null & spin "${C}[${Y}i${C}]${G} Network control..." "$status"
 }
 
+# Bağımlılıkları kontrol eden fonksiyon
+check_dependencies() {
+    local deps=("git" "curl" "awk" "bc" "grep")
+    for cmd in "${deps[@]}"; do
+        if ! command -v "$cmd" &> /dev/null; then
+            echo -e "\n  ${C}[${R}!${C}]${R} Error! '$cmd' is not installed. Please install it with the 'pkg install $cmd' command."
+            exit 1
+        fi
+    done
+}
+
+check_dependencies # Fonksiyonu çağırıyoruz
+
+# Log Yönetimi
+manage_logs() {
+    local log_file="$HOME/.TheDarkRoot_debug.log"
+    # Eğer dosya 1MB'ı (1024 KB) geçtiyse temizle
+    if [ -f "$log_file" ] && [ $(du -k "$log_file" | cut -f1) -gt 1024 ]; then
+        echo "$(date): Log rotated." > "$log_file"
+    fi
+}
+
+manage_logs # Fonksiyonu çağırıyoruz
+
 install_packages() {
     local manager="$1"
     shift
     local missing_pkgs=()
 
-    # Adım 1: Paket yöneticisine göre eksik paketleri tespit et
-	for pkg in "$@"; do
+    # Adım 1: Hangi paketler eksik? Hepsini tek tek kontrol et, eksikse 'missing_pkgs' dizisine ekle.
+    for pkg in "$@"; do
         case "$manager" in
             pkg) if ! dpkg -s "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
             pip) if ! pip show "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
-            # npm ve gem için aynı mantık...
         esac
     done
 
-    # Adım 2: Sadece eksik paketler varsa doğru yöneticiyle kurulumu başlat
-	if [ ${#missing_pkgs[@]} -gt 0 ]; then
+    # Adım 2: Toplu Kurulum. Eğer dizide paket varsa, tek bir komutla hepsini yükle.
+    if [ ${#missing_pkgs[@]} -gt 0 ]; then
+        echo -e "\n ${C}[${Y}i${C}]${G} Installing: ${missing_pkgs[*]}"
         case "$manager" in
             pkg) pkg install -y "${missing_pkgs[@]}" ;;
             pip) pip install --upgrade --break-system-packages "${missing_pkgs[@]}" ;;
             npm) npm install -g "${missing_pkgs[@]}" ;;
             gem) gem install "${missing_pkgs[@]}" ;;
         esac
+    else
+        echo -e "\n ${C}[${Y}i${C}]${G} All packages are already installed."
     fi
 }
 
