@@ -141,7 +141,12 @@ install_packages() {
             pkg) pkg install -y "${missing_pkgs[@]}" ;;
             pip) pip install --upgrade --break-system-packages "${missing_pkgs[@]}" ;;
             npm) npm install -g "${missing_pkgs[@]}" ;;
-            gem) gem install "${missing_pkgs[@]}" ;;
+            gem) 
+                # GEM için özel düzeltme: Gem paketleri genellikle tek tek kurulur
+                for gem_pkg in "${missing_pkgs[@]}"; do
+                    gem install "$gem_pkg"
+                done
+                ;;
         esac
     else
         echo -e "\n ${C}[${Y}i${C}]${G} All packages are already installed."
