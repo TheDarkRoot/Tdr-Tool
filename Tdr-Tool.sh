@@ -283,7 +283,12 @@ run_speedtest () {
     my_ip=$(grep -oE "Testing from .* \([0-9.]+\)" "$RAW_FILE" | grep -oE "[0-9.]+" | head -n 1)
     provider=$(grep -oE "Testing from .* \(" "$RAW_FILE" | sed 's/Testing from //' | sed 's/ ($//' | sed 's/ (//')
     server_info=$(grep "Hosted by" "$RAW_FILE" | sed 's/Hosted by //' | cut -d '[' -f1 | sed 's/ *$//')
-    ping_val=$(grep "Hosted by" "$RAW_FILE" | grep -oE "\[[0-9.]+ ms\]" | sed 's/\[//g' | sed 's/\]//g')
+    
+    # PING İÇİN GÜNCELLEME:
+    # Hem "Hosted by" satırındaki köşeli parantezi, hem de bazen ayrı satırda çıkan 
+    # "Latency: X ms" formatını yakalayan daha genel bir regex kullandık.
+    ping_val=$(grep -oE "([0-9.]+ ms|\[[0-9.]+ ms\])" "$RAW_FILE" | head -n 1 | sed 's/\[//g; s/\]//g')
+    
     dl_val=$(grep "Download:" "$RAW_FILE" | sed 's/Download: //')
     ul_val=$(grep "Upload:" "$RAW_FILE" | sed 's/Upload: //')
 
