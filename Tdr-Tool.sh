@@ -20,8 +20,7 @@ Reload="termux-reload-settings"
 # 1. Termux Depolama İzni Kontrolü
 if [ ! -d "$HOME/storage" ]; then
     termux-setup-storage
-    sleep 5
-	$Reload
+    sleep 5 && $Reload
 fi
 
 # 2. Gerekli Tüm Klasörlerin Oluşturulması
