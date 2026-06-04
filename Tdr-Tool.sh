@@ -111,28 +111,38 @@ install_tool() {
     local tool_name="$1"
     local target_dir="$Tool/$tool_name"
     local temp_dir="$Tool/${tool_name}_temp"
-    local backup_file="$Tool/${tool_name}.bckp"
-    
-    rm -rf "$temp_dir"
+    local backup_target="$Backup/${tool_name}_$(date +%Y%m%d).bckp"
 
-    if [ -d "$target_dir" ]; then
-        mv "$target_dir" "$backup_file"
+    # 1. Bağlantı kontrolü (Daha önce konuştuğumuz kural)
+    if ! ping -c 1 8.8.8.8 &> /dev/null; then
+        echo -e "\n  ${C}[${R}!${C}]${R} Cut! Please check your network connection."
+        return 1
     fi
 
-    if git clone --quiet "$TheDarkRoot/$tool_name.git" "$temp_dir"; then
+    rm -rf "$temp_dir"
+
+    # 2. İndirmeyi dene
+    if git clone --quiet "$TheDarkRoot/$tool_name.git" "$temp_dir" &> /dev/null; then
+        
+        # 3. Eğer araç zaten varsa, eskisini yedekle ve taşı
+        if [ -d "$target_dir" ]; then
+            # Önce .bckp isminde geçici olarak klasörde tut, sonra Backup'a taşı
+            mv "$target_dir" "$Tool/${tool_name}.bckp"
+            
+            # Eğer Backup klasöründe zaten bir yedek varsa onu sil (ki çakışmasın)
+            [ -d "$backup_target" ] && rm -rf "$backup_target"
+            
+            # Artık Backup klasörüne taşıyoruz
+            mv "$Tool/${tool_name}.bckp" "$backup_target"
+        fi
+
+        # Yeni sürümü yerine koy
         mv "$temp_dir" "$target_dir"
         chmod -R +x "$target_dir"
-
-        if [ -f "$backup_file" ]; then
-            rm -rf "$Backup/${tool_name}.bckp"
-            mv "$backup_file" "$Backup/${tool_name}.bckp"
-        fi
         return 0
     else
+        echo -e "\n  ${C}[${R}!${C}]${R} Error: Download failed."
         rm -rf "$temp_dir"
-        if [ -d "$backup_file" ]; then
-            mv "$backup_file" "$target_dir"
-        fi
         return 1
     fi
 }
@@ -187,109 +197,94 @@ run_update () {
 }
 
 run_speedtest () {
-	# Bağımlılık Kontrolü
+    # Bağımlılık Kontrolü
     local dependencies=("python3" "awk" "bc" "curl")
     for cmd in "${dependencies[@]}"; do
         if ! command -v "$cmd" &> /dev/null; then
             echo -e "\n  ${C}[${R}!${C}]${R} Error: '$cmd' package missing!"
             echo -e "\n  ${C}[${Y}i${C}]${G} You can install packages with the 'U' Update option."
-            return 1 # Fonksiyonu iptal et ve menüye dön
+            return 1
         fi
     done
 
-    # Çakışmaları önlemek için benzersiz geçici dosyaları oluşturuyoruz
+    # 5. GEÇİCİ DOSYA YÖNETİMİ (mktemp)
+    # Her çalıştırmada benzersiz dosyalar oluşturarak çakışmaları önler.
     local RAW_FILE=$(mktemp)
     local RESULT_FILE=$(mktemp)
 
-	# Ham verileri filtreleyebilmek için normal çıktı alıyoruz ve uyarıları gizliyoruz
-	(
-		if command -v speedtest-cli &> /dev/null; then
-			speedtest-cli > "$RAW_FILE" 2>&1
-		else
-            # Eğer yerelde yoksa bir kereye mahsus indir ve kaydet
-            if [ ! -f "$Tool/speedtest.py" ]; then
-                curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py -o "$Tool/speedtest.py"
-            fi
-            # Yerel dosyayı çalıştır
-			python3 -W ignore "$Tool/speedtest.py" > "$RAW_FILE" 2>&1
-		fi
-	) & spin "${C}[${Y}↓${C}]${G} Testing network speed..." " ${W}⟫${G} Complete."
+    # 3. İŞLEM HATA YÖNETİMİ (Arka plan PID takibi)
+    (
+        if command -v speedtest-cli &> /dev/null; then
+            speedtest-cli > "$RAW_FILE" 2>&1
+        else
+            [ ! -f "$Tool/speedtest.py" ] && curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py -o "$Tool/speedtest.py"
+            python3 -W ignore "$Tool/speedtest.py" > "$RAW_FILE" 2>&1
+        fi
+    ) & 
+    local spin_pid=$!
+    spin "${C}[${Y}↓${C}]${G} Testing network speed..." " ${W}⟫${G} Complete." " ${W}⟫${R} Failed!"
+    wait $spin_pid
 
-	# --- GÜVENLİK KİLİDİ BAŞLANGICI ---
-	# İşlem başarısız olduysa VEYA geçerli bir indirme verisi gelmediyse işlemi iptal et
-	if [ $? -ne 0 ] || ! grep -q "Download:" "$RAW_FILE"; then
-		echo -e "\n  ${C}[${R}!${C}]${R} Cut! Please check your network connection."
-		rm -f "$RAW_FILE" "$RESULT_FILE"
-		return 1
-	fi
+    # 1. GREP VE İNTERNET KESİNTİSİ KONTROLÜ
+    # Dosya boşsa veya "Download:" verisi gelmediyse işlemi durdur.
+    if [ ! -s "$RAW_FILE" ] || ! grep -q "Download:" "$RAW_FILE"; then
+        echo -e "\n  ${C}[${R}!${C}]${R} Cut! Please check your network connection."
+        rm -f "$RAW_FILE" "$RESULT_FILE"
+        return 1
+    fi
 
-	# Alınan ham verileri RAW_FILE üzerinden ayıklıyoruz
-	my_ip=$(grep -oE "Testing from .* \([0-9.]+\)" "$RAW_FILE" | grep -oE "[0-9.]+" | head -n 1)
-	provider=$(grep -oE "Testing from .* \(" "$RAW_FILE" | sed 's/Testing from //' | sed 's/ ($//' | sed 's/ (//')
-	server_info=$(grep "Hosted by" "$RAW_FILE" | sed 's/Hosted by //' | cut -d '[' -f1 | sed 's/ *$//')
+    # Verileri ayıkla
+    my_ip=$(grep -oE "Testing from .* \([0-9.]+\)" "$RAW_FILE" | grep -oE "[0-9.]+" | head -n 1)
+    provider=$(grep -oE "Testing from .* \(" "$RAW_FILE" | sed 's/Testing from //' | sed 's/ ($//' | sed 's/ (//')
+    server_info=$(grep "Hosted by" "$RAW_FILE" | sed 's/Hosted by //' | cut -d '[' -f1 | sed 's/ *$//')
+    ping_val=$(grep "Hosted by" "$RAW_FILE" | grep -oE "\[[0-9.]+ ms\]" | sed 's/\[//g' | sed 's/\]//g')
+    dl_val=$(grep "Download:" "$RAW_FILE" | sed 's/Download: //')
+    ul_val=$(grep "Upload:" "$RAW_FILE" | sed 's/Upload: //')
 
-	# Ping ayıklama yapısı
-	ping_val=$(grep "Hosted by" "$RAW_FILE" | grep -oE "\[[0-9.]+ ms\]" | sed 's/\[//g' | sed 's/\]//g')
-	[[ -z $ping_val ]] && ping_val=$(grep "Hosted by" "$RAW_FILE" | grep -oE "[0-9.]+ ms")
+    # 2. DEĞİŞKENLERİN BOŞ KALMA RİSKİ (Varsayılan değer atama ve kontrol)
+    dl_num=$(echo "$dl_val" | awk '{print $1}')
+    ul_num=$(echo "$ul_val" | awk '{print $1}')
+    ping_num=$(echo "$ping_val" | awk '{print $1}')
 
-	dl_val=$(grep "Download:" "$RAW_FILE" | sed 's/Download: //')
-	ul_val=$(grep "Upload:" "$RAW_FILE" | sed 's/Upload: //')
+    # Regex kontrolü: Sayı değilse veya boşsa 0 ata
+    [[ ! "$dl_num" =~ ^[0-9.]+$ ]] && dl_num=0
+    [[ ! "$ul_num" =~ ^[0-9.]+$ ]] && ul_num=0
+    [[ ! "$ping_num" =~ ^[0-9.]+$ ]] && ping_num=0
 
-	# Değerleri sayısal formata çevirip kalite kontrolü yapıyoruz
-	dl_num=$(echo "$dl_val" | awk '{print $1}')
-	ul_num=$(echo "$ul_val" | awk '{print $1}')
-	ping_num=$(echo "$ping_val" | awk '{print $1}')
+    # Kalite Hesaplama (Kodun orijinali)
+    b_qual="${R} Poor" && g_qual="${R} Poor" && s_qual="${R} Poor" && v_qual="${R} Poor"
+    if (( $(echo "$dl_num >= 15" | bc -l) )); then b_qual="${G} Great"; elif (( $(echo "$dl_num >= 5" | bc -l) )); then b_qual="${Y} Good"; fi
+    if (( $(echo "$ping_num <= 30 && $ping_num > 0" | bc -l) && $(echo "$ul_num >= 5" | bc -l) )); then g_qual="${G} Great"; elif (( $(echo "$ping_num <= 60" | bc -l) )); then g_qual="${Y} Good"; fi
+    if (( $(echo "$dl_num >= 25" | bc -l) )); then s_qual="${G} Great"; elif (( $(echo "$dl_num >= 10" | bc -l) )); then s_qual="${Y} Good"; fi
+    if (( $(echo "$ul_num >= 8" | bc -l) && $(echo "$ping_num <= 40" | bc -l) )); then v_qual="${G} Great"; elif (( $(echo "$ul_num >= 3" | bc -l) )); then v_qual="${Y} Good"; fi
 
-	[[ -z $dl_num ]] && dl_num=0
-	[[ -z $ul_num ]] && ul_num=0
-	[[ -z $ping_num ]] && ping_num=0
+    # Raporlama
+    echo -e "IP Address: $my_ip\nProvider: $provider\nServer: $server_info\nPing: $ping_val\nDownload: $dl_val\nUpload: $ul_val" > "$RESULT_FILE"
+    echo -e "  ${C}=======================================================${W}"
+    echo -e "   ${C}[${Y}WAN${C}]${G} IP Address : ${Y}$my_ip"
+    echo -e "   ${C}[${Y}ISP${C}]${G} Provider   : ${Y}$provider"
+    echo -e "   ${C}[${Y}SRV${C}]${G} Server     : ${Y}$server_info"
+    echo -e "   ${C}[${Y}LAT${C}]${G} Ping       : ${Y}$ping_val"
+    echo -e "   ${C}[${Y}OUT${C}]${G} Download   : ${Y}$dl_val"
+    echo -e "   ${C}[${Y}INP${C}]${G} Upload     : ${Y}$ul_val"
+    echo -e "  ${C}-------------------------------------------------------${W}"
+    echo -e "   ${C}[${Y} » ${C}]${M} Browsing Quality  : ${b_qual}"
+    echo -e "   ${C}[${Y} » ${C}]${M} Gaming Quality    : ${g_qual}"
+    echo -e "   ${C}[${Y} » ${C}]${M} Streaming Quality : ${s_qual}"
+    echo -e "   ${C}[${Y} » ${C}]${M} Video Call Quality: ${v_qual}"
+    echo -e "  ${C}=======================================================${W}"
 
-	# Dinamik Kalite Hesaplama Alanı
-	b_qual="${R} Poor" && g_qual="${R} Poor" && s_qual="${R} Poor" && v_qual="${R} Poor"
-
-	# Browsing (Webde Gezinme) Kalitesi
-	if (( $(echo "$dl_num >= 15" | bc -l) )); then b_qual="${G} Great"; elif (( $(echo "$dl_num >= 5" | bc -l) )); then b_qual="${Y} Good"; fi
-	# Gaming (Oyun) Kalitesi
-	if (( $(echo "$ping_num <= 30 && $ping_num > 0" | bc -l) && $(echo "$ul_num >= 5" | bc -l) )); then g_qual="${G} Great"; elif (( $(echo "$ping_num <= 60" | bc -l) )); then g_qual="${Y} Good"; fi
-	# Streaming (Video İzleme) Kalitesi
-	if (( $(echo "$dl_num >= 25" | bc -l) )); then s_qual="${G} Great"; elif (( $(echo "$dl_num >= 10" | bc -l) )); then s_qual="${Y} Good"; fi
-	# Video Call (Görüntülü Görüşme) Kalitesi
-	if (( $(echo "$ul_num >= 8" | bc -l) && $(echo "$ping_num <= 40" | bc -l) )); then v_qual="${G} Great"; elif (( $(echo "$ul_num >= 3" | bc -l) )); then v_qual="${Y} Good"; fi
-
-	# Sonucu kaydetmek üzere düz metin hazırlıyoruz
-	echo -e "IP Address: $my_ip\nProvider: $provider\nServer: $server_info\nPing: $ping_val\nDownload: $dl_val\nUpload: $ul_val" > "$RESULT_FILE"
-
-	# EKRANA RENKLİ RAPOR BASKI ALANI
-	echo -e "  ${C}=======================================================${W}"
-	echo -e "   ${C}[${Y}WAN${C}]${G} IP Address : ${Y}$my_ip"
-	echo -e "   ${C}[${Y}ISP${C}]${G} Provider   : ${Y}$provider"
-	echo -e "   ${C}[${Y}SRV${C}]${G} Server     : ${Y}$server_info"
-	echo -e "   ${C}[${Y}LAT${C}]${G} Ping       : ${Y}$ping_val"
-	echo -e "   ${C}[${Y}OUT${C}]${G} Download   : ${Y}$dl_val"
-	echo -e "   ${C}[${Y}INP${C}]${G} Upload     : ${Y}$ul_val"
-	echo -e "  ${C}-------------------------------------------------------${W}"
-	echo -e "   ${C}[${Y} » ${C}]${M} Browsing Quality  : ${b_qual}"
-	echo -e "   ${C}[${Y} » ${C}]${M} Gaming Quality    : ${g_qual}"
-	echo -e "   ${C}[${Y} » ${C}]${M} Streaming Quality : ${s_qual}"
-	echo -e "   ${C}[${Y} » ${C}]${M} Video Call Quality: ${v_qual}"
-	echo -e "  ${C}=======================================================${W}"
-
-    # İşimiz bitince ham veriyi siliyoruz
-	rm -f "$RAW_FILE"
-
-	# Sonuçları kaydetme aşaması
-	read -p " $(echo -e " ${C}[${Y}?${C}]${M} Do you want to save the results to a file? (Y/n): ${Y}")" save_choice
-
-	local sc_lower="${save_choice,,}"
-
-	if [[ -z $sc_lower || $sc_lower == y* ]]; then
-		log_file="NetworkLog.$(date +%Y%m%d_%H%M%S).txt" # Sonuçları kaydetme dosyası
-		mv "$RESULT_FILE" "$Network/$log_file"
-		echo -e "\n  ${C}[${G}✓${C}]${G} Saved successfully as:\n\n  ${C}[${G}i${C}] ${Y}~/$log_file"
-	else
-		rm -f "$RESULT_FILE"
-		echo -e "\n  ${C}[${R}x${C}]${R} Results deleted."
-	fi
+    # Temizlik ve Kayıt
+    rm -f "$RAW_FILE"
+    read -p " $(echo -e " ${C}[${Y}?${C}]${M} Do you want to save the results to a file? (Y/n): ${Y}")" save_choice
+    if [[ -z ${save_choice,,} || ${save_choice,,} == y* ]]; then
+        log_file="NetworkLog.$(date +%Y%m%d_%H%M%S).txt"
+        mv "$RESULT_FILE" "$Network/$log_file"
+        echo -e "\n  ${C}[${G}✓${C}]${G} Saved successfully:\n  ${C}[${G}i${C}] ${Y}~/$log_file"
+    else
+        rm -f "$RESULT_FILE"
+        echo -e "\n  ${C}[${R}x${C}]${R} Results deleted."
+    fi
 }
 
 spin () {
@@ -460,17 +455,23 @@ case "$pn_lower" in
         ;;
 
     x)
-        check_network # Fonksiyonu çağırıyoruz
-		
-		echo -e "\n ${C} [${Y}i${C}]${G} X: TheDarkRoot All-in-One Repositories."
-        (
-          install_tool "Hasher"
-          install_tool "Hashgen"
-          install_tool "Tertext"
-          install_tool "UserID"
-          cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh;
-          rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh && $Reload;
-        ) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading X..." " ${W}⟫${G} Complete."
+        check_network
+
+        if [ "$is_online" = true ]; then
+            echo -e "\n ${C} [${Y}i${C}]${G} X: TheDarkRoot All-in-One Repositories."
+            
+            # Tüm işlemleri tek bir alt kabukta birleştiriyoruz
+            (
+                install_tool "Hasher"
+                install_tool "Hashgen"
+                install_tool "Tertext"
+                install_tool "UserID"
+                
+                update_self # Fonksiyonu çağırıyoruz
+            ) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading X..." " ${W}⟫${G} Complete."
+        else
+            echo -e "\n  ${C}[${R}!${C}]${R} Cut! Please check your network connection."
+        fi
         ;;
 
     1|01)
@@ -510,7 +511,9 @@ if [[ "$pn_lower" != "q" && "$pn_lower" != "" && "$pn_lower" =~ ^(u|ut|p|t|x|1|2
     
     # Sadece aracı güncelleyen veya çoklu kurulum yapan işlemlerden sonra scripti yeniden başlat
     if [[ "$pn_lower" =~ ^(u|ut|x)$ ]]; then
-        exec bash "$0"
+        echo -e "\n ${C}[${Y}i${C}]${G} Restarting Tdr-Tool..."
+		sleep 2
+		exec bash "$0"
     fi
 fi
 done
