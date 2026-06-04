@@ -73,7 +73,7 @@ install_missing_packages() {
             missing_pkgs+=("$pkg")
         fi
     done
-    
+
     # Sadece eksik paket varsa kurulum komutunu çalıştır
     if [ ${#missing_pkgs[@]} -gt 0 ]; then
         pkg install -y "${missing_pkgs[@]}"
@@ -104,7 +104,10 @@ run_update () {
 	  gem install lolcat && $Reload;
 	) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Tools Installing..." " ${W}⟫${G} Complete."
 	#Termux Tdr-Tool Updating
-	( cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; ) &> ~/.TheDarkRootTool_debug.log & spin "${C}[$YY↓${C}]${G} Tdr-Tool Updating...$YY" " ${W}⟫${G} Complete."
+	(
+	 cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh;
+	 rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh;
+	) &> ~/.TheDarkRootTool_debug.log & spin "${C}[${Y}↓${C}]${G} Tdr-Tool Updating...${Y}" " ${W}⟫${G} Complete."
 }
 
 run_speedtest () {
@@ -129,7 +132,7 @@ run_speedtest () {
 		else
 			curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -W ignore - > "$RAW_FILE" 2>&1
 		fi
-	) & spin "${C}[$YY↓${C}]${G} Testing network speed..." " ${W}⟫${G} Complete."
+	) & spin "${C}[${Y}↓${C}]${G} Testing network speed..." " ${W}⟫${G} Complete."
 
 	# --- GÜVENLİK KİLİDİ BAŞLANGICI ---
 	# İşlem başarısız olduysa VEYA geçerli bir indirme verisi gelmediyse işlemi iptal et
@@ -164,13 +167,13 @@ run_speedtest () {
 	b_qual="${R} Poor" && g_qual="${R} Poor" && s_qual="${R} Poor" && v_qual="${R} Poor"
 
 	# Browsing (Webde Gezinme) Kalitesi
-	if (( $(echo "$dl_num >= 15" | bc -l) )); then b_qual="${G} Great"; elif (( $(echo "$dl_num >= 5" | bc -l) )); then b_qual="$YY Good"; fi
+	if (( $(echo "$dl_num >= 15" | bc -l) )); then b_qual="${G} Great"; elif (( $(echo "$dl_num >= 5" | bc -l) )); then b_qual="${Y} Good"; fi
 	# Gaming (Oyun) Kalitesi
-	if (( $(echo "$ping_num <= 30 && $ping_num > 0" | bc -l) && $(echo "$ul_num >= 5" | bc -l) )); then g_qual="${G} Great"; elif (( $(echo "$ping_num <= 60" | bc -l) )); then g_qual="$YY Good"; fi
+	if (( $(echo "$ping_num <= 30 && $ping_num > 0" | bc -l) && $(echo "$ul_num >= 5" | bc -l) )); then g_qual="${G} Great"; elif (( $(echo "$ping_num <= 60" | bc -l) )); then g_qual="${Y} Good"; fi
 	# Streaming (Video İzleme) Kalitesi
-	if (( $(echo "$dl_num >= 25" | bc -l) )); then s_qual="${G} Great"; elif (( $(echo "$dl_num >= 10" | bc -l) )); then s_qual="$YY Good"; fi
+	if (( $(echo "$dl_num >= 25" | bc -l) )); then s_qual="${G} Great"; elif (( $(echo "$dl_num >= 10" | bc -l) )); then s_qual="${Y} Good"; fi
 	# Video Call (Görüntülü Görüşme) Kalitesi
-	if (( $(echo "$ul_num >= 8" | bc -l) && $(echo "$ping_num <= 40" | bc -l) )); then v_qual="${G} Great"; elif (( $(echo "$ul_num >= 3" | bc -l) )); then v_qual="$YY Good"; fi
+	if (( $(echo "$ul_num >= 8" | bc -l) && $(echo "$ping_num <= 40" | bc -l) )); then v_qual="${G} Great"; elif (( $(echo "$ul_num >= 3" | bc -l) )); then v_qual="${Y} Good"; fi
 
 	# Sonucu kaydetmek üzere düz metin hazırlıyoruz
 	echo -e "IP Address: $my_ip\nProvider: $provider\nServer: $server_info\nPing: $ping_val\nDownload: $dl_val\nUpload: $ul_val" > "$RESULT_FILE"
@@ -258,37 +261,37 @@ spin () {
 
 while true; do
 clear;echo -e "
-${C} #######$YY ##################${C} #######$YY ####################
+${C} #######${Y} ##################${C} #######${Y} ####################
 ${C}    #    #####  #####          #     ####   ####  #
 ${C}    #    #    # #    #         #    #    # #    # #
 ${C}    #    #    # #    #  #####  #    #    # #    # #
 ${C}    #    #    # #####          #    #    # #    # #
 ${C}    #    #    # #   #          #    #    # #    # #
 ${C}    #    #####  #    #         #     ####   ####  ######
-$YY ###################[›${G} TheDarkRoot $YY‹]###################
+${Y} ###################[›${G} TheDarkRoot ${Y}‹]###################
 ${C} =======================================================
 ${C} ┌⊸⟜┬───⊸ [${M} TheDarkRoot Repositories: ${C}]
-${C} │  ├─┬─⊸ [$YY~1${R} Hasher${C}]
-${C} │  │ └─⊸ [$YY »${G} This is a Hash Cracker.${C}]
-${C} │  ├─┬─⊸ [$YY~2${R} Hashgen${C}]
-${C} │  │ └─⊸ [$YY »${G} Generate more 39 type hash.${C}]
-${C} │  ├─┬─⊸ [$YY~3${R} Tertext${C}]
-${C} │  │ └─⊸ [$YY »${G} Program for creating words from letters.${C}]
-${C} │  └─┬─⊸ [$YY~4${R} UserID${C}]
-${C} │    └─⊸ [$YY »${G} Search usernames on social media.${C}]
-${C} │  └─┬─⊸ [$YY~X${R} X${C}]
-${C} │    └─⊸ [$YY »${G} TheDarkRoot All-in-One Repositories.${C}]
+${C} │  ├─┬─⊸ [${Y}~1${R} Hasher${C}]
+${C} │  │ └─⊸ [${Y} »${G} This is a Hash Cracker.${C}]
+${C} │  ├─┬─⊸ [${Y}~2${R} Hashgen${C}]
+${C} │  │ └─⊸ [${Y} »${G} Generate more 39 type hash.${C}]
+${C} │  ├─┬─⊸ [${Y}~3${R} Tertext${C}]
+${C} │  │ └─⊸ [${Y} »${G} Program for creating words from letters.${C}]
+${C} │  ├─┬─⊸ [${Y}~4${R} UserID${C}]
+${C} │  │ └─⊸ [${Y} »${G} Search usernames on social media.${C}]
+${C} │  └─┬─⊸ [${Y}~X${R} X${C}]
+${C} │    └─⊸ [${Y} »${G} TheDarkRoot All-in-One Repositories.${C}]
 ${C} └⊸⟜┬───⊸ [${M} Termux Settings: ${C}]
-${C}    ├─┬─⊸ [$YY~N${R} Network${C}]
-${C}    │ └─⊸ [$YY »${G} Test your network connection.${C}]
-${C}    ├─┬─⊸ [$YY~U${R} Update${C}]
-${C}    │ └─⊸ [$YY »${G} Termux update.${C}]
-${C}    ├─┬─⊸ [$YY~P${R} ParrotOS-T${C}]
-${C}    │ └─⊸ [$YY »${G} Parrot OS theme for Termux.${C}]
-${C}    ├─┬─⊸ [$YY~T${R} TheDarkRoot-T${C}]
-${C}    │ └─⊸ [$YY »${G} TheDarkRoot theme for Termux.${C}]
-${C}    └─┬─⊸ [$YY~Q${R} Exit${C}]
-${C}      └─⊸ [$YY »${G} Tdr-Tool exit.${C}]\n"
+${C}    ├─┬─⊸ [${Y}~N${R} Network${C}]
+${C}    │ └─⊸ [${Y} »${G} Test your network connection.${C}]
+${C}    ├─┬─⊸ [${Y}~U${R} Update${C}]
+${C}    │ └─⊸ [${Y} »${G} Termux update.${C}]
+${C}    ├─┬─⊸ [${Y}~P${R} ParrotOS-T${C}]
+${C}    │ └─⊸ [${Y} »${G} Parrot OS theme for Termux.${C}]
+${C}    ├─┬─⊸ [${Y}~T${R} TheDarkRoot-T${C}]
+${C}    │ └─⊸ [${Y} »${G} TheDarkRoot theme for Termux.${C}]
+${C}    └─┬─⊸ [${Y}~Q${R} Exit${C}]
+${C}      └─⊸ [${Y} »${G} Tdr-Tool exit.${C}]\n"
 
 read -p " $(echo -e " ${C}[${Y}~${C}]${M} Program Number: ${Y}")" pn
 
@@ -308,7 +311,7 @@ read -p " $(echo -e " ${C}[${Y}~${C}]${M} Program Number: ${Y}")" pn
 	if [ "$is_online" = true ]; then
 		run_update
 
-		echo -e "\n ${C} [$YY!${C}]${G} Update completed!\n"
+		echo -e "\n ${C} [${Y}!${C}]${G} Update completed!\n"
 
 		read -p " $(echo -e " ${C}[${Y}?${C}]${M} Want to run an network speed test? (Y/n): ${Y}")" st_choice_aio
 
@@ -324,7 +327,10 @@ read -p " $(echo -e " ${C}[${Y}~${C}]${M} Program Number: ${Y}")" pn
 
 	elif [[ $pn == UT || $pn == ut ]]; then
 	echo -e "\n ${C} [${Y}i${C}]${G} Tdr-Tool: Fast updating program...";
-	( cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; ) &> ~/.TheDarkRootTool_debug.log & spin "${C}[$YY↓${C}]${G} Tdr-Tool Updating...$YY" " ${W}⟫${G} Complete."
+	(
+	 cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh;
+	 rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh; 
+	) &> ~/.TheDarkRootTool_debug.log & spin "${C}[${Y}↓${C}]${G} Tdr-Tool Updating...${Y}" " ${W}⟫${G} Complete."
 
 	elif [[ $pn == N || $pn == n ]]; then
 
@@ -353,18 +359,22 @@ read -p " $(echo -e " ${C}[${Y}~${C}]${M} Program Number: ${Y}")" pn
 	elif [[ $pn == P || $pn == p ]]; then
 	echo -e "\n ${C} [${Y}i${C}]${G} ParrotOS-T: Parrot OS theme for Termux.";
 	(
-	  cd $Etc && curl -sLf "$Raw/FileStore/master/Software%20Files/ParrotOS.trmx?t=$(date +%s)" -o bash.bashrc.tmp && rm -rf bash.bashrc && mv bash.bashrc.tmp bash.bashrc;
-	  cd ~/.termux && curl -sLf "$Raw/FileStore/master/Software%20Files/Terkey.trmx?t=$(date +%s)" -o termux.properties.tmp && rm -rf termux.properties && mv termux.properties.tmp termux.properties;
+	  cd $Etc && curl -sLf "$Raw/FileStore/master/Software%20Files/ParrotOS.trmx?t=$(date +%s)" -o bash.bashrc.tmp;
+	  rm -rf bash.bashrc && mv bash.bashrc.tmp bash.bashrc;
+	  cd ~/.termux && curl -sLf "$Raw/FileStore/master/Software%20Files/Terkey.trmx?t=$(date +%s)" -o termux.properties.tmp;
+	  rm -rf termux.properties && mv termux.properties.tmp termux.properties;
 	  cd ~/ && $Reload;
-	) &> ~/.TheDarkRoot_debug.log & spin "${C}[$YY↓${C}]${G} Downloading ParrotOS-T..." " ${W}⟫${G} Complete."
+	) &> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading ParrotOS-T..." " ${W}⟫${G} Complete."
 
 	elif [[ $pn == T || $pn == t ]]; then
 	echo -e "\n ${C} [${Y}i${C}]${G} TheDarkRoot-T: TheDarkRoot theme for Termux.";
 	(
-	  cd $Etc && curl -sLf "$Raw/FileStore/master/Software%20Files/TheDarkRoot.trmx?t=$(date +%s)" -o bash.bashrc.tmp && rm -rf bash.bashrc && mv bash.bashrc.tmp bash.bashrc;
-	  cd ~/.termux && curl -sLf "$Raw/FileStore/master/Software%20Files/Terkey.trmx?t=$(date +%s)" -o termux.properties.tmp && rm -rf termux.properties && mv termux.properties.tmp termux.properties;
+	  cd $Etc && curl -sLf "$Raw/FileStore/master/Software%20Files/TheDarkRoot.trmx?t=$(date +%s)" -o bash.bashrc.tmp;
+	  rm -rf bash.bashrc && mv bash.bashrc.tmp bash.bashrc;
+	  cd ~/.termux && curl -sLf "$Raw/FileStore/master/Software%20Files/Terkey.trmx?t=$(date +%s)" -o termux.properties.tmp;
+	  rm -rf termux.properties && mv termux.properties.tmp termux.properties;
 	  cd ~/ && $Reload;
-	) &> ~/.TheDarkRoot_debug.log & spin "${C}[$YY↓${C}]${G} Downloading TheDarkRoot-T..." " ${W}⟫${G} Complete."
+	) &> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading TheDarkRoot-T..." " ${W}⟫${G} Complete."
 
 	elif [[ $pn == X || $pn == x ]]; then
 	echo -e "\n ${C} [${Y}i${C}]${G} X: TheDarkRoot All-in-One Repositories.";
@@ -373,27 +383,28 @@ read -p " $(echo -e " ${C}[${Y}~${C}]${M} Program Number: ${Y}")" pn
 	  install_tool "Hashgen"
 	  install_tool "Tertext"
 	  install_tool "UserID"
-	  cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh && rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh && $Reload;
-	) &> ~/.TheDarkRoot_debug.log & spin "${C}[$YY↓${C}]${G} Downloading X..." " ${W}⟫${G} Complete."
+	  cd ~/ && curl -sLf "$Raw/Tdr-Tool/master/Tdr-Tool.sh?t=$(date +%s)" -o Tdr-Tool_temp.sh;
+	  rm -rf  Tdr-Tool.sh && mv Tdr-Tool_temp.sh Tdr-Tool.sh && chmod +x Tdr-Tool.sh && $Reload;
+	) &> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading X..." " ${W}⟫${G} Complete."
 
 	elif [[ $pn == 1 || $pn == 01 ]]; then
 	echo -e "\n ${C} [${Y}i${C}]${G} Hasher: This is a Hash Cracker.";
-	( install_tool "Hasher" && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[$YY↓${C}]${G} Downloading Hasher..." " ${W}⟫${G} Complete."
+	( install_tool "Hasher" && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading Hasher..." " ${W}⟫${G} Complete."
 
 	elif [[ $pn == 2 || $pn == 02 ]]; then
 	echo -e "\n ${C} [${Y}i${C}]${G} Hashgen: Generate more 39 type hash.";
-	( install_tool "Hashgen" && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[$YY↓${C}]${G} Downloading Hashgen..." " ${W}⟫${G} Complete."
+	( install_tool "Hashgen" && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading Hashgen..." " ${W}⟫${G} Complete."
 
 	elif [[ $pn == 3 || $pn == 03 ]]; then
 	echo -e "\n ${C} [${Y}i${C}]${G} Tertext: Program for creating words from letters.";
-	( install_tool "Tertext" && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[$YY↓${C}]${G} Downloading Tertext..." " ${W}⟫${G} Complete."
+	( install_tool "Tertext" && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading Tertext..." " ${W}⟫${G} Complete."
 
 	elif [[ $pn == 4 || $pn == 04 ]]; then
 	echo -e "\n ${C} [${Y}i${C}]${G} UserID: Search usernames on social media.";
-	( install_tool "UserID" && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[$YY↓${C}]${G} Downloading UserID..." " ${W}⟫${G} Complete."
+	( install_tool "UserID" && $Reload; ) &> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading UserID..." " ${W}⟫${G} Complete."
 
 	elif [[ $pn == Q || $pn == q ]]; then
-	echo -e "\n ${C} [$YY»${C}]${R} Good Bye...\n";
+	echo -e "\n ${C} [${Y}»${C}]${R} Good Bye...\n";
 	sleep 0;exit;
 
 	else
