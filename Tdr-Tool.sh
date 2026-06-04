@@ -204,36 +204,36 @@ run_speedtest () {
 	# Ham verileri filtreleyebilmek için normal çıktı alıyoruz ve uyarıları gizliyoruz
 	(
 		if command -v speedtest-cli &> /dev/null; then
-			speedtest-cli > "$Raw_FILE" 2>&1
+			speedtest-cli > "$RAW_FILE" 2>&1
 		else
             # Eğer yerelde yoksa bir kereye mahsus indir ve kaydet
             if [ ! -f "$Tool/speedtest.py" ]; then
                 curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py -o "$Tool/speedtest.py"
             fi
             # Yerel dosyayı çalıştır
-			python3 -W ignore "$Tool/speedtest.py" > "$Raw_FILE" 2>&1
+			python3 -W ignore "$Tool/speedtest.py" > "$RAW_FILE" 2>&1
 		fi
 	) & spin "${C}[${Y}↓${C}]${G} Testing network speed..." " ${W}⟫${G} Complete."
 
 	# --- GÜVENLİK KİLİDİ BAŞLANGICI ---
 	# İşlem başarısız olduysa VEYA geçerli bir indirme verisi gelmediyse işlemi iptal et
-	if [ $? -ne 0 ] || ! grep -q "Download:" "$Raw_FILE"; then
+	if [ $? -ne 0 ] || ! grep -q "Download:" "$RAW_FILE"; then
 		echo -e "\n  ${C}[${R}!${C}]${R} Cut! Please check your network connection."
-		rm -f "$Raw_FILE" "$RESULT_FILE"
+		rm -f "$RAW_FILE" "$RESULT_FILE"
 		return 1
 	fi
 
 	# Alınan ham verileri RAW_FILE üzerinden ayıklıyoruz
-	my_ip=$(grep -oE "Testing from .* \([0-9.]+\)" "$Raw_FILE" | grep -oE "[0-9.]+" | head -n 1)
-	provider=$(grep -oE "Testing from .* \(" "$Raw_FILE" | sed 's/Testing from //' | sed 's/ ($//' | sed 's/ (//')
-	server_info=$(grep "Hosted by" "$Raw_FILE" | sed 's/Hosted by //' | cut -d '[' -f1 | sed 's/ *$//')
+	my_ip=$(grep -oE "Testing from .* \([0-9.]+\)" "$RAW_FILE" | grep -oE "[0-9.]+" | head -n 1)
+	provider=$(grep -oE "Testing from .* \(" "$RAW_FILE" | sed 's/Testing from //' | sed 's/ ($//' | sed 's/ (//')
+	server_info=$(grep "Hosted by" "$RAW_FILE" | sed 's/Hosted by //' | cut -d '[' -f1 | sed 's/ *$//')
 
 	# Ping ayıklama yapısı
-	ping_val=$(grep "Hosted by" "$Raw_FILE" | grep -oE "\[[0-9.]+ ms\]" | sed 's/\[//g' | sed 's/\]//g')
-	[[ -z $ping_val ]] && ping_val=$(grep "Hosted by" "$Raw_FILE" | grep -oE "[0-9.]+ ms")
+	ping_val=$(grep "Hosted by" "$RAW_FILE" | grep -oE "\[[0-9.]+ ms\]" | sed 's/\[//g' | sed 's/\]//g')
+	[[ -z $ping_val ]] && ping_val=$(grep "Hosted by" "$RAW_FILE" | grep -oE "[0-9.]+ ms")
 
-	dl_val=$(grep "Download:" "$Raw_FILE" | sed 's/Download: //')
-	ul_val=$(grep "Upload:" "$Raw_FILE" | sed 's/Upload: //')
+	dl_val=$(grep "Download:" "$RAW_FILE" | sed 's/Download: //')
+	ul_val=$(grep "Upload:" "$RAW_FILE" | sed 's/Upload: //')
 
 	# Değerleri sayısal formata çevirip kalite kontrolü yapıyoruz
 	dl_num=$(echo "$dl_val" | awk '{print $1}')
@@ -275,7 +275,7 @@ run_speedtest () {
 	echo -e "  ${C}=======================================================${W}"
 
     # İşimiz bitince ham veriyi siliyoruz
-	rm -f "$Raw_FILE"
+	rm -f "$RAW_FILE"
 
 	# Sonuçları kaydetme aşaması
 	read -p " $(echo -e " ${C}[${Y}?${C}]${M} Do you want to save the results to a file? (Y/n): ${Y}")" save_choice
