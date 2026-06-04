@@ -91,7 +91,7 @@ install_tool() {
 run_update () {
 	echo -e "\n ${C} [${Y}i${C}]${G} Starting the update..."
 	#Termux Permissions
-	( termux-setup-storage; termux-wake-lock && $Reload; sleep 3 ) &>> ~/.TermuxPermissions_debug.log & spin "${C}[${Y}↓${C}]${G} Permission..." " ${W}⟫${G} Complete."
+	#( termux-setup-storage; termux-wake-lock && $Reload; sleep 3 ) &>> ~/.TermuxPermissions_debug.log & spin "${C}[${Y}↓${C}]${G} Permission..." " ${W}⟫${G} Complete."
 	#Termux Update
 	( echo "--- Updating ---" > "$Log"; pkg update -y; pkg upgrade -y && $Reload; ) &>> ~/.TermuxUpdate_debug.log & spin "${C}[${Y}↓${C}]${G} Updating..." " ${W}⟫${G} Complete."
 	#Termux Packages Installing
