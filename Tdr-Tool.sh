@@ -131,6 +131,8 @@ install_packages() {
         case "$manager" in
             pkg) if ! dpkg -s "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
             pip) if ! pip show "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
+			npm) if ! npm list -g "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
+			gem) if ! gem list -i "^$pkg$" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
         esac
     done
 
