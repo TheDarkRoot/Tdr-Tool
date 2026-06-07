@@ -98,10 +98,10 @@ check_dependencies() {
     if [ ${#missing[@]} -gt 0 ]; then
         echo -e "\n ${C}[${Y}i${C}]${G} Missing dependencies detected: ${missing[*]}"
         echo -e "\n ${C}[${Y}i${C}]${G} Installing automatically, please wait..."
-        
+
         # Sessizce kur
         pkg install -y "${missing[@]}" &>> ~/.TheDarkRoot_debug.log
-        
+
         echo -e "\n ${C}[${G}✓${C}]${G} Setup complete. Restarting...\n"
         sleep 2
         exec bash "$0" # Programı temiz bir şekilde yeniden başlat
@@ -169,15 +169,15 @@ install_tool() {
 
     # 2. İndirmeyi dene
     if git clone --quiet "$TheDarkRoot/$tool_name.git" "$temp_dir" &> /dev/null; then
-        
+
         # 3. Eğer araç zaten varsa, eskisini yedekle ve taşı
         if [ -d "$target_dir" ]; then
             # Önce .bckp isminde geçici olarak klasörde tut, sonra Backup'a taşı
             mv "$target_dir" "$Tool/${tool_name}.bckp"
-            
+
             # Eğer Backup klasöründe zaten bir yedek varsa onu sil (ki çakışmasın)
             [ -d "$backup_target" ] && rm -rf "$backup_target"
-            
+
             # Artık Backup klasörüne taşıyoruz
             mv "$Tool/${tool_name}.bckp" "$backup_target"
         fi
@@ -226,7 +226,7 @@ run_update () {
 	# Termux Update
 	( pkg update -y; pkg upgrade -y && $Reload; ) &>> ~/.TermuxUpdate_debug.log & spin "${C}[${Y}↓${C}]${G} Updating..." " ${W}⟫${G} Complete."
 	# Termux Packages Installing
-	( 
+	(
       install_packages pkg termux-tools coreutils binutils git curl wget sed grep gawk bc jq ncurses-utils python ruby php clang make openssh openssl zip unzip tar proot crunch neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet nodejs
       $Reload
     ) &>> ~/.TermuxPackages_debug.log & spin "${C}[${Y}↓${C}]${G} Packages Installing..." " ${W}⟫${G} Complete."
@@ -266,7 +266,7 @@ run_speedtest () {
             [ ! -f "$Tool/speedtest.py" ] && curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py -o "$Tool/speedtest.py"
             python3 -W ignore "$Tool/speedtest.py" > "$RAW_FILE" 2>&1
         fi
-    ) & 
+    ) &
     local spin_pid=$!
     spin "${C}[${Y}↓${C}]${G} Testing network speed..." " ${W}⟫${G} Complete." " ${W}⟫${R} Failed!"
     wait $spin_pid
@@ -283,12 +283,12 @@ run_speedtest () {
     my_ip=$(grep -oE "Testing from .* \([0-9.]+\)" "$RAW_FILE" | grep -oE "[0-9.]+" | head -n 1)
     provider=$(grep -oE "Testing from .* \(" "$RAW_FILE" | sed 's/Testing from //' | sed 's/ ($//' | sed 's/ (//')
     server_info=$(grep "Hosted by" "$RAW_FILE" | sed 's/Hosted by //' | cut -d '[' -f1 | sed 's/ *$//')
-    
+
     # PING İÇİN GÜNCELLEME:
     # Hem "Hosted by" satırındaki köşeli parantezi, hem de bazen ayrı satırda çıkan 
     # "Latency: X ms" formatını yakalayan daha genel bir regex kullandık.
     ping_val=$(grep -oE "([0-9.]+ ms|\[[0-9.]+ ms\])" "$RAW_FILE" | head -n 1 | sed 's/\[//g; s/\]//g')
-    
+
     dl_val=$(grep "Download:" "$RAW_FILE" | sed 's/Download: //')
     ul_val=$(grep "Upload:" "$RAW_FILE" | sed 's/Upload: //')
 
@@ -510,14 +510,14 @@ case "$pn_lower" in
 
         if [ "$is_online" = true ]; then
             echo -e "\n ${C} [${Y}i${C}]${G} X: TheDarkRoot All-in-One Repositories."
-            
+
             # Tüm işlemleri tek bir alt kabukta birleştiriyoruz
             (
                 install_tool "Hasher"
                 install_tool "Hashgen"
                 install_tool "Tertext"
                 install_tool "UserID"
-                
+
                 update_self # Fonksiyonu çağırıyoruz
             ) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading X..." " ${W}⟫${G} Complete."
         else
@@ -559,10 +559,10 @@ esac
 # Eğer çıkış veya hatalı tuş değilse, ana menüye dönmek için bekle
 if [[ "$pn_lower" != "q" && "$pn_lower" != "" && "$pn_lower" =~ ^(u|ut|p|t|x|1|2|3|4|n)$ ]]; then
     read -n 1 -s -p " $(echo -e "\n  ${C}[${Y}~${C}]${M} Press any key to return to main menu...${Y}")"
-    
+
     # Sadece aracı güncelleyen veya çoklu kurulum yapan işlemlerden sonra scripti yeniden başlat
     if [[ "$pn_lower" =~ ^(u|ut|x)$ ]]; then
-        echo -e "\n ${C}[${Y}i${C}]${G} Restarting Tdr-Tool..."
+        echo -e "\n\n  ${C}[${Y}i${C}]${G} Restarting Tdr-Tool..."
 		sleep 2
 		exec bash "$0"
     fi
