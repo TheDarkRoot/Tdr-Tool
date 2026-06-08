@@ -10,7 +10,7 @@ R='\033[31;1m'  # Kırmızı
 C='\033[36;1m'  # Turkuaz
 M='\033[35;1m'  # Magenta
 
-# 1. Ortam Kontrolü ve Dinamik Yol Tanımlamaları (Çakışmalar Engellendi)
+# 1. Ortam Kontrolü ve Dinamik Yol Tanımlamaları
 if [ -d "/data/data/com.termux/files/home" ]; then
     IS_TERMUX=true
     Etc="$PREFIX/etc"
@@ -29,9 +29,9 @@ fi
 Tool="$HOME/Tdr-Tool"
 Backup="$Tool/.Backup"
 Network="$Tool/.NetworkLog"
-Github="https://github.com"
+Github="[https://github.com](https://github.com)"
 TheDarkRoot="$Github/TheDarkRoot"
-Raw="https://raw.githubusercontent.com/TheDarkRoot"
+Raw="[https://raw.githubusercontent.com/TheDarkRoot](https://raw.githubusercontent.com/TheDarkRoot)"
 
 # 2. Termux Depolama İzni Kontrolü
 if [ "$IS_TERMUX" = true ]; then
@@ -74,7 +74,7 @@ ${G} |${Y} [${C}=${Y}]${W} Name     ${C}:${W} Tdr-Tool                          
 ${G} |${Y} [${C}=${Y}]${W} Code     ${C}:${W} Shell                                ${G}|
 ${G} |${Y} [${C}=${Y}]${W} Version  ${C}:${W} v1.2.7 (Alpha)                       ${G}|
 ${G} |${Y} [${C}=${Y}]${W} Author   ${C}:${W} Tdr-Tool                             ${G}|
-${G} |${Y} [${C}=${Y}]${W} Github   ${C}:${W} https://github.com/TheDarkRoot       ${G}|
+${G} |${Y} [${C}=${Y}]${W} Github   ${C}:${W} [https://github.com/TheDarkRoot](https://github.com/TheDarkRoot)       ${G}|
 ${G} |${Y} [${C}=${Y}]${W} Telegram ${C}:${W} @TheDarkRoot (t.me/TheDarkRoot)      ${G}|
 ${G} 0{===================================================}0\n"
         exit 0
@@ -83,7 +83,7 @@ ${G} 0{===================================================}0\n"
         ;;
 esac
 
-# İlerleme Çubuğu Fonksiyonu (PID takibi güvenli hale getirildi)
+# İlerleme Çubuğu Fonksiyonu (Animasyon kaymaları tamamen giderildi)
 spin () {
     local pid="$1"
     local msg_loading="$2"
@@ -93,7 +93,7 @@ spin () {
     local spinner=(
         "${B}■■■■■■■" "${G}█${Y}■■■■■■" "${Y}■${G}█${Y}■■■■■" "${Y}■■${G}█${Y}■■■■" 
         "${Y}■■■${G}█${Y}■■■" "${Y}■■■■${G}█${Y}■■" "${Y}■■■■■${G}█${Y}■" "${Y}■■■■■■${G}█" 
-        "${B}■■■■■ำ■" "${Y}■■■■■■${G}█" "${Y}■■■■■${G}█${Y}■" "${Y}■■■■${G}█${Y}■■" 
+        "${B}■■■■■■■" "${Y}■■■■■■${G}█" "${Y}■■■■■${G}█${Y}■" "${Y}■■■■${G}█${Y}■■" 
         "${Y}■■■${G}█${Y}■■■" "${Y}■■${G}█${Y}■■■■" "${Y}■${G}█${Y}■■■■■" "${G}█${Y}■■■■■■"
     )
 
@@ -114,6 +114,7 @@ spin () {
         return 0
     else
         echo -e "\r  $msg_loading \033[K$msg_fail"
+        kill -9 "$pid" 2>/dev/null
         return $exit_code
     fi
 }
@@ -133,7 +134,7 @@ check_network() {
     spin $! "${C}[${Y}i${C}]${G} Network control..." "$status"
 }
 
-# Bağımlılıkları kontrol eden fonksiyon (sudo eklendi)
+# Bağımlılık Kontrolü
 check_dependencies() {
     local deps=("git" "curl" "awk" "bc" "grep")
     local missing=()
@@ -173,7 +174,7 @@ manage_logs() {
 
 manage_logs
 
-# Paket yükleme fonksiyonu (Dinamik sorgulama eklendi)
+# Paket Yükleme Fonksiyonu
 install_packages() {
     local manager="$1"
     shift
@@ -194,7 +195,11 @@ install_packages() {
                 fi
                 ;;
             npm) 
-                if ! npm list -g "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi 
+                if [ "$IS_TERMUX" = true ]; then
+                    if ! npm list -g "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi
+                else
+                    if ! sudo npm list -g "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi
+                fi
                 ;;
             gem) 
                 if ! gem list -i "^$pkg$" &> /dev/null; then missing_pkgs+=("$pkg"); fi 
@@ -208,7 +213,13 @@ install_packages() {
             pkg) pkg install -y "${missing_pkgs[@]}" ;;
             apt) sudo apt-get install -y "${missing_pkgs[@]}" ;; 
             pip) python3 -m pip install --upgrade --break-system-packages "${missing_pkgs[@]}" ;;
-            npm) sudo npm install -g "${missing_pkgs[@]}" ;;
+            npm) 
+                if [ "$IS_TERMUX" = true ]; then
+                    npm install -g "${missing_pkgs[@]}"
+                else
+                    sudo npm install -g --unsafe-perm "${missing_pkgs[@]}"
+                fi
+                ;;
             gem) 
                 for gem_pkg in "${missing_pkgs[@]}"; do
                     sudo gem install "$gem_pkg"
@@ -225,7 +236,7 @@ install_tool() {
     local tool_name="$1"
     local target_dir="$Tool/$tool_name"
     local temp_dir="$Tool/${tool_name}_temp"
-    local backup_target="$Backup/${tool_name}_$(date +%Y%m%d).bckp"
+    local backup_target="$Backup/${tool_name}_$(date +%Y%m%d_%H%M%S).bckp"
 
     if ! ping -c 1 8.8.8.8 &> /dev/null; then
         echo -e "\n  ${C}[${R}!${C}]${R} Cut! Please check your network connection."
@@ -236,9 +247,7 @@ install_tool() {
 
     if git clone --quiet "$TheDarkRoot/$tool_name.git" "$temp_dir" &> /dev/null; then
         if [ -d "$target_dir" ]; then
-            mv "$target_dir" "$Tool/${tool_name}.bckp"
-            [ -d "$backup_target" ] && rm -rf "$backup_target"
-            mv "$Tool/${tool_name}.bckp" "$backup_target"
+            mv "$target_dir" "$backup_target"
         fi
 
         mv "$temp_dir" "$target_dir"
@@ -326,7 +335,7 @@ update_self() {
     spin $! "${C}[${Y}↓${C}]${G} Tdr-Tool Updating...${Y}" " ${W}⟫${G} Complete."
 }
 
-# Sistem ve Paket Güncelleme (Kali Uyumluluğu Artırıldı)
+# Sistem ve Paket Güncelleme
 run_update () {
     echo -e "\n ${C} [${Y}i${C}]${G} Starting the update..."
     
@@ -350,7 +359,7 @@ run_update () {
         spin $! "${C}[${Y}↓${C}]${G} Updating Kali Linux..." " ${W}⟫${G} Complete."
         
         (
-          install_packages apt coreutils binutils git curl wget sed grep gawk bc jq ncurses-utils python3 python3-pip python3-setuptools python3-wheel ruby php clang make openssh-client openssl zip unzip tar crunch neofetch nano vim cmatrix sl tmate zsh bash tor privoxy cowsay figlet toilet nodejs
+          install_packages apt coreutils binutils git curl wget sed grep gawk bc jq ncurses-utils python3 python3-pip python3-setuptools python3-wheel ruby php clang make openssh-client openssl zip unzip tar crunch neofetch nano vim zsh bash tor privoxy cowsay figlet toilet nodejs
         ) &>> ~/.KaliPackages_debug.log & 
         spin $! "${C}[${Y}↓${C}]${G} System Packages Installing..." " ${W}⟫${G} Complete."
     fi
@@ -360,7 +369,6 @@ run_update () {
       install_packages pip setuptools wheel bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest-cli
       install_packages npm readline-sync speed-test
       install_packages gem lolcat
-      $Reload
     ) &>> ~/.TheDarkRoot_debug.log & 
     spin $! "${C}[${Y}↓${C}]${G} Tools Installing..." " ${W}⟫${G} Complete."
     
@@ -384,15 +392,18 @@ run_speedtest () {
         if command -v speedtest-cli &> /dev/null; then
             speedtest-cli > "$RAW_FILE" 2>&1
         else
-            [ ! -f "$Tool/speedtest.py" ] && curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py -o "$Tool/speedtest.py"
+            [ ! -f "$Tool/speedtest.py" ] && curl -sL [https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py](https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py) -o "$Tool/speedtest.py"
             python3 -W ignore "$Tool/speedtest.py" > "$RAW_FILE" 2>&1
         fi
     ) &
     
-    spin $! "${C}[${Y}↓${C}]${G} Testing network speed..." " ${W}⟫${G} Complete." " ${W}⟫${R} Failed!"
+    local test_pid=$!
+    spin $test_pid "${C}[${Y}↓${C}]${G} Testing network speed..." " ${W}⟫${G} Complete." " ${W}⟫${R} Failed!"
+    local spin_res=$?
 
-    if [ ! -s "$RAW_FILE" ] || ! grep -q "Download:" "$RAW_FILE"; then
+    if [ $spin_res -ne 0 ] || [ ! -s "$RAW_FILE" ] || ! grep -q "Download:" "$RAW_FILE"; then
         echo -e "\n  ${C}[${R}!${C}]${R} Cut! Please check your network connection."
+        kill -9 "$test_pid" 2>/dev/null
         rm -f "$RAW_FILE" "$RESULT_FILE"
         return 1
     fi
@@ -413,10 +424,11 @@ run_speedtest () {
     [[ ! "$ping_num" =~ ^[0-9.]+$ ]] && ping_num=0
 
     b_qual="${R} Poor" && g_qual="${R} Poor" && s_qual="${R} Poor" && v_qual="${R} Poor"
-    if (( $(echo "$dl_num >= 15" | bc -l) )); then b_qual="${G} Great"; elif (( $(echo "$dl_num >= 5" | bc -l) )); then b_qual="${Y} Good"; fi
-    if (( $(echo "$ping_num <= 30 && $ping_num > 0" | bc -l) && $(echo "$ul_num >= 5" | bc -l) )); then g_qual="${G} Great"; elif (( $(echo "$ping_num <= 60" | bc -l) )); then g_qual="${Y} Good"; fi
-    if (( $(echo "$dl_num >= 25" | bc -l) )); then s_qual="${G} Great"; elif (( $(echo "$dl_num >= 10" | bc -l) )); then s_qual="${Y} Good"; fi
-    if (( $(echo "$ul_num >= 8" | bc -l) && $(echo "$ping_num <= 40" | bc -l) )); then v_qual="${G} Great"; elif (( $(echo "$ul_num >= 3" | bc -l) )); then v_qual="${Y} Good"; fi
+    
+    if [ $(echo "$dl_num >= 15" | bc -l) -eq 1 ]; then b_qual="${G} Great"; elif [ $(echo "$dl_num >= 5" | bc -l) -eq 1 ]; then b_qual="${Y} Good"; fi
+    if [ $(echo "$ping_num <= 30 && $ping_num > 0" | bc -l) -eq 1 ] && [ $(echo "$ul_num >= 5" | bc -l) -eq 1 ]; then g_qual="${G} Great"; elif [ $(echo "$ping_num <= 60" | bc -l) -eq 1 ]; then g_qual="${Y} Good"; fi
+    if [ $(echo "$dl_num >= 25" | bc -l) -eq 1 ]; then s_qual="${G} Great"; elif [ $(echo "$dl_num >= 10" | bc -l) -eq 1 ]; then s_qual="${Y} Good"; fi
+    if [ $(echo "$ul_num >= 8" | bc -l) -eq 1 ] && [ $(echo "$ping_num <= 40" | bc -l) -eq 1 ]; then v_qual="${G} Great"; elif [ $(echo "$ul_num >= 3" | bc -l) -eq 1 ]; then v_qual="${Y} Good"; fi
 
     echo -e "IP Address: $my_ip\nProvider: $provider\nServer: $server_info\nPing: $ping_val\nDownload: $dl_val\nUpload: $ul_val" > "$RESULT_FILE"
     echo -e "  ${C}=======================================================${W}"
@@ -445,7 +457,7 @@ run_speedtest () {
     fi
 }
 
-# ANA DÖNGÜ (MENU)
+# ANA DÖNGÜ (MENU) - Parçalanmış menü tek blokta birleştirildi
 while true; do
 clear;echo -e "
 ${C} #######${Y} ##################${C} #######${Y} ####################
@@ -483,8 +495,13 @@ ${C}      └─⊸ [${Y} »${G} Tdr-Tool exit.${C}]\n"
 read -p " $(echo -e " ${C}[${Y}~${C}]${M} Program Number: ${Y}")" pn
 pn_lower="${pn,,}"
 
-# Girişteki sol sıfırları temizleme (Örn: 01 -> 1)
+# Girişteki sol sıfırları temizleme
 pn_clean="${pn_lower#0}"
+
+# Kullanıcı hiçbir şey girmeden Enter'a basarsa döngüyü yenile
+if [ -z "$pn_clean" ]; then
+    continue
+fi
 
 case "$pn_clean" in
     u)
@@ -539,7 +556,7 @@ case "$pn_clean" in
                 install_tool "Tertext"
                 install_tool "UserID"
                 update_self 
-            ) &>> ~/.TheDarkRoot_debug.log & 
+            ) &>> ~/.TheDarkRoot_debug.log &
             spin $! "${C}[${Y}↓${C}]${G} Downloading X..." " ${W}⟫${G} Complete."
         else
             echo -e "\n  ${C}[${R}!${C}]${R} Cut! Please check your network connection."
@@ -548,26 +565,30 @@ case "$pn_clean" in
 
     1)
         echo -e "\n ${C} [${Y}i${C}]${G} Hasher: This is a Hash Cracker."
-        ( install_tool "Hasher" && $Reload; ) &>> ~/.TheDarkRoot_debug.log & 
+        install_tool "Hasher" &>> ~/.TheDarkRoot_debug.log &
         spin $! "${C}[${Y}↓${C}]${G} Downloading Hasher..." " ${W}⟫${G} Complete."
+        $Reload
         ;;
 
     2)
         echo -e "\n ${C} [${Y}i${C}]${G} Hashgen: Generate more 39 type hash."
-        ( install_tool "Hashgen" && $Reload; ) &>> ~/.TheDarkRoot_debug.log & 
+        install_tool "Hashgen" &>> ~/.TheDarkRoot_debug.log &
         spin $! "${C}[${Y}↓${C}]${G} Downloading Hashgen..." " ${W}⟫${G} Complete."
+        $Reload
         ;;
 
     3)
         echo -e "\n ${C} [${Y}i${C}]${G} Tertext: Program for creating words from letters."
-        ( install_tool "Tertext" && $Reload; ) &>> ~/.TheDarkRoot_debug.log & 
+        install_tool "Tertext" &>> ~/.TheDarkRoot_debug.log &
         spin $! "${C}[${Y}↓${C}]${G} Downloading Tertext..." " ${W}⟫${G} Complete."
+        $Reload
         ;;
 
     4)
         echo -e "\n ${C} [${Y}i${C}]${G} UserID: Search usernames on social media."
-        ( install_tool "UserID" && $Reload; ) &>> ~/.TheDarkRoot_debug.log & 
+        install_tool "UserID" &>> ~/.TheDarkRoot_debug.log &
         spin $! "${C}[${Y}↓${C}]${G} Downloading UserID..." " ${W}⟫${G} Complete."
+        $Reload
         ;;
 
     q)
@@ -582,7 +603,7 @@ case "$pn_clean" in
 esac
 
 # Menüye Dönüş Bekleme Bloğu
-if [[ "$pn_clean" != "q" && "$pn_clean" != "" && "$pn_clean" =~ ^(u|ut|p|t|x|1|2|3|4|n)$ ]]; then
+if [[ "$pn_clean" != "q" && "$pn_clean" =~ ^(u|ut|p|t|x|1|2|3|4|n)$ ]]; then
     read -n 1 -s -p " $(echo -e "\n  ${C}[${Y}~${C}]${M} Press any key to return to main menu...${Y}")"
     if [[ "$pn_clean" =~ ^(u|ut|x)$ ]]; then
         echo -e "\n\n  ${C}[${Y}i${C}]${G} Restarting Tdr-Tool..."
