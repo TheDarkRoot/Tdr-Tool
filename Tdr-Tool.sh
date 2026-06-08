@@ -9,6 +9,20 @@ R='\033[31;1m'  # Red Light
 C='\033[36;1m'  # Cyan Light
 M='\033[35;1m'  # Magenta Light
 
+if [ -d "/data/data/com.termux/files/home" ]; then
+    IS_TERMUX=true
+    Etc="$PREFIX/etc"
+    Termux="$HOME/.termux"
+    Reload="termux-reload-settings"
+    PKG_MAN="pkg"
+else
+    IS_TERMUX=false
+    Etc="/etc"  # Normal Linux genel bashrc yolu veya doğrudan $HOME/.bashrc seçilebilir
+    Termux="$HOME" 
+    Reload="source $HOME/.bashrc 2>/dev/null || source $HOME/.zshrc 2>/dev/null"
+    PKG_MAN="apt"
+fi
+
 # $HOME/   - /data/data/com.termux/files/home/
 # $PREFIX/ - /data/data/com.termux/files/usr/etc/
 Etc="$PREFIX/etc"
@@ -22,9 +36,12 @@ Raw="https://raw.githubusercontent.com/TheDarkRoot"
 Reload="termux-reload-settings"
 
 # 1. Termux Depolama İzni Kontrolü
-if [ ! -d "$HOME/storage" ]; then
-    termux-setup-storage
-    sleep 5 && $Reload
+if [ "$IS_TERMUX" = true ]; then
+    if [ ! -d "$HOME/storage" ]; then
+        termux-setup-storage
+        until [ -d "$HOME/storage" ]; do sleep 1; done
+        $Reload
+    fi
 fi
 
 # 2. Gerekli Tüm Klasörlerin Oluşturulması
@@ -87,24 +104,26 @@ check_dependencies() {
     local deps=("git" "curl" "awk" "bc" "grep")
     local missing=()
 
-    # 1. Hangi paketler eksik tespit et
     for cmd in "${deps[@]}"; do
         if ! command -v "$cmd" &> /dev/null; then
             missing+=("$cmd")
         fi
     done
 
-    # 2. Eğer eksik varsa, uyarı vermek yerine arka planda kur
     if [ ${#missing[@]} -gt 0 ]; then
         echo -e "\n ${C}[${Y}i${C}]${G} Missing dependencies detected: ${missing[*]}"
         echo -e "\n ${C}[${Y}i${C}]${G} Installing automatically, please wait..."
 
-        # Sessizce kur
-        pkg install -y "${missing[@]}" &>> ~/.TheDarkRoot_debug.log
+        if [ "$IS_TERMUX" = true ]; then
+            pkg install -y "${missing[@]}" &>> ~/.TheDarkRoot_debug.log
+        else
+            sudo apt-get update -y &>/dev/null
+            sudo apt-get install -y "${missing[@]}" &>> ~/.TheDarkRoot_debug.log
+        fi
 
-        echo -e "\n ${C}[${G}✓${C}]${G} Setup complete. Restarting...\n"
+        echo -e "\n\n  ${C}[${G}✓${C}]${G} Setup complete. Restarting...\n"
         sleep 2
-        exec bash "$0" # Programı temiz bir şekilde yeniden başlat
+        exec bash "$0"
     fi
 }
 
@@ -126,27 +145,31 @@ install_packages() {
     shift
     local missing_pkgs=()
 
-    # Adım 1: Hangi paketler eksik? Hepsini tek tek kontrol et, eksikse 'missing_pkgs' dizisine ekle.
+    # Eğer Kali'deysek ve manager 'pkg' ise otomatik olarak 'apt'ye çevir
+    if [ "$IS_TERMUX" = false ] && [ "$manager" = "pkg" ]; then
+        manager="apt"
+    fi
+
     for pkg in "$@"; do
         case "$manager" in
             pkg) if ! dpkg -s "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
+            apt) if ! dpkg -s "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
             pip) if ! pip show "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
-			npm) if ! npm list -g "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
-			gem) if ! gem list -i "^$pkg$" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
+            npm) if ! npm list -g "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
+            gem) if ! gem list -i "^$pkg$" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
         esac
     done
 
-    # Adım 2: Toplu Kurulum. Eğer dizide paket varsa, tek bir komutla hepsini yükle.
     if [ ${#missing_pkgs[@]} -gt 0 ]; then
         echo -e "\n ${C}[${Y}i${C}]${G} Installing: ${missing_pkgs[*]}"
         case "$manager" in
             pkg) pkg install -y "${missing_pkgs[@]}" ;;
+            apt) sudo apt-get install -y "${missing_pkgs[@]}" ;; # Kali için sudo eklendi
             pip) pip install --upgrade --break-system-packages "${missing_pkgs[@]}" ;;
-            npm) npm install -g "${missing_pkgs[@]}" ;;
+            npm) sudo npm install -g "${missing_pkgs[@]}" ;;
             gem) 
-                # GEM için özel düzeltme: Gem paketleri genellikle tek tek kurulur
                 for gem_pkg in "${missing_pkgs[@]}"; do
-                    gem install "$gem_pkg"
+                    sudo gem install "$gem_pkg"
                 done
                 ;;
         esac
@@ -195,6 +218,58 @@ install_tool() {
     fi
 }
 
+install_theme() {
+    local theme_name="$1"
+
+    # Kali Linux / Normal Linux Koruması
+    if [ "$IS_TERMUX" = false ]; then
+        echo -e "\n  ${Y}[${R}⦸${Y}]${R} Hata: Bu tema yapısı sadece Termux ortamı için tasarlanmıştır!"
+        sleep 2
+        return 1
+    fi
+
+    case "$theme_name" in
+        "Parrot")
+            echo -e "\n ${C} [${Y}i${C}]${G} ParrotOS-T: Parrot OS theme for Termux."
+
+            # Yedekleme fonksiyonunu çağırıyoruz
+            backup_files 
+
+            # İndirme ve Uygulama
+            (
+             if curl -sLf "$Raw/FileStore/master/Software%20Files/ParrotOS.trmx?t=$(date +%s)" -o "$Etc/bash.bashrc" && \
+                curl -sLf "$Raw/FileStore/master/Software%20Files/Terkey.trmx?t=$(date +%s)" -o "$Termux/termux.properties"; then
+                 $Reload
+             else
+                 restore_files # Hata durumunda yedekleri geri yükle
+             fi
+            ) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading ParrotOS-T..." " ${W}⟫${G} Complete."
+            ;;
+
+        "TheDarkRoot")
+            echo -e "\n ${C} [${Y}i${C}]${G} TheDarkRoot-T: TheDarkRoot theme for Termux."
+
+            # Yedekleme fonksiyonunu çağırıyoruz
+            backup_files 
+
+            # İndirme ve Uygulama
+            (
+             if curl -sLf "$Raw/FileStore/master/Software%20Files/TheDarkRoot.trmx?t=$(date +%s)" -o "$Etc/bash.bashrc" && \
+                curl -sLf "$Raw/FileStore/master/Software%20Files/Terkey.trmx?t=$(date +%s)" -o "$Termux/termux.properties"; then
+                 $Reload
+             else
+                 restore_files # Hata durumunda yedekleri geri yükle
+             fi
+            ) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading TheDarkRoot-T..." " ${W}⟫${G} Complete."
+            ;;
+            
+        *)
+            echo -e "\n  ${Y}[${R}⦸${Y}]${R} Hata: Geçersiz tema adı!"
+            return 1
+            ;;
+    esac
+}
+
 # Backup
 backup_files() {
     [ -f "$Etc/bash.bashrc" ] && cp "$Etc/bash.bashrc" "$Etc/bash.bashrc.bckp"
@@ -226,7 +301,12 @@ run_update () {
 	# Termux Permissions
 	#( termux-setup-storage; termux-wake-lock && $Reload; sleep 3 ) &>> ~/.TermuxPermissions_debug.log & spin "${C}[${Y}↓${C}]${G} Permission..." " ${W}⟫${G} Complete."
 	# Termux Update
-	( pkg update -y; pkg upgrade -y && $Reload; ) &>> ~/.TermuxUpdate_debug.log & spin "${C}[${Y}↓${C}]${G} Updating..." " ${W}⟫${G} Complete."
+	(
+	 export DEBIAN_FRONTEND=noninteractive
+	 pkg update -y
+	 apt-get upgrade -y -o Dpkg::Options::="--force-confold" -o Dpkg::Options::="--force-confdef"
+	 $Reload
+	) &>> ~/.TermuxUpdate_debug.log & spin "${C}[${Y}↓${C}]${G} Updating..." " ${W}⟫${G} Complete."
 	# Termux Packages Installing
 	(
       install_packages pkg termux-tools coreutils binutils git curl wget sed grep gawk bc jq ncurses-utils python ruby php clang make openssh openssl zip unzip tar proot crunch neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet nodejs
@@ -475,36 +555,11 @@ case "$pn_lower" in
         ;;
 
     p)
-        echo -e "\n ${C} [${Y}i${C}]${G} ParrotOS-T: Parrot OS theme for Termux."
-
-		# Yedekleme
-		backup_files # Fonksiyonu çağırıyoruz
-
-		# İndirme ve Uygulama
-		(
-		 if curl -sLf "$Raw/FileStore/master/Software%20Files/ParrotOS.trmx?t=$(date +%s)" -o "$Etc/bash.bashrc" && \
-			curl -sLf "$Raw/FileStore/master/Software%20Files/Terkey.trmx?t=$(date +%s)" -o "$Termux/termux.properties"; then
-			 $Reload
-		 else
-			 restore_files # Fonksiyonu çağırıyoruz
-         fi
-		) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading ParrotOS-T..." " ${W}⟫${G} Complete."
+        install_theme "Parrot"
         ;;
 
     t)
-        echo -e "\n ${C} [${Y}i${C}]${G} TheDarkRoot-T: TheDarkRoot theme for Termux."
-
-		# Yedekleme
-		backup_files # Fonksiyonu çağırıyoruz
-
-        (
-		 if curl -sLf "$Raw/FileStore/master/Software%20Files/TheDarkRoot.trmx?t=$(date +%s)" -o "$Etc/bash.bashrc" && \
-			curl -sLf "$Raw/FileStore/master/Software%20Files/Terkey.trmx?t=$(date +%s)" -o "$Termux/termux.properties"; then
-			 $Reload
-		 else
-			 restore_files # Fonksiyonu çağırıyoruz
-         fi
-		) &>> ~/.TheDarkRoot_debug.log & spin "${C}[${Y}↓${C}]${G} Downloading TheDarkRoot-T..." " ${W}⟫${G} Complete."
+        install_theme "TheDarkRoot"
         ;;
 
     x)
