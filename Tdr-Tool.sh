@@ -327,10 +327,10 @@ run_update () {
         exit $rc
     ) &>> "$Log" & spin "${C}[${Y}↓${C}]${G} Updating..." " ${W}⟫${G} Complete." " ${W}⟫${R} Failed! See: $Log"
 
-    # Termux Packages Installing
+    # Termux Packages Installing (tmate kaldırıldı)
     (
         rc=0
-        install_packages pkg termux-tools coreutils binutils git curl wget sed grep gawk bc jq ncurses-utils python python-pillow ruby php clang make openssh openssl zip unzip tar proot crunch neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet nodejs || rc=1
+        install_packages pkg termux-tools coreutils binutils git curl wget sed grep gawk bc jq ncurses-utils python python-pillow ruby php clang make openssh openssl zip unzip tar proot crunch neofetch nano vim cmatrix sl zsh bash tor privoxy play-audio mpv cowsay figlet toilet nodejs || rc=1
         $Reload
         exit $rc
     ) &>> "$Log" & spin "${C}[${Y}↓${C}]${G} Packages Installing..." " ${W}⟫${G} Complete." " ${W}⟫${R} Some packages failed. See: $Log"
