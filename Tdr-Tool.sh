@@ -9,22 +9,14 @@ R='\033[31;1m'  # Red Light
 C='\033[36;1m'  # Cyan Light
 M='\033[35;1m'  # Magenta Light
 
-if [ -d "/data/data/com.termux/files/home" ]; then
-    IS_TERMUX=true
-    Etc="$PREFIX/etc"
-    Termux="$HOME/.termux"
-    Reload="termux-reload-settings"
-    PKG_MAN="pkg"
-else
-    IS_TERMUX=false
-    Etc="/etc"  # Normal Linux genel bashrc yolu veya doğrudan $HOME/.bashrc seçilebilir
-    Termux="$HOME" 
-    Reload="source $HOME/.bashrc 2>/dev/null || source $HOME/.zshrc 2>/dev/null"
-    PKG_MAN="apt"
+# Sadece Termux: değilse hemen çık
+if [ ! -d "/data/data/com.termux/files/home" ] || [ -z "$PREFIX" ]; then
+    echo -e "\n  ${R}[!] Hata: Tdr-Tool sadece Termux üzerinde çalışır!${W}\n"
+    exit 1
 fi
 
 # $HOME/   - /data/data/com.termux/files/home/
-# $PREFIX/ - /data/data/com.termux/files/usr/etc/
+# $PREFIX/ - /data/data/com.termux/files/usr/
 Etc="$PREFIX/etc"
 Termux="$HOME/.termux"
 Tool="$HOME/Tdr-Tool"
@@ -36,12 +28,10 @@ Raw="https://raw.githubusercontent.com/TheDarkRoot"
 Reload="termux-reload-settings"
 
 # 1. Termux Depolama İzni Kontrolü
-if [ "$IS_TERMUX" = true ]; then
-    if [ ! -d "$HOME/storage" ]; then
-        termux-setup-storage
-        until [ -d "$HOME/storage" ]; do sleep 1; done
-        $Reload
-    fi
+if [ ! -d "$HOME/storage" ]; then
+    termux-setup-storage
+    until [ -d "$HOME/storage" ]; do sleep 1; done
+    $Reload
 fi
 
 # 2. Gerekli Tüm Klasörlerin Oluşturulması
@@ -114,12 +104,7 @@ check_dependencies() {
         echo -e "\n ${C}[${Y}i${C}]${G} Missing dependencies detected: ${missing[*]}"
         echo -e "\n ${C}[${Y}i${C}]${G} Installing automatically, please wait..."
 
-        if [ "$IS_TERMUX" = true ]; then
-            pkg install -y "${missing[@]}" &>> ~/.TheDarkRoot_debug.log
-        else
-            sudo apt-get update -y &>/dev/null
-            sudo apt-get install -y "${missing[@]}" &>> ~/.TheDarkRoot_debug.log
-        fi
+        pkg install -y "${missing[@]}" &>> ~/.TheDarkRoot_debug.log
 
         echo -e "\n\n  ${C}[${G}✓${C}]${G} Setup complete. Restarting...\n"
         sleep 2
@@ -145,15 +130,9 @@ install_packages() {
     shift
     local missing_pkgs=()
 
-    # Eğer Kali'deysek ve manager 'pkg' ise otomatik olarak 'apt'ye çevir
-    if [ "$IS_TERMUX" = false ] && [ "$manager" = "pkg" ]; then
-        manager="apt"
-    fi
-
     for pkg in "$@"; do
         case "$manager" in
             pkg) if ! dpkg -s "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
-            apt) if ! dpkg -s "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
             pip) if ! pip show "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
             npm) if ! npm list -g "$pkg" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
             gem) if ! gem list -i "^$pkg$" &> /dev/null; then missing_pkgs+=("$pkg"); fi ;;
@@ -164,12 +143,11 @@ install_packages() {
         echo -e "\n ${C}[${Y}i${C}]${G} Installing: ${missing_pkgs[*]}"
         case "$manager" in
             pkg) pkg install -y "${missing_pkgs[@]}" ;;
-            apt) sudo apt-get install -y "${missing_pkgs[@]}" ;; # Kali için sudo eklendi
-            pip) pip install --upgrade --break-system-packages "${missing_pkgs[@]}" ;;
-            npm) sudo npm install -g "${missing_pkgs[@]}" ;;
+            pip) pip install --upgrade "${missing_pkgs[@]}" ;;
+            npm) npm install -g "${missing_pkgs[@]}" ;;
             gem) 
                 for gem_pkg in "${missing_pkgs[@]}"; do
-                    sudo gem install "$gem_pkg"
+                    gem install "$gem_pkg"
                 done
                 ;;
         esac
@@ -220,13 +198,6 @@ install_tool() {
 
 install_theme() {
     local theme_name="$1"
-
-    # Kali Linux / Normal Linux Koruması
-    if [ "$IS_TERMUX" = false ]; then
-        echo -e "\n  ${Y}[${R}⦸${Y}]${R} Hata: Bu tema yapısı sadece Termux ortamı için tasarlanmıştır!"
-        sleep 2
-        return 1
-    fi
 
     case "$theme_name" in
         "Parrot")
