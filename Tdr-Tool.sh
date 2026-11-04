@@ -272,24 +272,32 @@ update_self() {
 
 run_update () {
 	echo -e "\n ${C} [${Y}i${C}]${G} Starting the update..."
-	# Termux Update
+
+	# 1. Termux Sistem Güncellemesi (dpkg kilitlenmesini önleyen bayraklarla)
 	(
 	 export DEBIAN_FRONTEND=noninteractive
-	 pkg update -y && pkg upgrade -y
+	 pkg update -y
+	 apt-get --fix-broken install -y
+	 pkg upgrade -y -o Dpkg::Options::="--force-confold" -o Dpkg::Options::="--force-confdef"
 	 $Reload
 	) &>> ~/.TheDarkRoot_debug.log & spin $! "${C}[${Y}↓${C}]${G} Updating..." " ${W}⟫${G} Complete."
 
-	# Termux Packages Installing
+	# 2. Termux Temel Paketleri
 	(
-      install_packages pkg termux-tools coreutils binutils git curl wget sed grep gawk bc jq ncurses-utils python ruby php clang make openssh openssl zip unzip tar proot crunch neofetch nano vim cmatrix sl tmate zsh bash tor privoxy play-audio mpv cowsay figlet toilet nodejs
+      install_packages pkg termux-tools coreutils binutils git curl wget sed grep gawk bc jq ncurses-utils python ruby php clang make openssh openssl zip unzip tar proot crunch neofetch nano vim cmatrix sl zsh bash tor privoxy play-audio mpv cowsay figlet toilet nodejs
       $Reload
     ) &>> ~/.TheDarkRoot_debug.log & spin $! "${C}[${Y}↓${C}]${G} Packages Installing..." " ${W}⟫${G} Complete."
 
-	# Termux Tools Installing
+	# 3. Pip, NPM ve Gem Araçları
 	(
+	  # Pip güncelleme ve modüller
 	  install_packages pip setuptools wheel bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest-cli
-	  npm install -g npm@latest
+	  
+	  # Node.js modülleri
+	  npm install -g npm@latest 2>/dev/null
 	  install_packages npm readline-sync speed-test
+	  
+	  # Ruby modülleri
 	  install_packages gem lolcat
       $Reload
 	) &>> ~/.TheDarkRoot_debug.log & spin $! "${C}[${Y}↓${C}]${G} Tools Installing..." " ${W}⟫${G} Complete."
