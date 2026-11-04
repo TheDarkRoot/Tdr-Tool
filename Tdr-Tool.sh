@@ -308,7 +308,7 @@ run_update () {
 
 run_speedtest () {
     # Bağımlılık Kontrolü
-    local dependencies=("python3" "awk" "bc" "curl")
+    local dependencies=("python" "awk" "bc" "curl")
     for cmd in "${dependencies[@]}"; do
         if ! command -v "$cmd" &> /dev/null; then
             echo -e "\n  ${C}[${R}!${C}]${R} Error: '$cmd' package missing!"
@@ -325,7 +325,7 @@ run_speedtest () {
         speedtest-cli > "$RAW_FILE" 2>&1
     else
         [ ! -f "$Tool/speedtest.py" ] && curl -sL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py -o "$Tool/speedtest.py"
-        python3 -W ignore "$Tool/speedtest.py" > "$RAW_FILE" 2>&1
+        python -W ignore "$Tool/speedtest.py" > "$RAW_FILE" 2>&1
     fi
 	) &
 	spin $! "${C}[${Y}↓${C}]${G} Testing network speed..." " ${W}⟫${G} Complete." " ${W}⟫${R} Failed!"
@@ -371,19 +371,19 @@ run_speedtest () {
 
     # Raporlama
     echo -e "IP Address: $my_ip\nProvider: $provider\nServer: $server_info\nPing: $ping_val\nDownload: $dl_val\nUpload: $ul_val" > "$RESULT_FILE"
-    echo -e "  ${C}=======================================================${W}"
+    echo -e "  ${C}======================================================${W}"
     echo -e "   ${C}[${Y}WAN${C}]${G} IP Address : ${Y}$my_ip"
     echo -e "   ${C}[${Y}ISP${C}]${G} Provider   : ${Y}$provider"
     echo -e "   ${C}[${Y}SRV${C}]${G} Server     : ${Y}$server_info"
     echo -e "   ${C}[${Y}LAT${C}]${G} Ping       : ${Y}$ping_val"
     echo -e "   ${C}[${Y}OUT${C}]${G} Download   : ${Y}$dl_val"
     echo -e "   ${C}[${Y}INP${C}]${G} Upload     : ${Y}$ul_val"
-    echo -e "  ${C}-------------------------------------------------------${W}"
+    echo -e "  ${C}------------------------------------------------------${W}"
     echo -e "   ${C}[${Y} » ${C}]${M} Browsing Quality  : ${b_qual}"
     echo -e "   ${C}[${Y} » ${C}]${M} Gaming Quality    : ${g_qual}"
     echo -e "   ${C}[${Y} » ${C}]${M} Streaming Quality : ${s_qual}"
     echo -e "   ${C}[${Y} » ${C}]${M} Video Call Quality: ${v_qual}"
-    echo -e "  ${C}=======================================================${W}"
+    echo -e "  ${C}======================================================${W}"
 
     # Temizlik ve Kayıt
     rm -f "$RAW_FILE"
