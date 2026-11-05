@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # -*- coding: utf-8 -*-
-# Tdr-Tool v1.2.8 (Alpha) - gözden geçirilmiş sürüm
+# Tdr-Tool v1.2.7 (Alpha) - gözden geçirilmiş sürüm
 
 # Color
 B='\033[34;1m'  # Blue Light
@@ -31,7 +31,10 @@ LOG="$HOME/.TheDarkRoot_debug.log"
 SCRIPT_PATH="$(readlink -f "$0" 2>/dev/null)"
 MAX_BACKUPS=3
 # Temaların terminal açılışında çağırdığı paketler: her zaman kurulur
-THEME_PKGS="figlet toilet cowsay neofetch ncurses-utils"
+THEME_PKGS="figlet toilet cowsay neofetch ncurses-utils ruby"
+THEME_GEMS="lolcat"
+# Temanın çağırdığı komutlar: kurulumdan sonra bunların varlığı doğrulanır
+THEME_CMDS="figlet toilet cowsay neofetch tput lolcat"
 
 # ---------------------------------------------------------------
 # Log yardımcıları
@@ -93,7 +96,7 @@ ${C} -------------------------------------------------------
 ${G} 0{======================${W} INFO ${G}=======================}0
 ${G} |${Y} [${C}=${Y}]${W} Name     ${C}:${W} Tdr-Tool                             ${G}|
 ${G} |${Y} [${C}=${Y}]${W} Code     ${C}:${W} Shell                                ${G}|
-${G} |${Y} [${C}=${Y}]${W} Version  ${C}:${W} v1.2.8 (Alpha)                       ${G}|
+${G} |${Y} [${C}=${Y}]${W} Version  ${C}:${W} v1.2.7 (Alpha)                       ${G}|
 ${G} |${Y} [${C}=${Y}]${W} Author   ${C}:${W} TheDarkRoot                          ${G}|
 ${G} |${Y} [${C}=${Y}]${W} Github   ${C}:${W} https://github.com/TheDarkRoot       ${G}|
 ${G} |${Y} [${C}=${Y}]${W} Telegram ${C}:${W} @TheDarkRoot (t.me/TheDarkRoot)      ${G}|
@@ -303,6 +306,59 @@ apply_theme_files() {
     return 1
 }
 
+# Tema için gereken tüm paketleri (pkg + gem) kurar ve komutları doğrular
+ensure_theme_requirements() {
+    local tp missing_pkgs=() missing_gems=() missing_cmds=() c
+
+    for tp in $THEME_PKGS; do
+        dpkg -s "$tp" &> /dev/null || missing_pkgs+=("$tp")
+    done
+
+    if [ ${#missing_pkgs[@]} -gt 0 ]; then
+        echo -e "\n ${C}[${Y}i${C}]${G} Installing theme requirements (pkg): ${missing_pkgs[*]}"
+        log_step "theme requirements (pkg): ${missing_pkgs[*]}"
+        pkg install -y "${missing_pkgs[@]}" &>> "$LOG" || {
+            echo -e "\n  ${C}[${R}!${C}]${R} Theme requirements (pkg) failed. Check $LOG"
+            return 1
+        }
+    fi
+
+    # gem paketleri (ruby yukarıda kurulduğu için gem artık mevcut)
+    if ! command -v gem &> /dev/null; then
+        echo -e "\n  ${C}[${R}!${C}]${R} 'gem' command not found (ruby missing)."
+        return 1
+    fi
+    for tp in $THEME_GEMS; do
+        gem list -i "^$tp$" &> /dev/null || missing_gems+=("$tp")
+    done
+
+    if [ ${#missing_gems[@]} -gt 0 ]; then
+        echo -e "\n ${C}[${Y}i${C}]${G} Installing theme requirements (gem): ${missing_gems[*]}"
+        log_step "theme requirements (gem): ${missing_gems[*]}"
+        for tp in "${missing_gems[@]}"; do
+            gem install --no-document "$tp" &>> "$LOG" || {
+                echo -e "\n  ${C}[${R}!${C}]${R} Theme requirements (gem: $tp) failed. Check $LOG"
+                return 1
+            }
+        done
+    fi
+
+    # Yeni kurulan komutların bu oturumda bulunabilmesi için hash tablosunu yenile
+    hash -r
+
+    # Son doğrulama: her komut gerçekten çalıştırılabilir mi?
+    for c in $THEME_CMDS; do
+        command -v "$c" &> /dev/null || missing_cmds+=("$c")
+    done
+    if [ ${#missing_cmds[@]} -gt 0 ]; then
+        echo -e "\n  ${C}[${R}!${C}]${R} Still not found after install: ${missing_cmds[*]}"
+        log_step "theme requirements: commands missing ${missing_cmds[*]}"
+        return 1
+    fi
+
+    return 0
+}
+
 install_theme() {
     local theme_name="$1"
     local rc_file label
@@ -329,17 +385,9 @@ install_theme() {
 
     # Tema, kurulu olmayan bir komutu çağırıp hata vermesin
     # (Update seçeneği hiç çalıştırılmamış olsa bile)
-    local missing_theme_pkgs=() tp
-    for tp in $THEME_PKGS; do
-        dpkg -s "$tp" &> /dev/null || missing_theme_pkgs+=("$tp")
-    done
-    if [ ${#missing_theme_pkgs[@]} -gt 0 ]; then
-        echo -e "\n ${C}[${Y}i${C}]${G} Installing theme requirements: ${missing_theme_pkgs[*]}"
-        log_step "install_theme: requirements ${missing_theme_pkgs[*]}"
-        if ! pkg install -y "${missing_theme_pkgs[@]}" &>> "$LOG"; then
-            echo -e "\n  ${C}[${R}!${C}]${R} Theme requirements failed to install. Check $LOG"
-            return 1
-        fi
+    if ! ensure_theme_requirements; then
+        echo -e "\n  ${C}[${R}!${C}]${R} Theme was NOT applied (requirements incomplete)."
+        return 1
     fi
 
     backup_files
