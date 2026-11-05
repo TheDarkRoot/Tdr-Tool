@@ -30,6 +30,8 @@ Reload="termux-reload-settings"
 LOG="$HOME/.TheDarkRoot_debug.log"
 SCRIPT_PATH="$(readlink -f "$0" 2>/dev/null)"
 MAX_BACKUPS=3
+# Temaların terminal açılışında çağırdığı paketler: her zaman kurulur
+THEME_PKGS="figlet toilet cowsay neofetch ncurses-utils"
 
 # ---------------------------------------------------------------
 # Log yardımcıları
@@ -91,7 +93,7 @@ ${C} -------------------------------------------------------
 ${G} 0{======================${W} INFO ${G}=======================}0
 ${G} |${Y} [${C}=${Y}]${W} Name     ${C}:${W} Tdr-Tool                             ${G}|
 ${G} |${Y} [${C}=${Y}]${W} Code     ${C}:${W} Shell                                ${G}|
-${G} |${Y} [${C}=${Y}]${W} Version  ${C}:${W} v1.2.7 (Alpha)                       ${G}|
+${G} |${Y} [${C}=${Y}]${W} Version  ${C}:${W} v1.2.8 (Alpha)                       ${G}|
 ${G} |${Y} [${C}=${Y}]${W} Author   ${C}:${W} TheDarkRoot                          ${G}|
 ${G} |${Y} [${C}=${Y}]${W} Github   ${C}:${W} https://github.com/TheDarkRoot       ${G}|
 ${G} |${Y} [${C}=${Y}]${W} Telegram ${C}:${W} @TheDarkRoot (t.me/TheDarkRoot)      ${G}|
@@ -170,32 +172,59 @@ check_dependencies
 install_packages() {
     local manager="$1"
     shift
-    local missing_pkgs=()
-    local p rc=0
+    local to_install=() to_update=() skipped=()
+    local p key outdated=""
+
+    # Güncel olmayan paketlerin listesini bir kez al
+    case "$manager" in
+        pkg) outdated=$(apt list --upgradable 2>/dev/null | awk -F/ 'NR>1 {print $1}') ;;
+        pip) outdated=$(pip list --outdated --format=freeze 2>/dev/null | cut -d= -f1 | tr 'A-Z_' 'a-z-') ;;
+        npm) outdated=$(npm outdated -g --parseable 2>/dev/null | awk -F: '{print $1}' | sed 's#.*/node_modules/##') ;;
+        gem) outdated=$(gem outdated 2>/dev/null | awk '{print $1}') ;;
+    esac
 
     for p in "$@"; do
+        local installed=1
         case "$manager" in
-            pkg) dpkg -s "$p" &> /dev/null || missing_pkgs+=("$p") ;;
-            pip) pip show "$p" &> /dev/null || missing_pkgs+=("$p") ;;
-            npm) npm list -g "$p" &> /dev/null || missing_pkgs+=("$p") ;;
-            gem) gem list -i "^$p$" &> /dev/null || missing_pkgs+=("$p") ;;
+            pkg) dpkg -s "$p" &> /dev/null || installed=0 ;;
+            pip) pip show "$p" &> /dev/null || installed=0 ;;
+            npm) npm list -g "$p" &> /dev/null || installed=0 ;;
+            gem) gem list -i "^$p$" &> /dev/null || installed=0 ;;
         esac
+
+        key="$p"
+        [ "$manager" = "pip" ] && key=$(echo "$p" | tr 'A-Z_' 'a-z-')
+
+        if [ "$installed" -eq 0 ]; then
+            to_install+=("$p")
+        elif echo "$outdated" | grep -qxF "$key"; then
+            to_update+=("$p")
+        else
+            skipped+=("$p")
+        fi
     done
 
-    if [ ${#missing_pkgs[@]} -gt 0 ]; then
-        echo -e "\n ${C}[${Y}i${C}]${G} Installing ($manager): ${missing_pkgs[*]}"
+    local rc=0
+    [ ${#skipped[@]} -gt 0 ] && echo -e "\n ${C}[${Y}=${C}]${G} ($manager) Up to date, skipped: ${skipped[*]}"
+    [ ${#to_update[@]} -gt 0 ] && echo -e "\n ${C}[${Y}↑${C}]${G} ($manager) Updating: ${to_update[*]}"
+    [ ${#to_install[@]} -gt 0 ] && echo -e "\n ${C}[${Y}+${C}]${G} ($manager) Installing: ${to_install[*]}"
+
+    local todo=("${to_install[@]}" "${to_update[@]}")
+    if [ ${#todo[@]} -gt 0 ]; then
         case "$manager" in
-            pkg) pkg install -y "${missing_pkgs[@]}" || rc=1 ;;
-            pip) pip install --break-system-packages "${missing_pkgs[@]}" || rc=1 ;;
-            npm) npm install -g "${missing_pkgs[@]}" || rc=1 ;;
+            pkg) pkg install -y -o Dpkg::Options::="--force-confold" -o Dpkg::Options::="--force-confdef" "${todo[@]}" || rc=1 ;;
+            pip) pip install --upgrade --break-system-packages "${todo[@]}" || rc=1 ;;
+            npm)
+                for p in "${todo[@]}"; do
+                    npm install -g "$p@latest" || rc=1
+                done
+                ;;
             gem)
-                for p in "${missing_pkgs[@]}"; do
+                for p in "${todo[@]}"; do
                     gem install "$p" || rc=1
                 done
                 ;;
         esac
-    else
-        echo -e "\n ${C}[${Y}i${C}]${G} ($manager) All packages are already installed."
     fi
     return $rc
 }
@@ -298,6 +327,21 @@ install_theme() {
         return 1
     fi
 
+    # Tema, kurulu olmayan bir komutu çağırıp hata vermesin
+    # (Update seçeneği hiç çalıştırılmamış olsa bile)
+    local missing_theme_pkgs=() tp
+    for tp in $THEME_PKGS; do
+        dpkg -s "$tp" &> /dev/null || missing_theme_pkgs+=("$tp")
+    done
+    if [ ${#missing_theme_pkgs[@]} -gt 0 ]; then
+        echo -e "\n ${C}[${Y}i${C}]${G} Installing theme requirements: ${missing_theme_pkgs[*]}"
+        log_step "install_theme: requirements ${missing_theme_pkgs[*]}"
+        if ! pkg install -y "${missing_theme_pkgs[@]}" &>> "$LOG"; then
+            echo -e "\n  ${C}[${R}!${C}]${R} Theme requirements failed to install. Check $LOG"
+            return 1
+        fi
+    fi
+
     backup_files
     log_step "install_theme: $theme_name"
 
@@ -353,30 +397,22 @@ run_update() {
     ) &>> "$LOG" &
     spin $! "${C}[${Y}↓${C}]${G} Updating..." " ${W}⟫${G} Complete."
 
-    # 2. Temel paketler
+    # 2. Termux paketleri (hepsi sorusuz kurulur; kuruluysa sürüm kontrolü yapılır)
     (
         rc=0
         install_packages pkg termux-tools coreutils binutils git curl wget sed grep gawk bc jq \
             ncurses-utils python ruby php clang make openssh openssl zip unzip tar proot crunch \
-            nano vim zsh bash tor privoxy nodejs || rc=1
+            neofetch nano vim cmatrix sl zsh bash tor privoxy play-audio mpv cowsay figlet toilet \
+            nodejs || rc=1
         $Reload
         exit $rc
     ) &>> "$LOG" &
     spin $! "${C}[${Y}↓${C}]${G} Packages Installing..." " ${W}⟫${G} Complete."
 
-    # 2b. İsteğe bağlı eğlence paketleri
-    read -r -p " $(echo -e " ${C}[${Y}?${C}]${M} Install extras (fastfetch, cmatrix, sl, cowsay, figlet, toilet, mpv)? (y/N): ${Y}")" extras
-    if [[ "${extras,,}" == y* ]]; then
-        (
-            install_packages pkg fastfetch cmatrix sl cowsay figlet toilet mpv play-audio
-        ) &>> "$LOG" &
-        spin $! "${C}[${Y}↓${C}]${G} Extras Installing..." " ${W}⟫${G} Complete."
-    fi
-
     # 3. Pip, NPM ve Gem araçları
     (
         rc=0
-        install_packages pip bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest-cli || rc=1
+        install_packages pip setuptools wheel bs4 requests mechanize passlib progressbar2 pillow termcolor speedtest-cli || rc=1
         install_packages npm readline-sync speed-test || rc=1
         install_packages gem lolcat || rc=1
         $Reload
